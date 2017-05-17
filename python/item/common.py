@@ -87,7 +87,8 @@ def log(*items, level=logging.INFO):
 
 
 def make_database_dirs(path, dry_run):
-    log('Creating database directories in: {}'.format(path))
+    # Don't use log() here, as it prematurely causes the logfile to be opened
+    print('Creating database directories in: {}'.format(path))
 
     dirs = [
         ('model', 'database'),
