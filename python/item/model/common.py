@@ -8,23 +8,12 @@ import xarray as xr
 import yaml
 
 from item.common import log, paths
+from item.model.dimensions import INDEX
 
 
 # Information about the models
 MODELS = {}
 SCENARIOS = None
-
-# List of the index columns required to identify all data series
-INDEX = [
-    'model',
-    'scenario',
-    'region',
-    'variable',
-    'mode',
-    'technology',
-    'fuel',
-    'unit',
-    ]
 
 
 def as_xarray(data, version, fmt):

@@ -26,8 +26,8 @@ import xarray as xr
 import yaml
 
 from item.common import paths, log
-from item.model.common import as_xarray, data_columns, INDEX, tidy, select
-from item.model.dimensions import load_template
+from item.model.common import as_xarray, data_columns, tidy, select
+from item.model.dimensions import INDEX, load_template
 
 
 __all__ = [

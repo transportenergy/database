@@ -5,14 +5,24 @@ import pandas as pd
 import yaml
 
 from item.common import paths
-from item.model.common import as_xarray
 
 
-# Information
+# Metadata on database dimensions
 INFO = {}
 
+# List of the index columns required to identify all data series
+INDEX = [
+    'model',
+    'scenario',
+    'region',
+    'variable',
+    'mode',
+    'technology',
+    'fuel',
+    'unit',
+    ]
 
-# Constants for select()
+# Constants, for e.g. select()
 ALL = 'All'
 PAX = None
 FREIGHT = None
@@ -161,14 +171,15 @@ def list_pairs(in_file, out_file):
 
 
 def load_template(version):
+    """Load a data submission template for *version*."""
     qty = pd.read_csv(join(dir, 'iTEM{}_template.csv'.format(version)))
     qty['model'] = ''
     qty['scenario'] = ''
     qty['region'] = ''
     qty['2005'] = True
 
-    result = as_xarray(qty).sel(Year='2005').squeeze().drop(['model'])
-
+    # result = as_xarray(qty).sel(Year='2005').squeeze().drop(['model'])
+    result = qty
     return result
 
 
