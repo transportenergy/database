@@ -1,5 +1,5 @@
-R tools for accessing & maintaining the iTEM databases
-======================================================
+R tools for the iTEM databases
+==============================
 
 Installation
 ------------
@@ -8,8 +8,7 @@ Use [`devtools`](https://cran.r-project.org/package=devtools). From source (for 
 
 ```
 $ git clone git@github.com:transportenergy/database.git
-$ R
-> devtools::install_local('database/R/item')
+$ Rscript -e "devtools::install_local('database/R/item')"
 ```
 
 Or without cloning the repository:
