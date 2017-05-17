@@ -8,6 +8,16 @@ from item.common import paths
 from item.model.common import as_xarray
 
 
+# Information
+INFO = {}
+
+
+# Constants for select()
+ALL = 'All'
+PAX = None
+FREIGHT = None
+
+
 def check(A, out_file):
     """Compare a table of quantities, *A*, to the official list.
 
@@ -31,8 +41,9 @@ def check(A, out_file):
     merged.sort_values(by=cols).to_csv(out_file, sep='\t')
 
 
-def generate():
-    """Attempt to generate the reporting quantities from simple rules."""
+def load():
+    global PAX, FREIGHT
+
     # Read the lists of allowable labels for each data dimension
     data = OrderedDict()
     path = join(paths['data'], 'model', 'dimensions')
@@ -45,7 +56,9 @@ def generate():
     all_modes = frozenset(mode.keys())
     pax_modes = frozenset([m for m, info in mode.items()
                            if info['type'] == 'passenger'])
+    PAX = pax_modes
     freight_modes = all_modes - pax_modes
+    FREIGHT = freight_modes
 
     # Read allowable combinations of data dimensions
     # *mode_tech* and *tech_fuel* are now dictionaries mapping from labels on
@@ -62,11 +75,21 @@ def generate():
         f = tuple(['All'] + list(f))
     tech_fuel['All'] = ['All']
 
+    INFO.update(data)
+    INFO.update({
+        'modes_all': all_modes,
+        'mode_tech': mode_tech,
+        'tech_fuel': tech_fuel,
+        })
+
+
+def generate():
+    """Attempt to generate the reporting quantities from simple rules."""
     # Generate the list of quantities
     index = []
 
     # Iterate through each variable, in order
-    for name, var_info in variable.items():
+    for name, var_info in INFO['variable'].items():
         # Determine which modes are reported for this variable
         if var_info.get('global', False):
             # First eight are global quantities—only 'All' modes
@@ -76,9 +99,9 @@ def generate():
             var_type = var_info.get('type', None)
 
             if var_type == 'passenger':
-                modes = set(pax_modes)
+                modes = set(PAX)
             elif var_type == 'freight':
-                modes = set(freight_modes)
+                modes = set(FREIGHT)
             elif name == 'intensity_new':
                 # A specific subset is used for this variable
                 modes = {'2W', 'Aviation', 'Bus', 'HDT', 'LDV',
@@ -86,7 +109,7 @@ def generate():
             else:
                 # Other variables are reported for all modes, minus the
                 # exclusions below
-                modes = set(all_modes)
+                modes = set(INFO['modes_all'])
 
             # Further exclusions from some variables
             if name in ['ef_bc', 'intensity_service', 'tkm', 'ttw_bc',
@@ -103,8 +126,8 @@ def generate():
         # Add one entry to quantities for each allowable combination of
         # dimensions
         for m in ['All'] + sorted(modes):
-            for t in mode_tech[m]:
-                for f in tech_fuel[t]:
+            for t in INFO['mode_tech'][m]:
+                for f in INFO['tech_fuel'][t]:
                     index.append([name, m, t, f, var_info['unit']])
 
     # Combine into a single table and return
@@ -147,3 +170,6 @@ def load_template(version):
     result = as_xarray(qty).sel(Year='2005').squeeze().drop(['model'])
 
     return result
+
+
+load()
