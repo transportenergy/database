@@ -1,0 +1,13 @@
+# Mapping of EIA WEPS+ ITEDD 'flow' → iTEM 'mode'
+ROAD: 2W and 3W
+AIR: Aviation
+ROAD: Bus
+DOMESNAV: Domestic Shipping
+RAIL: Freight Rail
+RAIL: Freight Rail and Air and Ship
+ROAD: HDT
+MARBUNK: International Shipping
+ROAD: LDV
+RAIL: Passenger Rail
+ROAD: Road
+RAIL: Rai
