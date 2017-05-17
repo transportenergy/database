@@ -68,6 +68,17 @@ def debug():
     _dump(paths)
 
 
+@main.command()
+@click.option('--dry-run', '-n', is_flag=True,
+              help='Only show what would be done.')
+@click.argument('path', type=click.Path())
+def mkdirs(path, dry_run):
+    """Create a directory tree for the database."""
+    from item.common import make_database_dirs
+
+    make_database_dirs(path, dry_run)
+
+
 main.add_command(model)
 main.add_command(stats)
 

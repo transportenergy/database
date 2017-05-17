@@ -1,4 +1,3 @@
-from os import makedirs
 from os.path import join
 import shutil
 import tempfile
@@ -26,14 +25,16 @@ def item_tmp_dir():
     |  |- processed
 
     """
-    from item.common import init_paths
+    from item.common import init_paths, make_database_dirs
 
     local_data = pytest.config.getoption('--local-data')
 
     path = tempfile.mkdtemp()
     try:
-        for sub in ['raw', 'processed', 'database']:
-            makedirs(join(path, 'model', sub))
+        # Create the directories
+        make_database_dirs(path, False)
+
+        # Override configuration for the test suite
         paths = {
             'log': path,
             'model': path,
@@ -41,7 +42,9 @@ def item_tmp_dir():
             'model database': join(local_data, 'model', 'database'),
             }
         init_paths(**paths)
-        print(path)
+
+        # For use by test functions
         yield path
     finally:
+        # Remove the whole tree
         shutil.rmtree(path)

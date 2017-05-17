@@ -84,3 +84,21 @@ def log(*items, level=logging.INFO):
         _logger.info(*items)
     elif level == logging.DEBUG:
         _logger.debug(*items)
+
+
+def make_database_dirs(path, dry_run):
+    log('Creating database directories in: {}'.format(path))
+
+    dirs = [
+        ('model', 'database'),
+        ('model', 'processed'),
+        ('model', 'raw'),
+        ('stats',),
+        ]
+    dirs = [path] + [join(path, *d) for d in dirs]
+
+    for dirname in dirs:
+        if dry_run:
+            log('  ' + dirname)
+        else:
+            makedirs(dirname, exist_ok=True)
