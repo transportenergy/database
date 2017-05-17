@@ -155,6 +155,7 @@ def tidy(df):
 
 def select(data, *args, **kwargs):
     """Select from *data*."""
+    # Process arguments
     if len(args) > 1:
         raise ValueError(("can't determine dimensions for >1 positional "
                           "arguments: {}").format(' '.join(args)))
@@ -168,6 +169,13 @@ def select(data, *args, **kwargs):
     if len(args) and dims['variable'] is None:
         dims['variable'] = set(args)
 
+    # Code to this point is generic (doesn't depend on the format of *data*)
+
+    if isinstance(data, xr.Dataset) or isinstance(data, dict):
+        # TODO write methods for these other data types
+        raise NotImplementedError
+
+    # pandas.DataFrame
     # Construct a boolean mask
     keep = None
     for d, v in dims.items():
@@ -180,6 +188,11 @@ def select(data, *args, **kwargs):
 
     # Subset the data and return
     return data[keep]
+
+
+def squash_scenarios(data):
+    """Replace the per-model scenario names with categories."""
+    raise NotImplementedError
 
 
 load()

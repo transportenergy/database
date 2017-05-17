@@ -25,6 +25,7 @@ Contents
       - are named to match the keys in `models.yaml`,
       - contain model-specific metadata, including but not limited to:
         - `regions.yaml`: regional aggregation.
+        - `scenarios.yaml`: descriptions of scenarios submitted to each iTEM workshop.
   - `item_config_example.yaml` — an example configuration file.
 - `python/` — Python code for accessing & maintaining the database. See [`python/README.md`](https://github.com/transportenergy/database/blob/master/python/README.md).
 - `R/` — R code for accessing & maintaining the database. See [`R/README.md`](https://github.com/transportenergy/database/blob/master/R/README.md).

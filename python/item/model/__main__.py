@@ -1,7 +1,11 @@
 from click import Argument, Command, Group
 
 from item.model import process_raw
-from item.model.dimensions import list_pairs
+from item.model.dimensions import (
+    list_pairs,
+    make_regions_csv,
+    make_regions_yaml,
+    )
 from item.model.plot import plot_all_item1
 
 
@@ -24,6 +28,18 @@ add(process_raw,
 add(list_pairs,
     Argument(['in_file'], default='quantities.tsv'),
     Argument(['out_file'], default='pairs.txt'),
+    )
+
+add(make_regions_csv,
+    Argument(['models'], help='List of models to output'),
+    Argument(['out_file']),
+    )
+
+add(make_regions_yaml,
+    Argument(['in_file']),
+    Argument(['country'], help='IN_FILE column with country codes'),
+    Argument(['region'], help='IN_FILE column with region names'),
+    Argument(['out_file']),
     )
 
 add(plot_all_item1)

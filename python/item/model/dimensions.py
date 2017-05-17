@@ -183,4 +183,14 @@ def load_template(version):
     return result
 
 
+def make_regions_csv(out_file, models):
+    """Produce a CSV *out_file* with a country→region map for *models*."""
+    raise NotImplementedError
+
+
+def make_regions_yaml(in_file, country, region, out_file):
+    """Convert a country→region map from CSV *in_file* to YAML *out_file*."""
+    raise NotImplementedError
+
+
 load()
