@@ -1,0 +1,28 @@
+Package: item
+Version: 0.1
+Title: R tools for accessing & maintaining the iTEM databases
+Description: R tools for accessing & maintaining the iTEM databases.
+License: GPL-3
+Author: c(
+    person("Kishimoto", "Paul Natsuo", "mail@paul.kishimoto.name", "cre")
+    )
+Maintainer: Paul Natsuo Kishimoto <mail@paul.kishimoto.name>
+BugReports: https://github.com/transportenergy/database/issues
+Depends:
+    R (>= 3.1.0)
+Imports:
+    reshape2,
+    optparse,
+    R.utils,
+    utils,
+    yaml
+Suggests:
+    testthat
+LazyData: true
+Collate:
+    'common.R'
+    'cli.R'
+    'item.R'
+    'model-.R'
+    'model-downscale.R'
+RoxygenNote: 6.0.1

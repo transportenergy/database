@@ -1,0 +1,3 @@
+#!/usr/bin/env Rscript
+options(`item wd`=getwd())
+devtools::test('item')

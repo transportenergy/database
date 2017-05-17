@@ -1,0 +1,4 @@
+#!/usr/bin/env Rscript
+options(`item wd`=getwd())
+devtools::load_all('item')
+item::cli()

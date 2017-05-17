@@ -14,7 +14,7 @@ following in item_config.yaml:
 
        $ ./run --path model_raw ../custom/data/location COMMAND
 
- Underscores are converted to spaced automatically.
+Underscores are converted to spaces automatically.
 
 In a Python script, the following is equivalent:
 
