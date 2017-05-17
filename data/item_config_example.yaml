@@ -1,0 +1,14 @@
+# Template for item_config.yaml, a file to configure the iTEM tools
+
+# Paths to data and other information
+path:
+  # Location of the model database
+  model: ../../data/model
+
+  # Location for cached data
+  cache: ../../data/cache
+
+  # Location for the item.log file containing logs from the tools
+  # log: .
+
+# No other configuration options are currently recognized

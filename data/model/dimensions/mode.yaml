@@ -1,0 +1,37 @@
+2W:
+  type: passenger
+  description: two-wheeled vehicles (motorcycles, scooters, e-bikes, etc.)
+
+3W:
+  type: passenger
+  description: three-wheeled vehicles (rickshaws, etc.)
+
+Aviation:
+  type: passenger
+
+Bus:
+  type: passenger
+
+Domestic Shipping:
+  type: freight
+
+Freight Rail:
+  type: freight
+
+Freight Rail and Air and Ship:
+  type: freight
+  description: residual category for any models that do not represent these three modes explicitly
+
+HDT:
+  type: freight
+  description: heavy-duty freight trucks
+
+International Shipping:
+  type: freight
+
+LDV:
+  type: passenger
+  description: light-duty passenger cars and trucks/SUVs/vans
+
+Passenger Rail:
+  type: passenger

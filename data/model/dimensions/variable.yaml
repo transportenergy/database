@@ -1,0 +1,135 @@
+Population:
+  global: true
+  unit: 10⁶ persons
+  description: human population
+
+PPP-GDP:
+  global: true
+  unit: 10⁹ 2005 USD / year
+  description: gross domestic product in terms of purchasing power parity (PPP)
+
+Carbon Price:
+  global: true
+  unit: 2005 USD / t CO₂-eq
+  description: for models that use a carbon price to incentivize carbon reductions across sectors"
+
+CO2 Emissions (all sectors):
+  global: true
+  unit: Mt CO₂ / year
+  description: variable that is only relevant for multi-sector models (i.e., the IAMs that represent transport and everything else)"
+
+GHG Emissions (all sectors):
+  global: true
+  unit: Mt CO₂-eq / year
+  description: variable that is only relevant for multi-sector models (i.e., the IAMs that represent transport and everything else)"
+
+CO2 Concentration:
+  global: true
+  unit: ppm
+  description: variable that is only relevant for multi-sector models that are coupled with a climate model (i.e., the IAMs)"
+
+CO2eq Concentration (incl. all forcing agents):
+  global: true
+  unit: ppm
+  description: variable that is only relevant for multi-sector models that are coupled with a climate model (i.e., the IAMs)
+
+Radiative Forcing:
+  global: true
+  unit: W / m²
+  description: variable that is only relevant for multi-sector models that are coupled with a climate model (i.e., the IAMs)
+
+ef_bc:
+  unit: g / MJ
+  description: emissions factor for black carbon (in terms of energy units)
+
+ef_co2 (service):
+  type: passenger
+  unit: g / passenger-km
+  description: emissions factor for carbon dioxide (in terms of service demand units)
+
+ef_co2 (service):
+  type: freight
+  unit: g / tonne-km
+  description: emissions factor for carbon dioxide (in terms of service demand units)
+
+ef_co2:
+  unit: g / vehicle-km
+  description: emissions factor for carbon dioxide (in terms of vehicle use units)
+
+energy:
+  unit: PJ / year
+  description: energy use at the final energy (end-use transport sub-sector) level
+
+intensity_new:
+  unit: MJ / vehicle-km
+  description: energy intensity (efficiency) of new vehicle technologies (in vehicle use units)
+
+intensity_service:
+  type: passenger
+  unit: MJ / passenger-km
+  description: energy intensity (efficiency) of existing stock of vehicle technologies (in terms of service demand units)
+
+intensity_service:
+  type: freight
+  unit: MJ / tonne-km
+  description: energy intensity (efficiency) of existing stock of vehicle technologies (in terms of service demand units)
+
+intensity:
+  unit: MJ / vehicle-km
+  description: energy intensity (efficiency) of existing stock of vehicle technologies (in terms of vehicle use units)
+
+pkm:
+  type: passenger
+  unit: 10⁹ passenger-km / year
+  description: passenger-kilometers traveled
+
+sales:
+  type: passenger
+  unit: 10⁶ vehicle / year
+  description: vehicle sales in a given year
+
+stock:
+  type: passenger
+  unit: 10⁶ vehicle
+  description: existing vehicle stock (fleet) in a given year
+
+tkm:
+  type: freight
+  unit: 10⁹ tonne-km / year
+  description: tonne-kilometers traveled
+
+ttw_bc:
+  unit: kt BC / year
+  description: tank-to-wheel (i.e., direct) emissions of black carbon
+
+ttw_ch4:
+  unit: kt CH₄ / year
+  description: tank-to-wheel (i.e., direct) emissions of methane
+
+ttw_co2:
+  unit: Mt CO₂ / year
+  description: tank-to-wheel (i.e., direct) emissions of carbon dioxide
+
+ttw_co2e:
+  unit: Mt CO₂-eq / year
+  description: tank-to-wheel (i.e., direct) emissions of all Kyoto GHGs (in terms of CO2-equivalent emissions)
+
+ttw_n2o:
+  unit: kt N₂O / year
+  description: tank-to-wheel (i.e., direct) emissions of nitrous oxide
+
+ttw_pm2.5:
+  unit: kt PM2.5 / year
+  description: tank-to-wheel (i.e., direct) emissions of fine particulate matter
+
+vkt:
+  unit: 10⁹ vehicle-km / year
+  description: vehicle-kilometers traveled
+
+wtt_co2e:
+  unit: Mt CO₂ / year
+  description: well-to-tank (i.e., upstream) emissions of all Kyoto GHGs (in terms of CO2-equivalent emissions)
+
+wtw_co2e:
+  unit: Mt CO₂-eq / year
+  description: well-to-wheel (i.e., lifecycle) emissions of all Kyoto GHGs (in terms of CO2-equivalent emissions)

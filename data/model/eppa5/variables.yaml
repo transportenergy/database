@@ -1,0 +1,131 @@
+# Units used for conversions
+
+_units:
+  - 'gallon_gasoline_equivalent = 131.76 * MJ = gge'
+  - 'USD_2004 = [money]'
+  - 'USD_2005 = 1.034 * USD_2004'
+
+# Entries in this file as follows:
+#
+# [EPPA variable]:
+#   item:
+#     quantity: [iTEM Variable, Mode, Technology, Fuel] OR
+#       _dim: [EPPA dimension name for multiple iTEM variables]
+#       [value of _dim]: [ITEM Variable, Mode, Technology, Fuel]
+#       [value of _dim]: [ITEM Variable, Mode, Technology, Fuel]
+#       ...:
+#     unit: [iTEM Unit text]
+#   time: [dimension name or index (-1: last) for time (default: T)]
+#   region: [dimension name or index for region (default: R)]
+#   select: [optional mapping of dimension name → values to select]
+#   convert: [units from, units to (optional)]
+#   agg: [agregation function, false to disable (default: sum)]
+
+AGNP:
+  item:
+    quantity: [PPP-GDP, '', '', '']
+    unit: billion US$2005/yr
+  convert: [1e10 USD_2004, 1e9 USD_2005] # from 10 billions USD @ 2004
+
+POPULATION:
+  item:
+    quantity: [Population, '', '', '']
+    unit: million
+
+co2fi:
+  item:
+    quantity: [CO2 Emissions (all sectors), '', '', '']
+    unit: Mt CO2/yr
+  time: -1
+  region: 0
+
+co2eq:
+  item:
+    quantity: [GHG Emissions (all sectors), '', '', '']
+    unit: Mt CO2-equiv/yr
+
+vehstk:
+  item:
+    quantity: [stock, LDV, All, All]
+    unit: million vehicles
+
+vmt_tot:
+  item:
+    quantity: [vkt, LDV, All, All]
+    unit: bn vkm/yr
+  time: -1
+  region: 0
+  convert: [1e12 mile, 1e9 km]  # from trillion vehicle miles per year
+
+eff_tot:
+  item:
+    quantity: [intensity, LDV, All, All]
+    unit: MJ per vkm
+  time: -1
+  region: 0
+  convert: [mile per gge, MJ per km] # from vehicle miles per gallon
+  agg: false
+
+eff_new:
+  item:
+    quantity: [intensity_new, LDV, All, All]
+    unit: MJ per vkm
+  time: -1
+  region: 0
+  convert: [mile per gge, MJ per km] # from vehicle miles per gallon
+  agg: false
+
+TEECI:
+  item:
+    quantity: [energy, LDV, All, All]
+    unit: PJ/yr
+  select:
+    E: ROIL
+  convert: [EJ, PJ]
+
+htrnem:
+  item:
+    quantity: [ttw_co2, LDV, All, All]
+    unit: Mt CO2/yr
+
+EEI:
+  item:
+    quantity:
+      _dim: E
+      ROIL: [energy, Commercial transport, Liquids, Liquids]
+      OIL: [energy, Commercial transport, Liquids, Crude oil]
+      COAL: [energy, Commercial transport, Coal, Coal]
+      ELEC: [energy, Commercial transport, Electric, Electricity]
+      GAS: [energy, Commercial transport, Natural gas, Natural gas]
+    unit: PJ/yr
+  select:
+    I: TRAN
+  convert: [EJ, PJ]
+
+CEEI:
+  item:
+    quantity:
+      _dim: E
+      ROIL: [ttw_co2, Commercial transport, Liquids, Liquids]
+      OIL: [ttw_co2, Commercial transport, Liquids, Crude oil]
+      COAL: [ttw_co2, Commercial transport, Coal, Coal]
+      ELEC: [ttw_co2, Commercial transport, Electric, Electricity]
+      GAS: [ttw_co2, Commercial transport, Natural gas, Natural gas]
+    unit: Mt CO2/yr
+  select:
+    I: TRAN
+
+sectem:
+  item:
+    quantity: [ttw_co2, Commercial transport, All, All]
+    unit: Mt CO2/yr
+  select:
+    I: TRAN
+
+urban:
+  item:
+    quantity: [ttw_bc, Commercial transport, All, All]
+    unit: kt BC/yr
+  select:
+    URB: BC
+    _urban_1: TRAN

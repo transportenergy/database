@@ -1,0 +1,14 @@
+All:
+
+Liquids:
+  description: All types of liquid fuel that can be combusted onboard a vehicle (e.g., gasoline, diesel, jet fuel, fossil synfuels, biofuels, etc.)
+
+Electricity:
+
+Liquids/Electricity:
+
+Natural gas:
+
+Hydrogen:
+
+Coal:

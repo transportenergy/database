@@ -1,0 +1,40 @@
+bp:
+  format: xlsx
+
+eia:
+  format: null
+
+eppa5:
+  format: gdx
+  model: Emissions Prediction & Policy Analysis (EPPA)
+  model_url: http://globalchange.mit.edu/research/IGSM#economics
+  org: MIT Joint Program on the Science & Policy of Global Change
+  org_url: http://globalchange.mit.edu
+  versions: 2
+
+exxonmobil:
+  format: xlsx
+
+gcam:
+  format: null
+
+get:
+  format: xlsx
+
+itf:
+  format: xlsx
+
+message:
+  format: xlsx
+
+momo:
+  format: null
+
+roadmap:
+  format: csv
+
+shell:
+  format: null
+
+statoil:
+  format: null

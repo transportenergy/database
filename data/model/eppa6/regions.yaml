@@ -1,0 +1,191 @@
+USA:
+  description: United States of America
+  countries: [USA]
+
+CAN:
+  description: Canada
+  countries: [CAN]
+
+MEX:
+  description: Mexico
+  countries: [MEX]
+
+BRA:
+  description: Brazil
+  countries: [BRA]
+
+LAM:
+  description: Rest of Americas
+  countries:
+    - ARG
+    - BOL
+    - CHL
+    - COL
+    - CRI
+    - ECU
+    - GTM
+    - HND
+    - NIC
+    - PAN
+    - PER
+    - PRY
+    - SLV
+    - URY
+    - VEN
+    - XCA
+    - XCB
+    - XNA
+    - XSM
+
+EUR:
+  description: Europe
+  countries:
+    - AUT
+    - BEL
+    - BGR
+    - CHE
+    - CYP
+    - CZE
+    - DEU
+    - DNK
+    - ESP
+    - EST
+    - FIN
+    - FRA
+    - GBR
+    - GRC
+    - HRV
+    - HUN
+    - IRL
+    - ITA
+    - LTU
+    - LUX
+    - LVA
+    - MLT
+    - NLD
+    - NOR
+    - POL
+    - PRT
+    - ROU
+    - SVK
+    - SVN
+    - SWE
+    - XEF
+
+RUS:
+  description: Russian Federation
+  countries: [RUS]
+
+ROE:
+  description: Rest of Europe and Central Asia
+  countries:
+    - ALB
+    - ARM
+    - AZE
+    - BLR
+    - GEO
+    - KAZ
+    - KGZ
+    - TUR
+    - UKR
+    - XEE
+    - XER
+    - XSU
+
+CHN:
+  description: China
+  countries: [CHN, HKG]
+
+IND:
+  description: India
+  countries: [IND]
+
+JPN:
+  description: Japan
+  countries: [JPN]
+
+ASI:
+  description: Dynamic Asia
+  countries:
+    - MYS
+    - PHL
+    - SGP
+    - THA
+    - TWN
+
+
+REA:
+  description: Rest of East Asia
+  countries:
+    - BGD
+    - KHM
+    - LAO
+    - LKA
+    - MMR
+    - MNG
+    - NPL
+    - PAK
+    - VNM
+    - XEA
+    - XSA
+    - XSE
+
+ANZ:
+  description: Australia and Oceania
+  countries:
+    - AUS
+    - NZL
+    - XOC
+    - XTW
+
+MES:
+  description: Middle East
+  countries:
+    - ARE
+    - BHR
+    - IRN
+    - ISR
+    - KWT
+    - OMN
+    - QAT
+    - SAU
+    - XWS
+
+AFR:
+  description: Africa
+  countries:
+    - BWA
+    - CIV
+    - CMR
+    - EGY
+    - ETH
+    - GHA
+    - KEN
+    - MAR
+    - MDG
+    - MOZ
+    - MUS
+    - MWI
+    - NAM
+    - NGA
+    - SEN
+    - TUN
+    - TZA
+    - UGA
+    - XAC
+    - XCF
+    - XEC
+    - XNF
+    - XSC
+    - XWF
+    - ZAF
+    - ZMB
+    - ZWE
+
+KOR:
+  description: South Korea
+  countries: [KOR]
+
+IDZ:
+  description: Indonesia
+  countries: [IDN]

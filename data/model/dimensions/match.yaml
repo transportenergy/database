@@ -1,0 +1,29 @@
+# Allowable combinations
+mode_technology:
+  2W: [BEV, CNG, FCEV, Liquids, Liquids PHEV]
+  3W: [BEV, CNG, FCEV, Liquids, Liquids PHEV]
+  Aviation: [Hydrogen, Liquids]
+  Bus: [BEV, CNG, FCEV, Liquids, Liquids PHEV]
+  Domestic Shipping: [Liquids]
+  Freight Rail: [Coal, Electric, Liquids]
+  Freight Rail and Air and Ship:
+    - Coal
+    - Electric
+    - Hydrogen
+    - Liquids
+    - Natural gas
+  HDT: [BEV, CNG, Electric, FCEV, Liquids, Liquids PHEV]
+  International Shipping: [Hydrogen, Liquids, Natural gas]
+  LDV: [BEV, CNG, FCEV, Liquids, Liquids PHEV]
+  Passenger Rail: [Coal, Electric, Liquids]
+
+technology_fuel:
+  Liquids: [Liquids]
+  Liquids PHEV: [Liquids/Electricity, Liquids, Electricity]
+  BEV: [Electricity]
+  FCEV: [Hydrogen]
+  CNG: [Natural gas]
+  Natural gas: [Natural gas]
+  Electric: [Electricity]
+  Hydrogen: [Hydrogen]
+  Coal: [Coal]

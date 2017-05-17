@@ -1,0 +1,24 @@
+All:
+
+Liquids:
+
+Liquids PHEV:
+  description: Plug-in hybrid electric vehicle
+
+BEV:
+  description: Plug-in battery-electric vehicle (pure electric)
+
+FCEV:
+  description: Fuel cell electric vehicle
+
+CNG:
+  description: Compressed natural gas vehicle
+
+Natural gas:
+  description:
+
+Electric:
+
+Hydrogen:
+
+Coal:
