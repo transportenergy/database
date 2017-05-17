@@ -1,5 +1,6 @@
+*.log
+*.py,cover
+*.pdf
 .cache
 .coverage
-# git correctly handles these without slashes, but GitKraken does not
-**/__pycache__
-**/*.py,cover
+__pycache__
