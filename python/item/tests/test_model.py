@@ -72,3 +72,9 @@ def test_select(item1_data):
     data = select(item1_data, 'energy', tech='All', fuel='All', mode=PAX)
     # print(data.head(), len(data))
     assert len(data) == 6752
+
+
+def test_scenarios():
+    from item.model.common import SCENARIOS
+
+    assert len(SCENARIOS) == 8

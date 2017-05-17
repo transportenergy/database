@@ -1,11 +1,18 @@
 """Common code for data input."""
 from logging import DEBUG
+from os.path import join
 
 import numpy as np
+import pandas as pd
 import xarray as xr
+import yaml
 
-from item.common import log
+from item.common import log, paths
 
+
+# Information about the models
+MODELS = {}
+SCENARIOS = None
 
 # List of the index columns required to identify all data series
 INDEX = [
@@ -109,6 +116,35 @@ def drop_empty(df, columns=None):
     return df
 
 
+def load():
+    """Load model & scenario data."""
+    global SCENARIOS
+
+    with open(join(paths['data'], 'model', 'models.yaml')) as f:
+        MODELS = yaml.load(f)
+
+    # Load scenario information
+    scenarios = []
+    for model in MODELS:
+        fn = join(paths['data'], 'model', model, 'scenarios.yaml')
+        try:
+            with open(fn) as f:
+                m_s = yaml.load(f)
+        except FileNotFoundError:
+            continue
+
+        for version, m_s_v in m_s.items():
+            for name, m_s_v_n in m_s_v.items():
+                scenarios.append({
+                    'model': model,
+                    'version': version,
+                    'scenario': name,
+                    'category': m_s_v_n.get('category')
+                    })
+
+    SCENARIOS = pd.DataFrame(scenarios)
+
+
 def tidy(df):
     # Rename data columns:
     # - remove 'X' preceding years
@@ -155,3 +191,6 @@ def select(data, *args, **kwargs):
 
     # Subset the data and return
     return data[keep]
+
+
+load()

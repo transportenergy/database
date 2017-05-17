@@ -8,7 +8,7 @@ eppa5:
   format: gdx
   model: Emissions Prediction & Policy Analysis (EPPA)
   model_url: http://globalchange.mit.edu/research/IGSM#economics
-  org: MIT Joint Program on the Science & Policy of Global Change
+  org: Massachusetts Institute of Technology (MIT) Joint Program on the Science & Policy of Global Change (JP)
   org_url: http://globalchange.mit.edu
   versions: 2
 
@@ -17,6 +17,7 @@ exxonmobil:
 
 gcam:
   format: null
+  versions: [1, 2]
 
 get:
   format: xlsx
@@ -26,12 +27,19 @@ itf:
 
 message:
   format: xlsx
+  org: International Institute for Applied Systems Analysis (IIASA)
+  versions: [1, 2]
+
 
 momo:
   format: null
+  org: International Energy Agency (IEA)
+  versions: [1, 2]
 
 roadmap:
   format: csv
+  org: International Council on Clean Transportation (ICCT)
+  versions: [1, 2]
 
 shell:
   format: null
