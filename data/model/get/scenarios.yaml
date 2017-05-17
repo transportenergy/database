@@ -1,0 +1,21 @@
+2:
+  BAU:
+    category: reference
+
+  400ppm_withCCS:
+    category: policy
+
+  400ppm_withoutCCS:
+    category: policy
+
+  450ppm_withCCS:
+    category: policy
+
+  450ppm_withoutCCS:
+    category: policy
+
+  550ppm_withCCS:
+    category: policy
+
+  550ppm_withoutCCS:
+    category: policy

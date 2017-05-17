@@ -77,4 +77,4 @@ def test_select(item1_data):
 def test_scenarios():
     from item.model.common import SCENARIOS
 
-    assert len(SCENARIOS) == 8
+    assert len(SCENARIOS) == 28

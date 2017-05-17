@@ -4,3 +4,10 @@
 
   SSP2_4DS:
     category: policy
+
+2:
+  Reference:
+    category: reference
+
+  2DS:
+    category: policy

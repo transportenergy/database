@@ -4,3 +4,10 @@
 
   Policy:
     category: policy
+
+2:
+  Adopted:
+    category: reference
+
+  'Fuel efficiency and e-drive':
+    category: policy
