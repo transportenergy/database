@@ -26,11 +26,14 @@ import xarray as xr
 import yaml
 
 from item.common import paths, log
-from item.model.common import as_xarray, data_columns, INDEX, tidy
+from item.model.common import as_xarray, data_columns, INDEX, tidy, select
 from item.model.dimensions import load_template
 
 
-__all__ = ['load_model_data']
+__all__ = [
+    'load_model_data',
+    'select',
+    ]
 
 
 def order_columns(df):

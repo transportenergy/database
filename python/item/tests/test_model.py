@@ -3,7 +3,7 @@ import pytest
 import xarray as xr
 
 from item.common import paths
-from item.model import load_model_data, process_raw
+from item.model import load_model_data, process_raw, select
 
 
 slow = pytest.mark.skipif(
@@ -14,6 +14,11 @@ slow = pytest.mark.skipif(
 
 item1_size = 928541
 item2_size = 1994943
+
+
+@pytest.fixture(scope='session')
+def item1_data():
+    yield load_model_data(1)
 
 
 @slow
@@ -59,3 +64,11 @@ def test_invalid_version():
     # Load an invalid model database version
     with pytest.raises(ValueError):
         load_model_data(99)
+
+
+def test_select(item1_data):
+    from item.model.dimensions import PAX
+
+    data = select(item1_data, 'energy', tech='All', fuel='All', mode=PAX)
+    # print(data.head(), len(data))
+    assert len(data) == 6752

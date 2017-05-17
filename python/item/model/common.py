@@ -126,3 +126,32 @@ def tidy(df):
 
     df.rename(columns=_rename, inplace=True)
     return drop_empty(df.reindex_axis(INDEX + data_columns(df), axis=1))
+
+
+def select(data, *args, **kwargs):
+    """Select from *data*."""
+    if len(args) > 1:
+        raise ValueError(("can't determine dimensions for >1 positional "
+                          "arguments: {}").format(' '.join(args)))
+
+    dims = {k: None for k in INDEX}
+
+    for d, v in kwargs.items():
+        d = 'technology' if d == 'tech' else d
+        dims[d] = set([v]) if isinstance(v, str) else set(v)
+
+    if len(args) and dims['variable'] is None:
+        dims['variable'] = set(args)
+
+    # Construct a boolean mask
+    keep = None
+    for d, v in dims.items():
+        if v is None:
+            continue
+        elif keep is None:
+            keep = data[d].isin(v)
+        else:
+            keep &= data[d].isin(v)
+
+    # Subset the data and return
+    return data[keep]
