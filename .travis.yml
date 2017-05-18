@@ -67,7 +67,8 @@ before_install:
   - echo 'options(repos = c(CRAN = "https://cloud.r-project.org"))' > ~/.Rprofile.site
 
 install:
-  - Rscript -e 'devtools::install_deps("R/item")'
+  - Rscript -e 'withr::with_libpaths(Sys.getenv("R_LIBS_USER"), devtools::install_deps("R/item"))'
+  - Rscript -e 'devtools::session_info(installed.packages()[, "Package"])'
   - pip install -r ci/requirements.txt
   - pip install codecov pytest-cov
 
