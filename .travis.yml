@@ -24,7 +24,7 @@ python:
 env:
   global:
     - TRAVIS_R_VERSION=3.4.0
-    - R_LIBS_USER=~/R/library
+    - R_LIBS_USER=~/R/Library
     - R_LIBS_SITE=/usr/local/lib/R/site-library:/usr/lib/R/site-library
     - R_PROFILE=~/.Rprofile.site
 
