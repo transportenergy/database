@@ -18,8 +18,9 @@ env:
 addons:
   apt:
     sources:
-      - sourceline: 'deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)/'
-        key_url: 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xE084DAB9'
+      - sourceline: ppa:marutter/rrutter
+      - sourceline: ppa:marutter/c2d4u
+      - sourceline: deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)
     packages:
       # default Travis package set for R
       - build-essential
