@@ -20,7 +20,8 @@ addons:
     sources:
       - sourceline: 'ppa:marutter/rrutter'
       - sourceline: 'ppa:marutter/c2d4u'
-      - sourceline: 'deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)'
+      - sourceline: 'deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)/'
+        key_url: 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xE084DAB9'
     packages:
       # default Travis package set for R
       - build-essential
