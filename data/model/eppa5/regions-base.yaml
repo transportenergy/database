@@ -1,60 +1,39 @@
-# iTEM2 (generated from map_cntry_region_ALL.csv)
+# EPPA base regional mapping
+#
+# This mapping includes some codes like 'XOC' that do not appear in the ISO
+# standard; they are shorthand for regions in the GTAP database, which EPPA
+# in turn aggregates to the groups in this file. See regions-gtap.yaml for
+# a list of the countries in these regions.
+#
+# Making the appropriate replacements should yield regions.yaml
+
 AFR:
   description: Africa
   countries:
-  - AGO
-  - BDI
-  - BEN
-  - BFA
   - BWA
-  - CAF
   - CIV
   - CMR
-  - COD
-  - COG
-  - COM
-  - CPV
-  - DJI
-  - DZA
   - EGY
-  - ERI
   - ETH
-  - GAB
   - GHA
-  - GIN
-  - GMB
-  - GNB
-  - GNQ
   - KEN
-  - LBR
-  - LBY
-  - LSO
   - MAR
   - MDG
-  - MLI
   - MOZ
-  - MRT
   - MUS
   - MWI
-  - MYT
   - NAM
-  - NER
   - NGA
-  - REU
-  - RWA
-  - SDN
   - SEN
-  - SHN
-  - SLE
-  - SOM
-  - STP
-  - SWZ
-  - SYC
-  - TCD
-  - TGO
   - TUN
   - TZA
   - UGA
+  - XAC
+  - XCF
+  - XEC
+  - XNF
+  - XSC
+  - XWF
   - ZAF
   - ZMB
   - ZWE
@@ -62,30 +41,10 @@ AFR:
 ANZ:
   description: Australia and Oceania
   countries:
-  - ASM
   - AUS
-  - COK
-  - FJI
-  - FSM
-  - GUM
-  - KIR
-  - MHL
-  - MNP
-  - NCL
-  - NFK
-  - NIU
-  - NRU
   - NZL
-  - PLW
-  - PNG
-  - PYF
-  - SLB
-  - TKL
-  - TON
-  - TUV
-  - VUT
-  - WLF
-  - WSM
+  - XOC
+  - XTW
 
 ASI:
   description: Dynamic Asia
@@ -130,9 +89,7 @@ EUR:
   - HRV
   - HUN
   - IRL
-  - ISL
   - ITA
-  - LIE
   - LTU
   - LUX
   - LVA
@@ -141,11 +98,11 @@ EUR:
   - NOR
   - POL
   - PRT
-  - ROM
   - ROU
   - SVK
   - SVN
   - SWE
+  - XEF
 
 IND:
   description: India
@@ -158,53 +115,25 @@ JPN:
 LAM:
   description: Rest of Americas
   countries:
-  - ABW
-  - AIA
-  - ANT
   - ARG
-  - ATG
-  - BHS
-  - BLZ
-  - BMU
   - BOL
-  - BRB
   - CHL
   - COL
   - CRI
-  - CUB
-  - CYM
-  - DMA
-  - DOM
   - ECU
-  - FLK
-  - GLP
-  - GRD
-  - GRL
   - GTM
-  - GUF
-  - GUY
   - HND
-  - HTI
-  - JAM
-  - KNA
-  - LCA
-  - MSR
-  - MTQ
   - NIC
   - PAN
   - PER
-  - PRI
   - PRY
   - SLV
-  - SPM
-  - SUR
-  - TCA
-  - TTO
   - URY
-  - VCT
   - VEN
-  - VGB
-  - VIR
+  - XCA
+  - XCB
+  - XNA
+  - XSM
 
 MES:
   description: Middle East
@@ -212,67 +141,48 @@ MES:
   - ARE
   - BHR
   - IRN
-  - IRQ
   - ISR
-  - JOR
   - KWT
-  - LBN
   - OMN
-  - PSE
   - QAT
   - SAU
-  - SYR
-  - YEM
+  - XWS
 
 MEX:
-  countries:
-  - MEX
+  description: Mexico
+  countries: [MEX]
 
 REA:
   description: Rest of East Asia
   countries:
-  - AFG
   - BGD
-  - BRN
-  - BTN
   - KHM
   - LAO
   - LKA
-  - MAC
-  - MDV
+  - MMR
   - MNG
   - NPL
   - PAK
-  - PRK
-  - TLS
   - VNM
+  - XEA
+  - XSA
+  - XSE
 
 ROE:
   description: Rest of Europe and Central Asia
   countries:
   - ALB
-  - AND
   - ARM
   - AZE
-  - BIH
   - BLR
-  - FRO
   - GEO
-  - GIB
   - KAZ
   - KGZ
-  - MCO
-  - MDA
-  - MKD
-  - MNE
-  - SCG
-  - SMR
-  - SRB
-  - TJK
-  - TKM
   - TUR
   - UKR
-  - UZB
+  - XEE
+  - XER
+  - XSU
 
 RUS:
   description: Russia

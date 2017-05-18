@@ -15,6 +15,7 @@ Africa:
   - CPV
   - DJI
   - DZA
+  - EGY
   - ERI
   - ESH
   - ETH
@@ -55,123 +56,7 @@ Africa:
   - ZMB
   - ZWE
 
-Australia:
-  countries:
-  - AUS
-
-Brazil:
-  countries:
-  - BRA
-
-Canada:
-  countries:
-  - CAN
-
-China:
-  countries:
-  - CHN
-  - HKG
-  - MAC
-  - TWN
-
-EU-27:
-  countries:
-  - AUT
-  - BEL
-  - BGR
-  - CYP
-  - CZE
-  - DEU
-  - DNK
-  - ESP
-  - EST
-  - FIN
-  - FRA
-  - GBR
-  - GRC
-  - GRL
-  - HRV
-  - HUN
-  - IRL
-  - ITA
-  - LTU
-  - LUX
-  - LVA
-  - MLT
-  - NLD
-  - POL
-  - PRT
-  - ROM
-  - ROU
-  - SVK
-  - SVN
-  - SWE
-
-India:
-  countries:
-  - IND
-
-Japan:
-  countries:
-  - JPN
-
-Mexico:
-  countries:
-  - MEX
-
-Middle East:
-  countries:
-  - ARE
-  - BHR
-  - EGY
-  - IRN
-  - IRQ
-  - ISR
-  - JOR
-  - KWT
-  - LBN
-  - OMN
-  - PSE
-  - QAT
-  - SAU
-  - SYR
-  - YEM
-
-Non-EU Europe:
-  countries:
-  - ALB
-  - AND
-  - ARM
-  - AZE
-  - BIH
-  - BLR
-  - CHE
-  - CHI
-  - FRO
-  - GEO
-  - GIB
-  - IMN
-  - ISL
-  - LIE
-  - MCO
-  - MDA
-  - MKD
-  - MNE
-  - NOR
-  - SCG
-  - SHN
-  - SJM
-  - SMR
-  - SPM
-  - SRB
-  - TCA
-  - TUR
-  - UKR
-  - VAT
-  - WLF
-  - YUG
-
-Other Asia-Pacific:
+Asia:
   countries:
   - AFG
   - ASM
@@ -185,8 +70,6 @@ Other Asia-Pacific:
   - FSM
   - GUM
   - IDN
-  - KAZ
-  - KGZ
   - KHM
   - KIR
   - LAO
@@ -203,7 +86,6 @@ Other Asia-Pacific:
   - NIU
   - NPL
   - NRU
-  - NZL
   - PAK
   - PCI
   - PCN
@@ -216,18 +98,71 @@ Other Asia-Pacific:
   - SLB
   - SYC
   - THA
-  - TJK
   - TKL
-  - TKM
   - TLS
   - TON
   - TUV
-  - UZB
   - VNM
   - VUT
   - WSM
 
-Other Latin America:
+China + India:
+  countries:
+  - CHN
+  - HKG
+  - IND
+  - MAC
+  - TWN
+
+EEA + Turkey:
+  countries:
+  - AND
+  - AUT
+  - BEL
+  - BGR
+  - CHE
+  - CHI
+  - CYP
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - FRO
+  - GBR
+  - GIB
+  - GRC
+  - GRL
+  - HUN
+  - IMN
+  - IRL
+  - ISL
+  - ITA
+  - LIE
+  - LUX
+  - MCO
+  - MLT
+  - NLD
+  - NOR
+  - POL
+  - PRT
+  - ROM
+  - ROU
+  - SHN
+  - SJM
+  - SMR
+  - SPM
+  - SVK
+  - SVN
+  - SWE
+  - TCA
+  - TUR
+  - VAT
+  - VGB
+  - WLF
+
+Latin America:
   countries:
   - ABW
   - AIA
@@ -238,6 +173,7 @@ Other Latin America:
   - BLZ
   - BMU
   - BOL
+  - BRA
   - BRB
   - CHL
   - COL
@@ -263,6 +199,7 @@ Other Latin America:
   - NIC
   - PAN
   - PER
+  - PRI
   - PRY
   - SLV
   - SUR
@@ -270,18 +207,60 @@ Other Latin America:
   - URY
   - VCT
   - VEN
-  - VGB
   - VIR
 
-Russia:
+Middle East:
   countries:
-  - RUS
+  - ARE
+  - BHR
+  - IRN
+  - IRQ
+  - ISR
+  - JOR
+  - KWT
+  - LBN
+  - OMN
+  - PSE
+  - QAT
+  - SAU
+  - SYR
+  - YEM
 
-South Korea:
+North America:
   countries:
-  - KOR
-
-U.S.:
-  countries:
-  - PRI
+  - CAN
+  - MEX
   - USA
+
+OECD Pacific:
+  countries:
+  - AUS
+  - JPN
+  - KOR
+  - NZL
+
+Transition:
+  countries:
+  - ALB
+  - ARM
+  - AZE
+  - BIH
+  - BLR
+  - EST
+  - GEO
+  - HRV
+  - KAZ
+  - KGZ
+  - LTU
+  - LVA
+  - MDA
+  - MKD
+  - MNE
+  - RUS
+  - SCG
+  - SRB
+  - TJK
+  - TKM
+  - UKR
+  - UZB
+  - YUG

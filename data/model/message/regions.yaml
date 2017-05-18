@@ -1,0 +1,257 @@
+# Regions appearing in the iTEM1 data set:
+# - Africa
+# - Australia
+# - Brazil
+# - Canada
+# - China
+# - EU-27
+# - Global
+# - India
+# - Japan
+# - Mexico
+# - Middle East
+# - Russia
+# - South Korea
+# - U.S.
+
+# iTEM2 (generated from map_cntry_region_ALL.csv)
+AFR:
+  countries:
+  - AGO
+  - BDI
+  - BEN
+  - BFA
+  - BWA
+  - CAF
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COM
+  - CPV
+  - DJI
+  - ERI
+  - ETH
+  - GAB
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - KEN
+  - LBR
+  - LSO
+  - MDG
+  - MLI
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - NAM
+  - NER
+  - NGA
+  - REU
+  - RWA
+  - SEN
+  - SHN
+  - SLE
+  - SOM
+  - STP
+  - SWZ
+  - SYC
+  - TCD
+  - TGO
+  - TZA
+  - UGA
+  - ZAF
+  - ZMB
+  - ZWE
+
+CPA:
+  countries:
+  - CHN
+  - HKG
+  - KHM
+  - LAO
+  - MAC
+  - MNG
+  - PRK
+  - VNM
+
+EEU:
+  countries:
+  - ALB
+  - BGR
+  - BIH
+  - CZE
+  - HRV
+  - HUN
+  - MKD
+  - MNE
+  - POL
+  - ROM
+  - ROU
+  - SCG
+  - SRB
+  - SVK
+  - SVN
+  - YUG
+
+FSU:
+  countries:
+  - ARM
+  - AZE
+  - BLR
+  - EST
+  - GEO
+  - KAZ
+  - KGZ
+  - LTU
+  - LVA
+  - MDA
+  - RUS
+  - TJK
+  - TKM
+  - UKR
+  - UZB
+
+LAM:
+  countries:
+  - ANT
+  - ARG
+  - ATG
+  - BHS
+  - BLZ
+  - BMU
+  - BOL
+  - BRA
+  - BRB
+  - CHL
+  - COL
+  - CRI
+  - CUB
+  - DMA
+  - DOM
+  - ECU
+  - GLP
+  - GRD
+  - GTM
+  - GUF
+  - GUY
+  - HND
+  - HTI
+  - JAM
+  - KNA
+  - LCA
+  - MEX
+  - MTQ
+  - NIC
+  - PAN
+  - PER
+  - PRY
+  - SLV
+  - SUR
+  - TTO
+  - URY
+  - VCT
+  - VEN
+
+MEA:
+  countries:
+  - ARE
+  - BHR
+  - DZA
+  - EGY
+  - IRN
+  - IRQ
+  - ISR
+  - JOR
+  - KWT
+  - LBN
+  - LBY
+  - MAR
+  - OMN
+  - QAT
+  - SAU
+  - SDN
+  - SYR
+  - TUN
+  - YEM
+
+NAM:
+  countries:
+  - CAN
+  - GUM
+  - PRI
+  - USA
+  - VIR
+
+PAO:
+  countries:
+  - AUS
+  - JPN
+  - NZL
+
+PAS:
+  countries:
+  - ASM
+  - BRN
+  - FJI
+  - IDN
+  - KIR
+  - KOR
+  - MMR
+  - MYS
+  - NCL
+  - PHL
+  - PNG
+  - PYF
+  - SGP
+  - SLB
+  - THA
+  - TON
+  - TWN
+  - VUT
+
+SAS:
+  countries:
+  - AFG
+  - BGD
+  - BTN
+  - IND
+  - LKA
+  - MDV
+  - NPL
+  - PAK
+
+WEU:
+  countries:
+  - AND
+  - AUT
+  - BEL
+  - CHE
+  - CHI
+  - CYP
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - FRO
+  - GBR
+  - GIB
+  - GRC
+  - GRL
+  - IMN
+  - IRL
+  - ISL
+  - ITA
+  - LIE
+  - LUX
+  - MCO
+  - MLT
+  - NLD
+  - NOR
+  - PRT
+  - SWE
+  - TUR

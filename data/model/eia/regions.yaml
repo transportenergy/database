@@ -1,5 +1,5 @@
 # iTEM2 (generated from map_cntry_region_ALL.csv)
-Africa:
+AFR:
   countries:
   - AGO
   - BDI
@@ -15,6 +15,7 @@ Africa:
   - CPV
   - DJI
   - DZA
+  - EGY
   - ERI
   - ESH
   - ETH
@@ -55,179 +56,25 @@ Africa:
   - ZMB
   - ZWE
 
-Australia:
+ANZ:
   countries:
   - AUS
+  - NZL
 
-Brazil:
+BRZ:
   countries:
   - BRA
 
-Canada:
+CAN:
   countries:
   - CAN
 
-China:
+CHI:
   countries:
   - CHN
-  - HKG
-  - MAC
   - TWN
 
-EU-27:
-  countries:
-  - AUT
-  - BEL
-  - BGR
-  - CYP
-  - CZE
-  - DEU
-  - DNK
-  - ESP
-  - EST
-  - FIN
-  - FRA
-  - GBR
-  - GRC
-  - GRL
-  - HRV
-  - HUN
-  - IRL
-  - ITA
-  - LTU
-  - LUX
-  - LVA
-  - MLT
-  - NLD
-  - POL
-  - PRT
-  - ROM
-  - ROU
-  - SVK
-  - SVN
-  - SWE
-
-India:
-  countries:
-  - IND
-
-Japan:
-  countries:
-  - JPN
-
-Mexico:
-  countries:
-  - MEX
-
-Middle East:
-  countries:
-  - ARE
-  - BHR
-  - EGY
-  - IRN
-  - IRQ
-  - ISR
-  - JOR
-  - KWT
-  - LBN
-  - OMN
-  - PSE
-  - QAT
-  - SAU
-  - SYR
-  - YEM
-
-Non-EU Europe:
-  countries:
-  - ALB
-  - AND
-  - ARM
-  - AZE
-  - BIH
-  - BLR
-  - CHE
-  - CHI
-  - FRO
-  - GEO
-  - GIB
-  - IMN
-  - ISL
-  - LIE
-  - MCO
-  - MDA
-  - MKD
-  - MNE
-  - NOR
-  - SCG
-  - SHN
-  - SJM
-  - SMR
-  - SPM
-  - SRB
-  - TCA
-  - TUR
-  - UKR
-  - VAT
-  - WLF
-  - YUG
-
-Other Asia-Pacific:
-  countries:
-  - AFG
-  - ASM
-  - BGD
-  - BRN
-  - BTN
-  - CCK
-  - COK
-  - CXR
-  - FJI
-  - FSM
-  - GUM
-  - IDN
-  - KAZ
-  - KGZ
-  - KHM
-  - KIR
-  - LAO
-  - LKA
-  - MDV
-  - MHL
-  - MMR
-  - MNG
-  - MNP
-  - MYS
-  - MYT
-  - NCL
-  - NFK
-  - NIU
-  - NPL
-  - NRU
-  - NZL
-  - PAK
-  - PCI
-  - PCN
-  - PHL
-  - PLW
-  - PNG
-  - PRK
-  - PYF
-  - SGP
-  - SLB
-  - SYC
-  - THA
-  - TJK
-  - TKL
-  - TKM
-  - TLS
-  - TON
-  - TUV
-  - UZB
-  - VNM
-  - VUT
-  - WSM
-
-Other Latin America:
+CSA:
   countries:
   - ABW
   - AIA
@@ -239,7 +86,6 @@ Other Latin America:
   - BMU
   - BOL
   - BRB
-  - CHL
   - COL
   - CRI
   - CUB
@@ -263,6 +109,7 @@ Other Latin America:
   - NIC
   - PAN
   - PER
+  - PRI
   - PRY
   - SLV
   - SUR
@@ -273,15 +120,168 @@ Other Latin America:
   - VGB
   - VIR
 
-Russia:
+EUR:
+  countries:
+  - AUT
+  - BEL
+  - CHE
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - FRO
+  - GBR
+  - GRC
+  - GRL
+  - HUN
+  - IRL
+  - ISL
+  - ITA
+  - LUX
+  - LVA
+  - NLD
+  - NOR
+  - POL
+  - PRT
+  - SJM
+  - SVK
+  - SVN
+  - SWE
+  - TUR
+  - VAT
+  - WLF
+
+IND:
+  countries:
+  - IND
+
+JPN:
+  countries:
+  - JPN
+
+MID:
+  countries:
+  - ARE
+  - BHR
+  - IRN
+  - IRQ
+  - ISR
+  - JOR
+  - KWT
+  - LBN
+  - OMN
+  - PSE
+  - QAT
+  - SAU
+  - SYR
+  - YEM
+
+MXC:
+  countries:
+  - CHL
+  - MEX
+
+OAS:
+  countries:
+  - AFG
+  - ASM
+  - BGD
+  - BRN
+  - BTN
+  - CCK
+  - COK
+  - CXR
+  - FJI
+  - FSM
+  - GUM
+  - HKG
+  - IDN
+  - KHM
+  - KIR
+  - LAO
+  - LKA
+  - MAC
+  - MDV
+  - MHL
+  - MMR
+  - MNG
+  - MNP
+  - MYS
+  - MYT
+  - NCL
+  - NFK
+  - NIU
+  - NPL
+  - NRU
+  - PAK
+  - PCI
+  - PCN
+  - PHL
+  - PLW
+  - PNG
+  - PRK
+  - PYF
+  - SGP
+  - SLB
+  - SYC
+  - THA
+  - TKL
+  - TLS
+  - TON
+  - TUV
+  - VNM
+  - VUT
+  - WSM
+
+RUS:
   countries:
   - RUS
 
-South Korea:
+SKO:
   countries:
   - KOR
 
-U.S.:
+URA:
   countries:
-  - PRI
+  - ALB
+  - AND
+  - ARM
+  - AZE
+  - BGR
+  - BIH
+  - BLR
+  - CHI
+  - CYP
+  - GEO
+  - GIB
+  - HRV
+  - IMN
+  - KAZ
+  - KGZ
+  - LIE
+  - LTU
+  - MCO
+  - MDA
+  - MKD
+  - MLT
+  - MNE
+  - ROM
+  - ROU
+  - SCG
+  - SHN
+  - SMR
+  - SPM
+  - SRB
+  - TCA
+  - TJK
+  - TKM
+  - UKR
+  - UZB
+  - YUG
+
+USA:
+  countries:
   - USA

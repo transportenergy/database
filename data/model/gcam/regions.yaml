@@ -1,0 +1,354 @@
+# Regions appearing in the iTEM1 data set:
+# - Africa
+# - Asia-Pacific-40
+# - Australia
+# - Brazil
+# - Canada
+# - China
+# - EU-27
+# - Global
+# - India
+# - Japan
+# - Latin America-31
+# - Mexico
+# - Middle East
+# - Non-EU Europe
+# - Russia
+# - South Korea
+# - U.S.
+
+# iTEM2 (generated from map_cntry_region_ALL.csv)
+Africa_Eastern:
+  countries:
+  - BDI
+  - COM
+  - DJI
+  - ERI
+  - ETH
+  - KEN
+  - MDG
+  - MUS
+  - REU
+  - RWA
+  - SDN
+  - SOM
+  - UGA
+
+Africa_Northern:
+  countries:
+  - DZA
+  - EGY
+  - ESH
+  - LBY
+  - MAR
+  - TUN
+
+Africa_Southern:
+  countries:
+  - AGO
+  - BWA
+  - LSO
+  - MOZ
+  - MWI
+  - NAM
+  - SWZ
+  - TZA
+  - ZMB
+  - ZWE
+
+Africa_Western:
+  countries:
+  - BEN
+  - BFA
+  - CAF
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - CPV
+  - GAB
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - LBR
+  - MLI
+  - MRT
+  - NER
+  - NGA
+  - SEN
+  - SLE
+  - STP
+  - TCD
+  - TGO
+
+Argentina:
+  countries:
+  - ARG
+
+Australia_NZ:
+  countries:
+  - AUS
+  - NZL
+
+Brazil:
+  countries:
+  - BRA
+
+Canada:
+  countries:
+  - CAN
+
+Central America and Caribbean:
+  countries:
+  - ABW
+  - AIA
+  - ANT
+  - ATG
+  - BHS
+  - BLZ
+  - BMU
+  - BRB
+  - CRI
+  - CUB
+  - CYM
+  - DMA
+  - DOM
+  - GLP
+  - GRD
+  - GTM
+  - HND
+  - HTI
+  - JAM
+  - KNA
+  - LCA
+  - MSR
+  - MTQ
+  - NIC
+  - PAN
+  - SLV
+  - TTO
+  - VCT
+
+Central Asia:
+  countries:
+  - ARM
+  - AZE
+  - GEO
+  - KAZ
+  - KGZ
+  - MNG
+  - TJK
+  - TKM
+  - UZB
+
+China:
+  countries:
+  - CHN
+  - HKG
+  - MAC
+
+Colombia:
+  countries:
+  - COL
+
+EU-12:
+  countries:
+  - BGR
+  - CYP
+  - CZE
+  - EST
+  - HUN
+  - LTU
+  - LVA
+  - MLT
+  - POL
+  - ROM
+  - ROU
+  - SVK
+  - SVN
+
+EU-15:
+  countries:
+  - AND
+  - AUT
+  - BEL
+  - CHI
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FLK
+  - FRA
+  - FRO
+  - GBR
+  - GIB
+  - GRC
+  - GRL
+  - IMN
+  - IRL
+  - ITA
+  - LUX
+  - MCO
+  - NLD
+  - PRT
+  - SHN
+  - SMR
+  - SPM
+  - SWE
+  - TCA
+  - VAT
+  - VGB
+  - WLF
+
+Europe_Eastern:
+  countries:
+  - BLR
+  - MDA
+  - UKR
+
+Europe_Non_EU:
+  countries:
+  - ALB
+  - BIH
+  - HRV
+  - MKD
+  - MNE
+  - SCG
+  - SRB
+  - TUR
+  - YUG
+
+European Free Trade Association:
+  countries:
+  - CHE
+  - ISL
+  - LIE
+  - NOR
+  - SJM
+
+India:
+  countries:
+  - IND
+
+Indonesia:
+  countries:
+  - IDN
+
+Japan:
+  countries:
+  - JPN
+
+Mexico:
+  countries:
+  - MEX
+
+Middle East:
+  countries:
+  - ARE
+  - BHR
+  - IRN
+  - IRQ
+  - ISR
+  - JOR
+  - KWT
+  - LBN
+  - OMN
+  - PSE
+  - QAT
+  - SAU
+  - SYR
+  - YEM
+
+Pakistan:
+  countries:
+  - PAK
+
+Russia:
+  countries:
+  - RUS
+
+South Africa:
+  countries:
+  - ZAF
+
+South America_Northern:
+  countries:
+  - GUF
+  - GUY
+  - SUR
+  - VEN
+
+South America_Southern:
+  countries:
+  - BOL
+  - CHL
+  - ECU
+  - PER
+  - PRY
+  - URY
+
+South Asia:
+  countries:
+  - AFG
+  - ASM
+  - BGD
+  - BTN
+  - LAO
+  - LKA
+  - MDV
+  - NPL
+
+South Korea:
+  countries:
+  - KOR
+
+Southeast Asia:
+  countries:
+  - BRN
+  - CCK
+  - COK
+  - CXR
+  - FJI
+  - FSM
+  - GUM
+  - KHM
+  - KIR
+  - MHL
+  - MMR
+  - MNP
+  - MYS
+  - MYT
+  - NCL
+  - NFK
+  - NIU
+  - NRU
+  - PCI
+  - PCN
+  - PHL
+  - PLW
+  - PNG
+  - PRK
+  - PYF
+  - SGP
+  - SLB
+  - SYC
+  - THA
+  - TKL
+  - TLS
+  - TON
+  - TUV
+  - VNM
+  - VUT
+  - WSM
+
+Taiwan:
+  countries:
+  - TWN
+
+USA:
+  countries:
+  - PRI
+  - USA
+  - VIR

@@ -1,0 +1,258 @@
+# Regions appearing in the iTEM1 data set:
+# - Africa
+# - Asia-Pacific-40
+# - Australia
+# - Brazil
+# - Canada
+# - China
+# - EU-27
+# - Global
+# - India
+# - Japan
+# - Latin America-31
+# - Mexico
+# - Middle East
+# - Non-EU Europe
+# - Russia
+# - South Korea
+# - U.S.
+
+# iTEM2 (generated from map_cntry_region_ALL.csv)
+Africa:
+  countries:
+  - AGO
+  - BDI
+  - BEN
+  - BFA
+  - BWA
+  - CAF
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COM
+  - CPV
+  - DJI
+  - DZA
+  - ERI
+  - ETH
+  - GAB
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - KEN
+  - LBR
+  - LBY
+  - LSO
+  - MAR
+  - MDG
+  - MLI
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - NAM
+  - NER
+  - NGA
+  - RWA
+  - SDN
+  - SEN
+  - SLE
+  - SOM
+  - STP
+  - SWZ
+  - SYC
+  - TCD
+  - TGO
+  - TUN
+  - TZA
+  - UGA
+  - ZAF
+  - ZMB
+  - ZWE
+
+Asia-Pacific-40:
+  countries:
+  - AFG
+  - BGD
+  - BRN
+  - BTN
+  - COK
+  - FJI
+  - FSM
+  - IDN
+  - KAZ
+  - KGZ
+  - KHM
+  - KIR
+  - LAO
+  - LKA
+  - MDV
+  - MMR
+  - MNG
+  - MYS
+  - NIU
+  - NPL
+  - NRU
+  - NZL
+  - PAK
+  - PHL
+  - PLW
+  - PNG
+  - PRK
+  - SGP
+  - SLB
+  - THA
+  - TJK
+  - TKM
+  - TLS
+  - TON
+  - TUV
+  - UZB
+  - VNM
+  - VUT
+  - WSM
+
+Australia:
+  countries:
+  - AUS
+
+Brazil:
+  countries:
+  - BRA
+
+Canada:
+  countries:
+  - CAN
+
+China:
+  countries:
+  - CHN
+
+EU-27:
+  countries:
+  - AUT
+  - BEL
+  - BGR
+  - CYP
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HUN
+  - IRL
+  - ITA
+  - LTU
+  - LUX
+  - LVA
+  - MLT
+  - NLD
+  - POL
+  - PRT
+  - SVK
+  - SVN
+  - SWE
+
+India:
+  countries:
+  - IND
+
+Japan:
+  countries:
+  - JPN
+
+Latin America-31:
+  countries:
+  - ARG
+  - ATG
+  - BHS
+  - BLZ
+  - BOL
+  - BRB
+  - CHL
+  - COL
+  - CRI
+  - CUB
+  - DMA
+  - DOM
+  - ECU
+  - GRD
+  - GTM
+  - GUY
+  - HND
+  - HTI
+  - JAM
+  - KNA
+  - LCA
+  - NIC
+  - PAN
+  - PER
+  - PRY
+  - SLV
+  - SUR
+  - TTO
+  - URY
+  - VCT
+  - VEN
+
+Mexico:
+  countries:
+  - MEX
+
+Middle East:
+  countries:
+  - ARE
+  - BHR
+  - EGY
+  - IRN
+  - IRQ
+  - ISR
+  - JOR
+  - KWT
+  - LBN
+  - OMN
+  - QAT
+  - SAU
+  - SYR
+  - TUR
+  - YEM
+
+Non-EU Europe:
+  countries:
+  - ALB
+  - AND
+  - ARM
+  - AZE
+  - BIH
+  - BLR
+  - CHE
+  - GEO
+  - HRV
+  - ISL
+  - MCO
+  - MDA
+  - MKD
+  - MNE
+  - NOR
+  - SMR
+  - SRB
+  - UKR
+
+Russia:
+  countries:
+  - RUS
+
+South Korea:
+  countries:
+  - KOR
+
+U.S.:
+  countries:
+  - USA

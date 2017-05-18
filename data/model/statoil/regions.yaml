@@ -55,69 +55,13 @@ Africa:
   - ZMB
   - ZWE
 
-Australia:
-  countries:
-  - AUS
-
-Brazil:
-  countries:
-  - BRA
-
-Canada:
-  countries:
-  - CAN
-
 China:
   countries:
   - CHN
-  - HKG
-  - MAC
-  - TWN
-
-EU-27:
-  countries:
-  - AUT
-  - BEL
-  - BGR
-  - CYP
-  - CZE
-  - DEU
-  - DNK
-  - ESP
-  - EST
-  - FIN
-  - FRA
-  - GBR
-  - GRC
-  - GRL
-  - HRV
-  - HUN
-  - IRL
-  - ITA
-  - LTU
-  - LUX
-  - LVA
-  - MLT
-  - NLD
-  - POL
-  - PRT
-  - ROM
-  - ROU
-  - SVK
-  - SVN
-  - SWE
 
 India:
   countries:
   - IND
-
-Japan:
-  countries:
-  - JPN
-
-Mexico:
-  countries:
-  - MEX
 
 Middle East:
   countries:
@@ -137,97 +81,7 @@ Middle East:
   - SYR
   - YEM
 
-Non-EU Europe:
-  countries:
-  - ALB
-  - AND
-  - ARM
-  - AZE
-  - BIH
-  - BLR
-  - CHE
-  - CHI
-  - FRO
-  - GEO
-  - GIB
-  - IMN
-  - ISL
-  - LIE
-  - MCO
-  - MDA
-  - MKD
-  - MNE
-  - NOR
-  - SCG
-  - SHN
-  - SJM
-  - SMR
-  - SPM
-  - SRB
-  - TCA
-  - TUR
-  - UKR
-  - VAT
-  - WLF
-  - YUG
-
-Other Asia-Pacific:
-  countries:
-  - AFG
-  - ASM
-  - BGD
-  - BRN
-  - BTN
-  - CCK
-  - COK
-  - CXR
-  - FJI
-  - FSM
-  - GUM
-  - IDN
-  - KAZ
-  - KGZ
-  - KHM
-  - KIR
-  - LAO
-  - LKA
-  - MDV
-  - MHL
-  - MMR
-  - MNG
-  - MNP
-  - MYS
-  - MYT
-  - NCL
-  - NFK
-  - NIU
-  - NPL
-  - NRU
-  - NZL
-  - PAK
-  - PCI
-  - PCN
-  - PHL
-  - PLW
-  - PNG
-  - PRK
-  - PYF
-  - SGP
-  - SLB
-  - SYC
-  - THA
-  - TJK
-  - TKL
-  - TKM
-  - TLS
-  - TON
-  - TUV
-  - UZB
-  - VNM
-  - VUT
-  - WSM
-
-Other Latin America:
+Non-OECD Americas:
   countries:
   - ABW
   - AIA
@@ -238,8 +92,8 @@ Other Latin America:
   - BLZ
   - BMU
   - BOL
+  - BRA
   - BRB
-  - CHL
   - COL
   - CRI
   - CUB
@@ -273,15 +127,149 @@ Other Latin America:
   - VGB
   - VIR
 
+Non-OECD Europe:
+  countries:
+  - ALB
+  - AND
+  - BGR
+  - BIH
+  - CHI
+  - CYP
+  - FRO
+  - GIB
+  - GRL
+  - HRV
+  - IMN
+  - LIE
+  - MCO
+  - MKD
+  - MLT
+  - MNE
+  - ROM
+  - ROU
+  - SCG
+  - SHN
+  - SJM
+  - SMR
+  - SPM
+  - SRB
+  - SVN
+  - TCA
+  - VAT
+  - WLF
+  - YUG
+
+OECD Americas:
+  countries:
+  - CAN
+  - CHL
+  - MEX
+  - PRI
+  - USA
+
+OECD Asia Pacific:
+  countries:
+  - AUS
+  - JPN
+  - KOR
+  - NZL
+
+OECD Europe:
+  countries:
+  - AUT
+  - BEL
+  - CHE
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HUN
+  - IRL
+  - ISL
+  - ITA
+  - LUX
+  - NLD
+  - NOR
+  - POL
+  - PRT
+  - SVK
+  - SWE
+  - TUR
+
+Other FSU:
+  countries:
+  - ARM
+  - AZE
+  - BLR
+  - EST
+  - GEO
+  - KAZ
+  - KGZ
+  - LTU
+  - LVA
+  - MDA
+  - TJK
+  - TKM
+  - UKR
+  - UZB
+
+Other Non-OECD Asia:
+  countries:
+  - AFG
+  - ASM
+  - BGD
+  - BRN
+  - BTN
+  - CCK
+  - COK
+  - CXR
+  - FJI
+  - FSM
+  - GUM
+  - HKG
+  - IDN
+  - KHM
+  - KIR
+  - LAO
+  - LKA
+  - MAC
+  - MDV
+  - MHL
+  - MMR
+  - MNG
+  - MNP
+  - MYS
+  - MYT
+  - NCL
+  - NFK
+  - NIU
+  - NPL
+  - NRU
+  - PAK
+  - PCI
+  - PCN
+  - PHL
+  - PLW
+  - PNG
+  - PRK
+  - PYF
+  - SGP
+  - SLB
+  - SYC
+  - THA
+  - TKL
+  - TLS
+  - TON
+  - TUV
+  - TWN
+  - VNM
+  - VUT
+  - WSM
+
 Russia:
   countries:
   - RUS
-
-South Korea:
-  countries:
-  - KOR
-
-U.S.:
-  countries:
-  - PRI
-  - USA

@@ -1,0 +1,315 @@
+# Regions appearing in the iTEM1 data set:
+# - Africa
+# - Asia-Pacific-40
+# - Australia
+# - Brazil
+# - Canada
+# - China
+# - EU-27
+# - Global
+# - India
+# - Japan
+# - Mexico
+# - Middle East
+# - Non-EU Europe
+# - Russia
+# - South Korea
+# - U.S.
+
+# iTEM2 (generated from map_cntry_region_ALL.csv)
+ASEAN:
+  countries:
+  - AFG
+  - BGD
+  - BRN
+  - BTN
+  - CCK
+  - COK
+  - FJI
+  - FSM
+  - IDN
+  - KHM
+  - KIR
+  - LAO
+  - LKA
+  - MDV
+  - MMR
+  - MNG
+  - MYS
+  - NCL
+  - NFK
+  - NPL
+  - PAK
+  - PHL
+  - PLW
+  - PNG
+  - PRK
+  - SGP
+  - SJM
+  - SLB
+  - THA
+  - TLS
+  - TON
+  - VNM
+  - VUT
+  - WSM
+
+Australia and NZ:
+  countries:
+  - AUS
+  - NZL
+
+Brazil:
+  countries:
+  - BRA
+
+Canada:
+  countries:
+  - CAN
+
+China:
+  countries:
+  - CHN
+  - HKG
+  - TWN
+
+India:
+  countries:
+  - IND
+
+Japan:
+  countries:
+  - JPN
+
+Korea:
+  countries:
+  - KOR
+
+Mexico:
+  countries:
+  - MEX
+
+Middle East:
+  countries:
+  - ARE
+  - BHR
+  - IRN
+  - IRQ
+  - JOR
+  - KWT
+  - LBN
+  - OMN
+  - PSE
+  - QAT
+  - SAU
+  - SYR
+  - YEM
+
+Middle East / Other OECD:
+  countries:
+  - ISR
+
+Non-EU Europe:
+  countries:
+  - TUR
+  - YUG
+
+ODA:
+  countries:
+  - MAC
+  - PYF
+
+OECD Europe:
+  countries:
+  - AUT
+  - BEL
+  - BGR
+  - CYP
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HUN
+  - IRL
+  - ITA
+  - LTU
+  - LUX
+  - LVA
+  - MLT
+  - NLD
+  - POL
+  - PRT
+  - ROM
+  - ROU
+  - SVK
+  - SVN
+  - SWE
+  - VAT
+
+OECD Europe (covered in EDC energy balances under France):
+  countries:
+  - MCO
+
+OECD Europe (included in EDC Energy Balances under Italy):
+  countries:
+  - SMR
+
+OECD North America:
+  countries:
+  - ASM
+
+OETE:
+  countries:
+  - ALB
+  - BIH
+  - BLR
+  - GIB
+  - HRV
+  - ISL
+  - MDA
+  - MKD
+  - MNE
+  - NOR
+  - SCG
+  - SRB
+  - UKR
+
+OETE / Other OECD / Non-EU Europe:
+  countries:
+  - CHE
+
+Other Africa:
+  countries:
+  - AGO
+  - BDI
+  - BEN
+  - BFA
+  - BWA
+  - CAF
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COM
+  - CPV
+  - DJI
+  - DZA
+  - ERI
+  - ETH
+  - GAB
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - KEN
+  - LBR
+  - LBY
+  - LSO
+  - MAR
+  - MDG
+  - MLI
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - NAM
+  - NER
+  - NGA
+  - REU
+  - RWA
+  - SDN
+  - SEN
+  - SHN
+  - SLE
+  - SOM
+  - STP
+  - SWZ
+  - SYC
+  - TCD
+  - TGO
+  - TUN
+  - TZA
+  - UGA
+  - ZMB
+  - ZWE
+
+Other Latin America:
+  countries:
+  - ABW
+  - ANT
+  - ARG
+  - ATG
+  - BHS
+  - BLZ
+  - BMU
+  - BOL
+  - BRB
+  - CHL
+  - COL
+  - CRI
+  - CUB
+  - CYM
+  - DMA
+  - DOM
+  - ECU
+  - FLK
+  - GLP
+  - GRD
+  - GTM
+  - GUF
+  - GUY
+  - HND
+  - HTI
+  - JAM
+  - KNA
+  - LCA
+  - MSR
+  - MTQ
+  - NIC
+  - PAN
+  - PER
+  - PRY
+  - SLV
+  - SPM
+  - SUR
+  - TCA
+  - TTO
+  - URY
+  - VCT
+  - VEN
+  - VGB
+
+Other Other Africa:
+  countries:
+  - EGY
+
+Russia:
+  countries:
+  - AND
+  - ARM
+  - AZE
+  - GEO
+  - KAZ
+  - KGZ
+  - RUS
+  - TJK
+  - TKM
+  - UZB
+
+South Africa:
+  countries:
+  - ZAF
+
+USA:
+  countries:
+  - GUM
+  - MNP
+  - PRI
+  - USA
+  - VIR

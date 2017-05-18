@@ -1,0 +1,261 @@
+# iTEM2 (generated from map_cntry_region_ALL.csv)
+AFR:
+  countries:
+  - AGO
+  - BDI
+  - BEN
+  - BFA
+  - BWA
+  - CAF
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COM
+  - CPV
+  - DJI
+  - ERI
+  - ESH
+  - ETH
+  - GAB
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - KEN
+  - LBR
+  - LSO
+  - MDG
+  - MLI
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - NAM
+  - NER
+  - NGA
+  - REU
+  - RWA
+  - SEN
+  - SHN
+  - SLE
+  - SOM
+  - STP
+  - SWZ
+  - SYC
+  - TCD
+  - TGO
+  - TZA
+  - UGA
+  - ZAF
+  - ZMB
+  - ZWE
+
+CPA:
+  countries:
+  - CHN
+  - HKG
+  - KHM
+  - LAO
+  - MAC
+  - MNG
+  - PRK
+  - TWN
+  - VNM
+
+EUR:
+  countries:
+  - ALB
+  - AND
+  - AUT
+  - BEL
+  - BGR
+  - BIH
+  - CHE
+  - CYP
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - FRO
+  - GBR
+  - GIB
+  - GRC
+  - GRL
+  - HRV
+  - HUN
+  - IRL
+  - ISL
+  - ITA
+  - LIE
+  - LUX
+  - MCO
+  - MKD
+  - MLT
+  - MNE
+  - NLD
+  - NOR
+  - POL
+  - PRT
+  - ROM
+  - ROU
+  - SCG
+  - SMR
+  - SPM
+  - SRB
+  - SVK
+  - SVN
+  - SWE
+  - TUR
+  - VAT
+  - YUG
+
+FSU:
+  countries:
+  - ARM
+  - AZE
+  - BLR
+  - EST
+  - GEO
+  - KAZ
+  - KGZ
+  - LTU
+  - LVA
+  - MDA
+  - RUS
+  - TJK
+  - TKM
+  - UKR
+  - UZB
+
+LAM:
+  countries:
+  - ABW
+  - AIA
+  - ANT
+  - ARG
+  - BHS
+  - BLZ
+  - BOL
+  - BRA
+  - CHL
+  - COK
+  - COL
+  - CRI
+  - CUB
+  - CYM
+  - DMA
+  - DOM
+  - ECU
+  - FLK
+  - GLP
+  - GRD
+  - GTM
+  - GUF
+  - GUY
+  - HND
+  - HTI
+  - JAM
+  - KNA
+  - LCA
+  - MEX
+  - MSR
+  - MTQ
+  - NIC
+  - PAN
+  - PER
+  - PRY
+  - SLV
+  - SUR
+  - TCA
+  - TTO
+  - URY
+  - VCT
+  - VEN
+
+Lam:
+  countries:
+  - BMU
+  - BRB
+
+MEA:
+  countries:
+  - ARE
+  - BHR
+  - DZA
+  - EGY
+  - IRN
+  - IRQ
+  - ISR
+  - JOR
+  - KWT
+  - LBN
+  - LBY
+  - MAR
+  - OMN
+  - QAT
+  - SAU
+  - SDN
+  - SYR
+  - TUN
+  - YEM
+
+NAM:
+  countries:
+  - CAN
+  - PRI
+  - USA
+  - VGB
+  - VIR
+
+PAO:
+  countries:
+  - AUS
+  - JPN
+  - KOR
+  - NZL
+
+PAS:
+  countries:
+  - ASM
+  - BRN
+  - FJI
+  - FSM
+  - IDN
+  - KIR
+  - MHL
+  - MMR
+  - MNP
+  - MYS
+  - NCL
+  - NIU
+  - NRU
+  - PCN
+  - PHL
+  - PLW
+  - PNG
+  - PYF
+  - SGP
+  - SLB
+  - THA
+  - TKL
+  - TLS
+  - TON
+  - TUV
+  - VUT
+  - WLF
+  - WSM
+
+SAS:
+  countries:
+  - AFG
+  - BGD
+  - BTN
+  - IND
+  - LKA
+  - MDV
+  - NPL
+  - PAK

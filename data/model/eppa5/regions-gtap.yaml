@@ -1,0 +1,172 @@
+# Data from
+# https://www.gtap.agecon.purdue.edu/databases/regions.asp?Version=7.211, with
+# some manual edits to match the ISO database
+XAC:
+- Angola
+- Congo, The Democratic Republic of the
+
+XCA:
+- Belize
+- El Salvador
+- Honduras
+
+XCB:
+- Anguilla
+- Antigua and Barbuda
+- Aruba
+- Bahamas
+- Barbados
+- Cayman Islands
+- Cuba
+- Dominica
+- Dominican Republic
+- Grenada
+- Guadeloupe
+- Haiti
+- Jamaica
+- Martinique
+- Montserrat
+- Netherlands Antilles
+- Puerto Rico
+- Saint Kitts and Nevis
+- Saint Lucia
+- Saint Vincent and the Grenadines
+- Trinidad and Tobago
+- Turks and Caicos Islands
+- Virgin Islands, British
+- Virgin Islands, U.S.
+
+XCF:
+- Cameroon
+- Central African Republic
+- Chad
+- Congo
+- Equatorial Guinea
+- Gabon
+- Sao Tome and Principe
+
+XEA:
+- Korea, Democratic People's Republic of
+- Macao
+- Mongolia
+
+XEC:
+- Burundi
+- Comoros
+- Djibouti
+- Eritrea
+- Kenya
+- Mayotte
+- Réunion
+- Rwanda
+- Seychelles
+- Somalia
+- Sudan
+
+XEE:
+- Moldova, Republic of
+
+XEF:
+- Iceland
+- Liechtenstein
+
+XER:
+- Andorra
+- Bosnia and Herzegovina
+- Faroe Islands
+- Gibraltar
+- Macedonia, Republic of
+- Monaco
+- San Marino
+- Serbia and Montenegro
+
+XNA:
+- Bermuda
+- Greenland
+- Saint Pierre and Miquelon
+
+XNF:
+- Algeria
+- Libya
+
+XOC:
+- American Samoa
+- Cook Islands
+- Fiji
+- French Polynesia
+- Guam
+- Wallis and Futuna
+- Kiribati
+- Marshall Islands
+- Micronesia, Federated States of
+- Nauru
+- New Caledonia
+- Niue
+- Norfolk Island
+- Northern Mariana Islands
+- Palau
+- Papua New Guinea
+- Samoa
+- Solomon Islands
+- Tokelau
+- Tonga
+- Tuvalu
+- Vanuatu
+
+XSA:
+- Afghanistan
+- Bhutan
+- Maldives
+- Nepal
+
+XSC:
+- Lesotho
+- Namibia
+- Swaziland
+
+XSE:
+- Brunei Darussalam
+- Timor-Leste
+
+XSM:
+- Falkland Islands (Malvinas)
+- French Guiana
+- Guyana
+- Suriname
+
+XSU:
+- Tajikistan
+- Turkmenistan
+- Uzbekistan
+
+XWF:
+- Benin
+- Burkina Faso
+- Cape Verde
+- Côte d'Ivoire
+- Gambia
+- Ghana
+- Guinea
+- Guinea-Bissau
+- Liberia
+- Mali
+- Mauritania
+- Niger
+- Saint Helena, Ascension and Tristan da Cunha
+- Sierra Leone
+- Togo
+
+XWS:
+- Bahrain
+- Iraq
+- Israel
+- Jordan
+- Kuwait
+- Lebanon
+- Oman
+- Palestine, State of
+- Qatar
+- Saudi Arabia
+- Syrian Arab Republic
+- United Arab Emirates
+- Yemen
