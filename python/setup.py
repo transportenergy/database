@@ -24,7 +24,6 @@ CLASSIFIERS = [
 
 INSTALL_REQUIRES = [
     'click >= 0.6',
-    'gdx >= 3',
     'pandas >= 0.20',
     'pint >= 0.8',
     'plotnine >= 0.1',
@@ -36,6 +35,7 @@ TESTS_REQUIRE = ['pytest >= 2.7']
 EXTRAS_REQUIRE = {
     'docs': ['sphinx', 'sphinx-rtd-theme', 'numpydoc'],
     'stats': ['requests', 'requests-cache'],
+    'eppa': ['gdx >= 3'],
     }
 
 DESCRIPTION = "Transportation energy projections database"
@@ -61,6 +61,7 @@ setup(name=DISTNAME,
       install_requires=INSTALL_REQUIRES,
       extras_require=EXTRAS_REQUIRE,
       tests_require=TESTS_REQUIRE,
+      extras_require=EXTRAS_REQUIRE,
       url=URL,
       packages=find_packages(),
       package_data={'item': ['../data/*']})
