@@ -1,0 +1,29 @@
+language: python
+
+cache: packages
+
+sudo: true
+
+python:
+  - 3.5
+
+r:
+  - release
+  - devel
+
+# before_install:
+#   - sudo apt-get install r-cran-ggplot2
+
+install:
+  - pip install -r ci/requirements.txt
+  - pip install codecov pytest-cov
+
+script:
+  - py.test python/item --cov=item --cov-report term-missing
+
+after_success:
+  - coverage combine
+  - codecov
+
+notifications:
+  email: false
