@@ -2,8 +2,6 @@ language: python
 
 cache: packages
 
-sudo: true
-
 python:
   - 3.5
 
@@ -19,7 +17,8 @@ install:
   - pip install codecov pytest-cov
 
 script:
-  - py.test python/item --cov=item --cov-report term-missing
+   - R CMD check R/item
+   - py.test python/item --cov=item --cov-report term-missing
 
 after_success:
   - coverage combine
