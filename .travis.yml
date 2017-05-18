@@ -5,12 +5,15 @@ cache: packages
 python:
   - 3.5
 
-r:
-  - release
-  - devel
-
-# before_install:
-#   - sudo apt-get install r-cran-ggplot2
+addons:
+  apt:
+    packages:
+      - r-cran-optparse
+      - r-cran-r.utils
+      - r-cran-reshape2
+      - r-cran-testthat
+      - r-cran-xml2
+      - r-cran-yaml
 
 install:
   - pip install -r ci/requirements.txt
