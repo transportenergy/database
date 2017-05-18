@@ -5,17 +5,50 @@ cache: packages
 python:
   - 3.5
 
+env:
+  global:
+    - TRAVIS_R_VERSION=3.4.0
+    - R_LIBS_USER=~/R/library
+    - R_LIBS_SITE=/usr/local/lib/R/site-library:/usr/lib/R/site-library
+    - R_PROFILE=~/.Rprofile.site
+
 addons:
   apt:
+    sources:
+      - sourceline: 'deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)/'
     packages:
-      - r-cran-optparse
-      - r-cran-r.utils
-      - r-cran-reshape2
-      - r-cran-testthat
-      - r-cran-xml2
-      - r-cran-yaml
+      # default Travis package set for R
+      - build-essential
+      - gcc
+      - g++
+      - gfortran
+      - libblas-dev
+      - liblapack-dev
+      - libncurses5-dev
+      - libreadline-dev
+      - libjpeg-dev
+      - libpng-dev
+      - zlib1g-dev
+      - libbz2-dev
+      - liblzma-dev
+      - cdbs
+      - qpdf
+      - texinfo
+      - libmagick++-dev
+      - libssh2-1-dev
+      # R development tools
+      - r-cran-devtools
+
+before_install:
+  - curl -fLo /tmp/R-3.4.0-$(lsb_release -cs).xz https://s3.amazonaws.com/rstudio-travis/R-3.4.0-$(lsb_release -cs).xz
+  - tar xJf /tmp/R-3.4.0-$(lsb_release -cs).xz -C ~
+  - export PATH=$HOME/R-bin/bin:$PATH
+  - export LD_LIBRARY_PATH=$HOME/R-bin/lib:$LD_LIBRARY_PATH
+  - rm /tmp/R-3.4.0-$(lsb_release -cs).xz
+  - echo 'options(repos = c(CRAN = "https://cloud.r-project.org"))' > ~/.Rprofile.site
 
 install:
+  - Rscript -e 'devtools::install_deps("R/item")'
   - pip install -r ci/requirements.txt
   - pip install codecov pytest-cov
 
