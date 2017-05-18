@@ -18,7 +18,7 @@ def add(fn, *params):
         fn.__name__,
         callback=fn,
         help=fn.__doc__,
-        params=params))
+        params=list(params)))
 
 
 add(process_raw,
@@ -31,14 +31,14 @@ add(list_pairs,
     )
 
 add(make_regions_csv,
-    Argument(['models'], help='List of models to output'),
+    Argument(['models']),
     Argument(['out_file']),
     )
 
 add(make_regions_yaml,
     Argument(['in_file']),
-    Argument(['country'], help='IN_FILE column with country codes'),
-    Argument(['region'], help='IN_FILE column with region names'),
+    Argument(['country']),
+    Argument(['region']),
     Argument(['out_file']),
     )
 
