@@ -1,4 +1,17 @@
+# N.B. this file configures Travis to test *both* the Python and R item codes.
+# This line:
 language: python
+# …invokes the Travis setup for Python. The Travis setup for R is patched into
+# the file below, with reference to:
+# - The Travis documentation: https://docs.travis-ci.com/
+# - Example .travis.yml for a popular R package:
+#   https://github.com/tidyverse/ggplot2/blob/master/.travis.yml
+# - The community-developed R support for Travis:
+#   - https://github.com/travis-ci/travis-build , in particular the file:
+#     lib/travis/build/script/r.rb
+#   - Example output: https://travis-ci.org/tidyverse/ggplot2/jobs/232365761
+
+dist: trusty
 
 cache:
   directories:
