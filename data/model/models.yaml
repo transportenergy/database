@@ -3,7 +3,7 @@ bp:
   versions: [2]
 
 eia:
-  format: null
+  format: xlsx
   org: United States Department of Energy (DoE) Energy Information Administration (EIA)
   versions: [2]
 
@@ -20,7 +20,7 @@ exxonmobil:
   versions: [2]
 
 gcam:
-  format: null
+  format: csv
   versions: [1, 2]
 
 get:

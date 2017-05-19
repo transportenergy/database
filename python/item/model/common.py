@@ -88,7 +88,11 @@ def as_xarray(data, version, fmt):
 
 def data_columns(df):
     """Return a sorted list of non-index columns in pandas.Dataframe *df*."""
-    return sorted(set(df.columns) - set(INDEX))
+    try:
+        return sorted(set(df.columns) - set(INDEX))
+    except TypeError:
+        print(set(df.columns), set(INDEX), set(df.columns) - set(INDEX))
+        raise
 
 
 def drop_empty(df, columns=None):

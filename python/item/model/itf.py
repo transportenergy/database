@@ -1,18 +1,16 @@
-import os
-
 import pandas as pd
 
-from .common import drop_empty, log
+from item.common import log
 
 
-def import_data(path):
-    input_fn = os.path.join(path,
-                            'iTEM2_reporting_ITF_UrbanPassenger_Fuel.xlsx')
+def import_data(data_path, metadata_path):
+    input_fn = data_path
 
     # Giving 'None' causes all five sheets to be loaded
     data = pd.read_excel(input_fn, None)
 
-    log(*['Sheet %s: %d rows' % (k, v.shape[0]) for k, v in data.items()])
+    for k, v in data.items():
+        log('Sheet {}: {} rows'.format(k, v.shape[0]))
 
     data = pd.concat(data.values())
 
@@ -20,4 +18,4 @@ def import_data(path):
     data['Model'] = 'ITF'
 
     # Combine the sheets. No comments supplied
-    return drop_empty(data), None
+    return data, None

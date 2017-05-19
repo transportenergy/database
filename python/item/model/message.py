@@ -1,10 +1,8 @@
-import os
-
 import pandas as pd
 
 
-def import_data(path):
-    input_fn = os.path.join(path, 'iTEM2_reporting_MESSAGE_2016-08-26.xlsx')
+def import_data(data_path, metadata_path):
+    input_fn = data_path
 
     data = pd.read_excel(input_fn, sheetname=['data_Base', 'data_2C'])
 

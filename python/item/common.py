@@ -1,6 +1,6 @@
 import logging
 from os import makedirs
-from os.path import abspath, join
+from os.path import abspath, dirname, join
 from warnings import filterwarnings
 
 import yaml
@@ -13,7 +13,8 @@ filterwarnings('ignore',
 
 # Various paths to data
 paths = {
-    'data': abspath(join('..', 'data')),  # Package data
+    # Package data
+    'data': abspath(join(dirname(__file__), '..', '..', 'data')),
     }
 
 

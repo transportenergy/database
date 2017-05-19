@@ -27,7 +27,7 @@ import xarray as xr
 import yaml
 
 from item.common import paths, log
-from item.model.common import as_xarray, data_columns, tidy, select
+from item.model.common import as_xarray, tidy, select
 from item.model.dimensions import INDEX, load_template
 
 
@@ -42,13 +42,6 @@ VERSIONS = [1, 2]
 
 # Information about the models
 MODELS = {}
-
-
-def order_columns(df):
-    """Return a copy of *df* with columns in a canonical order."""
-    df = df.reindex_axis(INDEX + data_columns(df), axis=1)
-    df.columns = map(str, df.columns)
-    return df
 
 
 def coverage(models):
@@ -109,10 +102,11 @@ def get_model_info(name, version):
 
     try:
         model_info = MODELS[name]
-        assert version in model_info['versions'], \
-            ValueError("model '{}' not present in database version {}"
-                       .format(name, version))
-        return
+        if version in model_info['versions']:
+            return model_info
+        else:
+            raise ValueError("model '{}' not present in database version {}"
+                             .format(name, version))
     except KeyError:
         raise ValueError('unknown model: {}'.format(name))
 
@@ -128,35 +122,44 @@ def get_model_names(version=VERSIONS[-1]):
     return result
 
 
-def process_raw(models):
+def process_raw(version, models):
     """Process raw data submissions.
 
     Data for MODELS are imported from the raw data directory.
     """
+    # Process arguments
+    models = models if len(models) else get_model_names(version)
+
     log('Processing raw data for: {}'.format(' '.join(models)))
-    with open(join(paths['data'], 'model', 'models.yaml')) as f:
-        model_info = yaml.load(f)
+
+    class _csv_model:
+        def import_data(self, data_path, metadata_path):
+            return pd.read_csv(data_path), None
 
     for name in models:
         try:
-            info = model_info[name]
+            info = get_model_info(name, version)
         except KeyError:
             log("  unknown model '%s', skipping" % name)
             continue
 
-        if info['format'] in [None, 'csv']:
-            log("  model '%s' data needs no import" % name)
+        if info['format'] == 'csv':
+            model = _csv_model()
+        elif info['format'] is None:
+            log("  model '{}' needs no import".format(name))
             continue
+        else:
+            model = import_module('item.model.%s' % name)
 
-        model = import_module('item.model.%s' % name)
-        _process_raw(name, model, info)
+        _process_raw(name, model, version, info)
 
 
-def _process_raw(name, model, info):
+def _process_raw(name, model, version, info):
     log('Processing raw data for {}'.format(name))
     # Path to raw data: this hold the contents of the Dropbox folder
     # 'ITEM2/Scenario_data_for_comparison/Data_submission_1/Raw_data'
-    raw_data = join(paths['model raw'], '%s.%s' % (name, info['format']))
+    raw_data = join(paths['model raw'], str(version),
+                    '{}.{}'.format(name, info['format']))
     metadata = join(paths['data'], 'model', name)
 
     log('  raw data: {}\n  metadata: {}'.format(raw_data, metadata))
@@ -165,23 +168,24 @@ def _process_raw(name, model, info):
     data, notes = model.import_data(raw_data, metadata)
 
     # Put columns in a canonical order
-    data = order_columns(data)
+    data = tidy(data)
 
     # Log some diagnostic information
-    iy = sorted(set(data.columns) - set(INDEX))[0]
-    log('  %d non-zero values beginning %s' % (
-        data.loc[:, iy:].notnull().sum().sum(), iy))
+    iy = list(set(data.columns) - set(INDEX))
+    log('  %d non-zero values beginning %s',
+        data.loc[:, iy].notnull().sum().sum(), iy)
 
     # Create a subdirectory under item2-data/model, if it does not already
     # exist
-    model_dir = join(paths['model processed'], name)
+    model_dir = join(paths['model processed'], str(version), name)
     makedirs(model_dir, exist_ok=True)
 
     # TODO log the last-changed date of the file used for import, or a
     # checksum
 
     # Write data
-    data.to_csv(join(paths['model processed'], '%s.csv' % name), index=False)
+    data.to_csv(join(paths['model processed'], str(version), '%s.csv' % name),
+                index=False)
 
     # Write the region list for this model
     pd.Series(data['region'].unique(), name='region') \
@@ -307,8 +311,6 @@ def make_regions_csv(out_file, models, compare):
     value and
     """
     version = VERSIONS[-1]  # Version 2 only
-
-    load_models_info()
 
     models = models if len(models) else get_model_names(version)
 

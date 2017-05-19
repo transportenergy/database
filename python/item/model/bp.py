@@ -1,7 +1,5 @@
 import pandas as pd
 
-from item.model.common import tidy
-
 
 def import_data(data_path, metadata_path):
     input_fn = data_path
@@ -14,4 +12,4 @@ def import_data(data_path, metadata_path):
               .drop(['Scenario', 'Region'], axis='columns')
     notes['Model'] = 'BP'
 
-    return tidy(data), notes
+    return data, notes

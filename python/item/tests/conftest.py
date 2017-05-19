@@ -9,8 +9,7 @@ def pytest_addoption(parser):
     parser.addoption('--run-slow', action='store_true',
                      help='run slow tests')
     parser.addoption('--local-data',
-                     required=True,
-                     help='path for local data for testing')
+                     help='path to local data for testing')
 
 
 # From xarray
@@ -29,22 +28,25 @@ def item_tmp_dir():
 
     local_data = pytest.config.getoption('--local-data')
 
-    path = tempfile.mkdtemp()
+    if local_data is None:
+        pytest.skip('needs full database (give --local-data)')
+
+    tmp_dir = tempfile.mkdtemp()
     try:
         # Create the directories
-        make_database_dirs(path, False)
+        make_database_dirs(tmp_dir, False)
 
         # Override configuration for the test suite
         paths = {
-            'log': path,
-            'model': path,
+            'log': tmp_dir,
+            'model': tmp_dir,
             'model raw': join(local_data, 'model', 'raw'),
             'model database': join(local_data, 'model', 'database'),
             }
         init_paths(**paths)
 
         # For use by test functions
-        yield path
+        yield tmp_dir
     finally:
         # Remove the whole tree
-        shutil.rmtree(path)
+        shutil.rmtree(tmp_dir)

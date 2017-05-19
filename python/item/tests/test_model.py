@@ -13,7 +13,7 @@ from item.model import (
 
 slow = pytest.mark.skipif(
     not pytest.config.getoption('--run-slow'),
-    reason='need --runslow option to run'
+    reason='need --run-slow option to run',
     )
 
 
@@ -26,11 +26,18 @@ def item1_data():
     yield load_model_data(1)
 
 
-@slow
-@pytest.mark.parametrize('model', ['bp', 'eppa5'])
+@pytest.mark.parametrize('model', ['bp', 'eia', 'exxonmobil', 'gcam', 'get',
+                                   'itf', 'message', 'roadmap'])
 def test_process_raw(item_tmp_dir, model):
-    process_raw([model])
-    assert exists(join(paths['model processed'], '%s.csv' % model))
+    process_raw(2, [model])
+    assert exists(join(paths['model processed'], '2', '%s.csv' % model))
+
+
+@slow
+@pytest.mark.parametrize('model', ['eppa5'])
+def test_process_raw_slow(item_tmp_dir, model):
+    process_raw(2, [model])
+    assert exists(join(paths['model processed'], '2', '%s.csv' % model))
 
 
 @slow
