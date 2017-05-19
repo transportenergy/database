@@ -104,6 +104,30 @@ def coverage(models):
     df.to_csv(os.path.join(paths['model data'], 'output', 'coverage.csv'))
 
 
+def get_model_info(name, version):
+    load_models_info()
+
+    try:
+        model_info = MODELS[name]
+        assert version in model_info['versions'], \
+            ValueError("model '{}' not present in database version {}"
+                       .format(name, version))
+        return
+    except KeyError:
+        raise ValueError('unknown model: {}'.format(name))
+
+
+def get_model_names(version=VERSIONS[-1]):
+    """Return the names of all models in *version*."""
+    load_models_info()
+
+    result = []
+    for name, info in MODELS.items():
+        if version in info['versions']:
+            result.append(name)
+    return result
+
+
 def process_raw(models):
     """Process raw data submissions.
 
@@ -223,6 +247,10 @@ def load_models_info():
     """Load the models metadata into the MODELS global."""
     global MODELS
 
+    if len(MODELS) > 0:
+        # Already loaded
+        return
+
     with open(join(paths['data'], 'model', 'models.yaml')) as f:
         MODELS = yaml.load(f)
 
@@ -239,20 +267,32 @@ def load_model_regions(name, version):
     """
     # TODO load from either regions-1.yaml or regions-2.yaml
     try:
-        model_info = MODELS[name]
-        assert version in model_info['versions'], \
-            ValueError("model '{}' not present in database version {}"
-                       .format(name, version))
-    except KeyError:
-        if name.lower() != 'item':
-            raise ValueError('unknown model: {}'.format(name))
-        else:
+        get_model_info(name, version)
+    except:
+        if name.lower() == 'item':
+            # Use an empty path in the join() call below; this causes the
+            # overall regions.yaml to be loaded
             name = ''
+        else:
+            raise
 
     with open(join(paths['data'], 'model', name, 'regions.yaml')) as f:
-        result = yaml.load(f)
+        return yaml.load(f)
 
-    return result
+
+def load_model_scenarios(name, version):
+    """Load scenarios.yaml for model *name* in database *version*.
+
+    Returns a dictionay where:
+    - Keys are codes or names of scenarios.
+    - Values are dictionaries with the key:
+      - category: either 'reference' or 'policy'.
+    """
+    # Don't do anything with the return value; just check arguments
+    get_model_info(name, version)
+
+    with open(join(paths['data'], 'model', name, 'scenarios.yaml')) as f:
+        return yaml.load(f)[version]
 
 
 def make_regions_csv(out_file, models, compare):
@@ -270,7 +310,7 @@ def make_regions_csv(out_file, models, compare):
 
     load_models_info()
 
-    models = models if len(models) else model_names(version)
+    models = models if len(models) else get_model_names(version)
 
     def _load(name):
         def _invert(data):
@@ -337,10 +377,16 @@ def make_regions_yaml(in_file, country, region, out_file):
         yaml.dump(result, f, default_flow_style=False)
 
 
-def model_names(version=VERSIONS[-1]):
-    """Return the names of all models in *version*."""
-    result = []
-    for name, info in MODELS.items():
-        if version in info['versions']:
-            result.append(name)
-    return result
+def squash_scenarios(data, version):
+    """Replace the per-model scenario names with scenario categories.
+
+    *data* is a pd.DataFrame. *version* is the version of the iTEM model
+    database.
+    """
+    # Construct the map from model metadata
+    scenarios_map = {}
+    for model in get_model_names(version):
+        for s, info in load_model_scenarios(model, version).items():
+            scenarios_map[s] = info['category']
+
+    return data.replace({'scenario': scenarios_map})

@@ -3,7 +3,12 @@ import pytest
 import xarray as xr
 
 from item.common import paths
-from item.model import load_model_data, process_raw, select
+from item.model import (
+    load_model_data,
+    process_raw,
+    select,
+    squash_scenarios,
+    )
 
 
 slow = pytest.mark.skipif(
@@ -74,7 +79,10 @@ def test_select(item1_data):
     assert len(data) == 6752
 
 
-def test_scenarios():
-    from item.model.common import SCENARIOS
+def test_squash_scenarios(item1_data):
+    # The input data has multiple scenario names
+    assert len(item1_data['scenario'].unique()) > 2
 
-    assert len(SCENARIOS) == 28
+    squashed = squash_scenarios(item1_data, 1)
+
+    assert sorted(squashed['scenario'].unique()) == ['policy', 'reference']

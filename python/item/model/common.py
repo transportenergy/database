@@ -190,9 +190,4 @@ def select(data, *args, **kwargs):
     return data[keep]
 
 
-def squash_scenarios(data):
-    """Replace the per-model scenario names with categories."""
-    raise NotImplementedError
-
-
 load()
