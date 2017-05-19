@@ -22,6 +22,7 @@ from os.path import join
 import pickle
 
 import pandas as pd
+import pycountry
 import xarray as xr
 import yaml
 
@@ -34,6 +35,13 @@ __all__ = [
     'load_model_data',
     'select',
     ]
+
+
+# Versions of the database
+VERSIONS = [1, 2]
+
+# Information about the models
+MODELS = {}
 
 
 def order_columns(df):
@@ -209,3 +217,130 @@ def load_model_data(version, skip_cache=False, cache=True, fmt=pd.DataFrame):
     else:
         # return as-is
         return data
+
+
+def load_models_info():
+    """Load the models metadata into the MODELS global."""
+    global MODELS
+
+    with open(join(paths['data'], 'model', 'models.yaml')) as f:
+        MODELS = yaml.load(f)
+
+
+def load_model_regions(name, version):
+    """Load regions.yaml for model *name* in database *version*.
+
+    Returns a dictionary where:
+    - Keys are codes or names of model regions.
+    - Values are dictionaries with the keys:
+      - description (optional): a longer name or description of the region
+      - countries: a list of ISO 3166 alpha-3 codes for countries in the
+        region.
+    """
+    # TODO load from either regions-1.yaml or regions-2.yaml
+    try:
+        model_info = MODELS[name]
+        assert version in model_info['versions'], \
+            ValueError("model '{}' not present in database version {}"
+                       .format(name, version))
+    except KeyError:
+        if name.lower() != 'item':
+            raise ValueError('unknown model: {}'.format(name))
+        else:
+            name = ''
+
+    with open(join(paths['data'], 'model', name, 'regions.yaml')) as f:
+        result = yaml.load(f)
+
+    return result
+
+
+def make_regions_csv(out_file, models, compare):
+    """Produce a CSV *out_file* with a country→region map for *models*.
+
+    The table is created by parsing the regions.yaml files in the iTEM model
+    database metadata. It is indexed by ISO 3166 (alpha-3) codes, and has one
+    column for each model in *models* (if no models are specified, all models
+    are included).
+
+    If *compare* is given, the table has entries only where the generated
+    value and
+    """
+    version = VERSIONS[-1]  # Version 2 only
+
+    load_models_info()
+
+    models = models if len(models) else model_names(version)
+
+    def _load(name):
+        def _invert(data):
+            result = {}
+            for k, v in data.items():
+                result.update({c: k for c in v['countries']})
+            return result
+
+        return pd.Series(_invert(load_model_regions(name, version)),
+                         name=name if len(name) else 'item')
+
+    result = pd.concat([_load(model) for model in ['item'] + models], axis=1)
+
+    def _get_name(row):
+        error = None
+        try:
+            name = pycountry.countries.get(alpha_3=row.name).name
+        except KeyError:
+            try:
+                name = pycountry.historic_countries.get(
+                    alpha_3=row.name).name
+                error = 'historical'
+            except KeyError:
+                name = ''
+                error = 'nonexistent'
+            finally:
+                print("{} ISO 3166 code '{}' in models: {}".format(error,
+                      row.name, ', '.join(row.dropna().index)))
+        return name
+
+    result['name'] = result.apply(_get_name, axis=1)
+
+    if compare is not None:
+        other = pd.read_csv(compare)
+        other.columns = map(str.lower, other.columns)
+        other.set_index('iso', inplace=True)
+        other.index = map(str.upper, other.index)
+
+        result = result.where(result.ne(other))
+
+    with open(out_file, 'w') as f:
+        result.to_csv(f)
+
+
+def make_regions_yaml(in_file, country, region, out_file):
+    """Convert a country→region map from CSV *in_file* to YAML *out_file*.
+
+    *country* and *region* are columns in *in_file* with country codes and
+    region names, respectively.
+    """
+    data = pd.read_csv(in_file)[[region, country]] \
+             .sort_values([region, country])
+    data[country] = data[country].apply(str.upper)
+
+    result = {}
+
+    for region, group in data.groupby(region):
+        result[region] = dict(
+            description='',
+            countries=list(group[country]),
+            )
+
+    with open(out_file, 'w') as f:
+        yaml.dump(result, f, default_flow_style=False)
+
+
+def model_names(version=VERSIONS[-1]):
+    """Return the names of all models in *version*."""
+    result = []
+    for name, info in MODELS.items():
+        if version in info['versions']:
+            result.append(name)
+    return result

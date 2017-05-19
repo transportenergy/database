@@ -1,20 +1,21 @@
-from click import Argument, Command, Group
+import click
+from click import Argument, Option
 
-from item.model import process_raw
-from item.model.dimensions import (
-    list_pairs,
+from item.model import (
     make_regions_csv,
     make_regions_yaml,
+    process_raw,
     )
+from item.model.dimensions import list_pairs
 from item.model.plot import plot_all_item1
 
 
-model = Group('model', help="Manipulate the model database.")
+model = click.Group('model', help="Manipulate the model database.")
 
 
 def add(fn, *params):
     """Wrap *fn* and add it to the click.Group."""
-    model.add_command(Command(
+    model.add_command(click.Command(
         fn.__name__,
         callback=fn,
         help=fn.__doc__,
@@ -31,8 +32,9 @@ add(list_pairs,
     )
 
 add(make_regions_csv,
-    Argument(['models']),
     Argument(['out_file']),
+    Argument(['models'], default=[]),
+    Option(['--compare'], type=click.Path()),
     )
 
 add(make_regions_yaml,

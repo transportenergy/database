@@ -183,33 +183,4 @@ def load_template(version):
     return result
 
 
-def make_regions_csv(models, out_file):
-    """Produce a CSV *out_file* with a country→region map for *models*.
-
-    *models* is a list of models to output."""
-    raise NotImplementedError
-
-
-def make_regions_yaml(in_file, country, region, out_file):
-    """Convert a country→region map from CSV *in_file* to YAML *out_file*.
-
-    *country* and *region* are columns in *in_file* with country codes and
-    region names, respectively.
-    """
-    data = pd.read_csv(in_file)[[region, country]] \
-             .sort_values([region, country])
-    data[country] = data[country].apply(str.upper)
-
-    result = {}
-
-    for region, group in data.groupby(region):
-        result[region] = dict(
-            description='',
-            countries=list(group[country]),
-            )
-
-    with open(out_file, 'w') as f:
-        yaml.dump(result, f, default_flow_style=False)
-
-
 load()
