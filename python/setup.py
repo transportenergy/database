@@ -31,8 +31,8 @@ INSTALL_REQUIRES = [
     'pint >= 0.8',
     'plotnine >= 0.1',
     'pycountry >= 17.5',
+    'pyyaml >= 3.12',
     'xarray >= 0.9',
-    'yaml >= 3.12',
     ]
 TESTS_REQUIRE = ['pytest >= 2.7']
 
