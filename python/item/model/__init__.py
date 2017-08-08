@@ -34,6 +34,7 @@ from item.model.dimensions import INDEX, load_template
 __all__ = [
     'load_model_data',
     'select',
+    'squash_scenarios',
     ]
 
 
@@ -199,7 +200,8 @@ def _process_raw(name, model, version, info):
         pass
 
 
-def load_model_data(version, skip_cache=False, cache=True, fmt=pd.DataFrame):
+def load_model_data(version, skip_cache=False, cache=True, fmt=pd.DataFrame,
+                    options=[]):
     """Load model database"""
     # Check arguments
     version = int(version)
@@ -239,6 +241,14 @@ def load_model_data(version, skip_cache=False, cache=True, fmt=pd.DataFrame):
             with open(cache_path, 'wb') as f:
                 pickle.dump(data, f)
 
+    # Optional additional processing
+    if 'squash scenarios' in options:
+        data = squash_scenarios(data, version)
+        options.remove('squash scenarios')
+
+    if len(options):
+        raise ValueError
+
     if fmt in [xr.Dataset, xr.DataArray]:
         # Convert to an xarray format
         return as_xarray(data, version, fmt)
@@ -269,7 +279,7 @@ def load_model_regions(name, version):
       - countries: a list of ISO 3166 alpha-3 codes for countries in the
         region.
     """
-    # TODO load from either regions-1.yaml or regions-2.yaml
+    # IDEA load from either regions-1.yaml or regions-2.yaml
     try:
         get_model_info(name, version)
     except:
