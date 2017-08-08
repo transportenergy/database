@@ -27,14 +27,16 @@ import xarray as xr
 import yaml
 
 from item.common import paths, log
-from item.model.common import as_xarray, tidy, select
+from item.model.common import as_xarray, concat_versions, tidy, select, to_wide
 from item.model.dimensions import INDEX, load_template
 
 
 __all__ = [
+    'concat_versions',
     'load_model_data',
     'select',
     'squash_scenarios',
+    'to_wide',
     ]
 
 

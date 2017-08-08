@@ -86,6 +86,18 @@ def as_xarray(data, version, fmt):
     return result
 
 
+def concat_versions(dataframes={}):
+    """Convert a dict of *dataframes* to a single pd.DataFrame.
+
+    The keys of *dataframes* are saved in a new column 'version'.
+    """
+    dfs = []
+    for version, df in dataframes.items():
+        df['version'] = version
+        dfs.append(df)
+    return pd.concat(dfs)
+
+
 def data_columns(df):
     """Return a sorted list of non-index columns in pandas.Dataframe *df*."""
     try:
@@ -191,7 +203,12 @@ def select(data, *args, **kwargs):
             keep &= data[d].isin(v)
 
     # Subset the data and return
-    return data[keep]
+    return data[keep].copy()
+
+
+def to_wide(data, dimension='year'):
+    """Convert *data* to wide format, one column per year."""
+    return data.set_index(INDEX + ['year'])['value'].unstack(dimension)
 
 
 load()
