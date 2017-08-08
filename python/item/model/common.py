@@ -180,7 +180,7 @@ def select(data, *args, **kwargs):
 
     for d, v in kwargs.items():
         d = 'technology' if d == 'tech' else d
-        dims[d] = set([v]) if isinstance(v, str) else set(v)
+        dims[d] = set([v]) if isinstance(v, (int, str)) else set(v)
 
     if len(args) and dims['variable'] is None:
         dims['variable'] = set(args)
