@@ -1,6 +1,6 @@
 import logging
 from os import makedirs
-from os.path import abspath, dirname, join
+from os.path import abspath, dirname, expanduser, join
 from warnings import filterwarnings
 
 import yaml
@@ -22,21 +22,23 @@ config = {}
 _logger = None
 
 
-def load_config():
+def load_config(path=None):
     """Load configuration."""
     global config
+    _path = abspath('.' if path is None else path)
     try:
-        with open('item_config.yaml') as f:
+        with open(join(_path, 'item_config.yaml')) as f:
             result = yaml.load(f)
             config['_from_file'] = result
             config.update(result)
             config['_filename'] = 'item_config.yaml'
     except FileNotFoundError:
-        pass
+        if path is not None:
+            raise
 
 
-def init():
-    load_config()
+def init(path=None):
+    load_config(path)
     init_paths()
 
 
@@ -61,7 +63,7 @@ def init_paths(**kwargs):
     path_config.update(kwargs)
 
     def init_path(name, default, mkdir=False):
-        paths[name] = abspath(path_config.get(name, default))
+        paths[name] = abspath(expanduser(path_config.get(name, default)))
         if mkdir:
             makedirs(paths['cache'], exist_ok=True)
 
@@ -75,6 +77,8 @@ def init_paths(**kwargs):
     init_path('model database', join(paths['model'], 'database'))
     init_path('models-1', join(paths['model database'], '1.csv'))
     init_path('models-2', join(paths['model database'], '2.csv'))
+
+    init_path('plot', join('.', 'plot'))
 
 
 def log(*items, level=logging.INFO):
@@ -99,8 +103,8 @@ def make_database_dirs(path, dry_run):
         ]
     dirs = [path] + [join(path, *d) for d in dirs]
 
-    for dirname in dirs:
+    for name in dirs:
         if dry_run:
-            log('  ' + dirname)
+            log('  ' + name)
         else:
-            makedirs(dirname, exist_ok=True)
+            makedirs(name, exist_ok=True)
