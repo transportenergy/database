@@ -16,7 +16,7 @@ following in item_config.yaml:
 Underscores are converted to spaces automatically."
 
 cli_debug <- function () {
-  print(ls(config)
+  print(ls(config))
   print(ls(paths))
 }
 
