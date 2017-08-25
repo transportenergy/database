@@ -53,8 +53,10 @@ init_paths <- function (path_args=list()) {
 
   init_path('model', paths[['wd']])
   init_path('model raw', paths[['model']], 'raw')
-  init_path('model processed', paths[['model']], 'processed')
+  init_path('model processed', paths[['model']], 'processed', '2')
+  init_path('roadmap model processed', paths[['model']], 'processed', '2', 'roadmap')
   init_path('model database', paths[['model']], 'database')
   init_path('models-1', paths[['model database']], '1.csv')
   init_path('models-2', paths[['model database']], '2.csv')
 }
+

@@ -23,7 +23,7 @@ load_model_data <- function (version) {
     return()
   }
 
-  data <- tidy(read.csv(path))
+  data <- tidy(read.csv(path, stringsAsFactors = FALSE))
   data <- reshape2::melt(data, id.vars=index, variable.name='year', na.rm=TRUE)
 
   return(data)
