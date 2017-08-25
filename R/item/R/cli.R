@@ -49,7 +49,7 @@ cli <- function () {
   init_paths()
 
   if (length(args) == 0) {
-    # No command given → print help
+    # No command given -> print help
     optparse::print_help(parser)
   } else {
     # First argument is name of the command
