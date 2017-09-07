@@ -1,0 +1,13 @@
+var1,var2,var1_Unit,unit_conversion,Unit
+energy,Population,PJ/yr,1,GJ/person/yr
+pkm,Population,bn pkm/yr,1,thousand pkm/person/yr
+tkm,Population,bn tkm/yr,1,thousand tkm/person/yr
+vkt,Population,bn vkm/yr,1,thousand vkm/person/yr
+stock,Population,million vehicles,1000,Vehicles per thousand persons
+ttw_co2,Population,Mt CO2/yr,1,t CO2/person/yr
+energy,PPP-GDP,PJ/yr,1,MJ/US$2005
+pkm,PPP-GDP,bn pkm/yr,1,pkm/US$2005
+tkm,PPP-GDP,bn tkm/yr,1,tkm/US$2005
+vkt,PPP-GDP,bn vkm/yr,1,vkm/US$2005
+stock,PPP-GDP,million vehicles,1000,vehicles/million US$2005
+ttw_co2,PPP-GDP,Mt CO2/yr,1,kg CO2/US$2005

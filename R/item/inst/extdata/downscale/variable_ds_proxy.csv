@@ -1,0 +1,24 @@
+# Map each variable to a variable type. For quantity variables, assign a downscaling proxy,
+variable,variable_type,ds_proxy
+Carbon Price,indicator,
+CO2 Concentration,indicator,
+CO2 Emissions (all sectors),quantity,CO2
+CO2eq Concentration,indicator,
+energy,quantity,TRANSPORTENERGY
+Fuel Price,indicator,
+GHG Emissions (all sectors),quantity,CO2
+intensity,indicator,
+intensity_new,indicator,
+pkm,quantity,TRANSPORTENERGY
+Population,quantity,POPULATION
+PPP-GDP,quantity,GDP
+Radiative Forcing,indicator,
+sales,quantity,TRANSPORTENERGY
+stock,quantity,TRANSPORTENERGY
+tkm,quantity,TRANSPORTENERGY
+ttw_bc,quantity,TRANSPORTENERGY
+ttw_ch4,quantity,TRANSPORTENERGY
+ttw_co2,quantity,TRANSPORTENERGY
+ttw_pm2.5,quantity,TRANSPORTENERGY
+vkt,quantity,TRANSPORTENERGY
+wtt_co2e,quantity,TRANSPORTENERGY

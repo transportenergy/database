@@ -10,6 +10,9 @@ index = list(
     'unit'
     )
 
+# Make these available as a character vector
+index_names <- as.character(index)
+
 #' Load the iTEM model database
 #'
 #' @param version Model database version to load (1 or 2)
@@ -25,6 +28,7 @@ load_model_data <- function (version) {
 
   data <- tidy(read.csv(path, stringsAsFactors = FALSE))
   data <- reshape2::melt(data, id.vars=index, variable.name='year', na.rm=TRUE)
+  data$year <- as.numeric(data$year)
 
   return(data)
 }

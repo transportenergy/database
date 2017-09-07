@@ -1,0 +1,275 @@
+# iTEM2 (generated from map_cntry_region_ALL.csv)
+Africa:
+  countries:
+  - AGO
+  - BDI
+  - BEN
+  - BFA
+  - BWA
+  - CAF
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COM
+  - CPV
+  - DJI
+  - DZA
+  - ERI
+  - ESH
+  - ETH
+  - GAB
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - KEN
+  - LBR
+  - LBY
+  - LSO
+  - MAR
+  - MDG
+  - MLI
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - NAM
+  - NER
+  - NGA
+  - REU
+  - RWA
+  - SDN
+  - SEN
+  - SLE
+  - SOM
+  - STP
+  - SWZ
+  - TCD
+  - TGO
+  - TUN
+  - TZA
+  - UGA
+  - ZAF
+  - ZMB
+  - ZWE
+
+China:
+  countries:
+  - CHN
+
+India:
+  countries:
+  - IND
+
+Middle East:
+  countries:
+  - ARE
+  - BHR
+  - EGY
+  - IRN
+  - IRQ
+  - ISR
+  - JOR
+  - KWT
+  - LBN
+  - OMN
+  - PSE
+  - QAT
+  - SAU
+  - SYR
+  - YEM
+
+Non-OECD Americas:
+  countries:
+  - ABW
+  - AIA
+  - ANT
+  - ARG
+  - ATG
+  - BHS
+  - BLZ
+  - BMU
+  - BOL
+  - BRA
+  - BRB
+  - COL
+  - CRI
+  - CUB
+  - CYM
+  - DMA
+  - DOM
+  - ECU
+  - FLK
+  - GLP
+  - GRD
+  - GTM
+  - GUF
+  - GUY
+  - HND
+  - HTI
+  - JAM
+  - KNA
+  - LCA
+  - MSR
+  - MTQ
+  - NIC
+  - PAN
+  - PER
+  - PRY
+  - SLV
+  - SUR
+  - TTO
+  - URY
+  - VCT
+  - VEN
+  - VGB
+  - VIR
+
+Non-OECD Europe:
+  countries:
+  - ALB
+  - AND
+  - BGR
+  - BIH
+  - CHI
+  - CYP
+  - FRO
+  - GIB
+  - GRL
+  - HRV
+  - IMN
+  - LIE
+  - MCO
+  - MKD
+  - MLT
+  - MNE
+  - ROM
+  - ROU
+  - SCG
+  - SHN
+  - SJM
+  - SMR
+  - SPM
+  - SRB
+  - SVN
+  - TCA
+  - VAT
+  - WLF
+  - YUG
+
+OECD Americas:
+  countries:
+  - CAN
+  - CHL
+  - MEX
+  - PRI
+  - USA
+
+OECD Asia Pacific:
+  countries:
+  - AUS
+  - JPN
+  - KOR
+  - NZL
+
+OECD Europe:
+  countries:
+  - AUT
+  - BEL
+  - CHE
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HUN
+  - IRL
+  - ISL
+  - ITA
+  - LUX
+  - NLD
+  - NOR
+  - POL
+  - PRT
+  - SVK
+  - SWE
+  - TUR
+
+Other FSU:
+  countries:
+  - ARM
+  - AZE
+  - BLR
+  - EST
+  - GEO
+  - KAZ
+  - KGZ
+  - LTU
+  - LVA
+  - MDA
+  - TJK
+  - TKM
+  - UKR
+  - UZB
+
+Other Non-OECD Asia:
+  countries:
+  - AFG
+  - ASM
+  - BGD
+  - BRN
+  - BTN
+  - CCK
+  - COK
+  - CXR
+  - FJI
+  - FSM
+  - GUM
+  - HKG
+  - IDN
+  - KHM
+  - KIR
+  - LAO
+  - LKA
+  - MAC
+  - MDV
+  - MHL
+  - MMR
+  - MNG
+  - MNP
+  - MYS
+  - MYT
+  - NCL
+  - NFK
+  - NIU
+  - NPL
+  - NRU
+  - PAK
+  - PCI
+  - PCN
+  - PHL
+  - PLW
+  - PNG
+  - PRK
+  - PYF
+  - SGP
+  - SLB
+  - SYC
+  - THA
+  - TKL
+  - TLS
+  - TON
+  - TUV
+  - TWN
+  - VNM
+  - VUT
+  - WSM
+
+Russia:
+  countries:
+  - RUS

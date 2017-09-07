@@ -1,0 +1,269 @@
+# iTEM2 (generated from map_cntry_region_ALL.csv)
+Africa:
+  countries:
+  - AGO
+  - BDI
+  - BEN
+  - BFA
+  - BWA
+  - CAF
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COM
+  - CPV
+  - DJI
+  - DZA
+  - EGY
+  - ERI
+  - ESH
+  - ETH
+  - GAB
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - KEN
+  - LBR
+  - LBY
+  - LSO
+  - MAR
+  - MDG
+  - MLI
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - NAM
+  - NER
+  - NGA
+  - REU
+  - RWA
+  - SDN
+  - SEN
+  - SLE
+  - SOM
+  - STP
+  - SWZ
+  - TCD
+  - TGO
+  - TUN
+  - TZA
+  - UGA
+  - ZAF
+  - ZMB
+  - ZWE
+
+Australasia:
+  countries:
+  - ASM
+  - AUS
+  - CCK
+  - COK
+  - CXR
+  - FJI
+  - FSM
+  - MHL
+  - MNP
+  - NIU
+  - NZL
+  - PCI
+  - PCN
+  - PLW
+  - PNG
+  - PYF
+  - TKL
+  - TUV
+  - WSM
+
+China:
+  countries:
+  - CHN
+  - HKG
+  - MAC
+  - TWN
+
+Europe:
+  countries:
+  - ALB
+  - AND
+  - AUT
+  - BEL
+  - BGR
+  - BIH
+  - CHE
+  - CHI
+  - CYP
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - FRO
+  - GBR
+  - GIB
+  - GRC
+  - GRL
+  - HRV
+  - HUN
+  - IMN
+  - IRL
+  - ISL
+  - ITA
+  - LIE
+  - LUX
+  - MCO
+  - MKD
+  - MLT
+  - MNE
+  - NLD
+  - NOR
+  - POL
+  - PRT
+  - ROM
+  - ROU
+  - SCG
+  - SHN
+  - SJM
+  - SMR
+  - SPM
+  - SRB
+  - SVK
+  - SVN
+  - SWE
+  - TCA
+  - TUR
+  - VAT
+  - VGB
+  - WLF
+  - YUG
+
+FSU:
+  countries:
+  - ARM
+  - AZE
+  - BLR
+  - EST
+  - GEO
+  - KAZ
+  - KGZ
+  - LTU
+  - LVA
+  - MDA
+  - RUS
+  - TJK
+  - TKM
+  - UKR
+  - UZB
+
+India:
+  countries:
+  - IND
+
+Middle East:
+  countries:
+  - ARE
+  - BHR
+  - IRN
+  - IRQ
+  - ISR
+  - JOR
+  - KWT
+  - LBN
+  - OMN
+  - PSE
+  - QAT
+  - SAU
+  - SYR
+  - YEM
+
+North America:
+  countries:
+  - CAN
+  - MEX
+  - USA
+
+Other Asia:
+  countries:
+  - AFG
+  - BGD
+  - BRN
+  - BTN
+  - GUM
+  - IDN
+  - JPN
+  - KHM
+  - KIR
+  - KOR
+  - LAO
+  - LKA
+  - MDV
+  - MMR
+  - MNG
+  - MYS
+  - MYT
+  - NCL
+  - NFK
+  - NPL
+  - NRU
+  - PAK
+  - PHL
+  - PRK
+  - SGP
+  - SLB
+  - SYC
+  - THA
+  - TLS
+  - TON
+  - VNM
+  - VUT
+
+South and Central America:
+  countries:
+  - ABW
+  - AIA
+  - ANT
+  - ARG
+  - ATG
+  - BHS
+  - BLZ
+  - BMU
+  - BOL
+  - BRA
+  - BRB
+  - CHL
+  - COL
+  - CRI
+  - CUB
+  - CYM
+  - DMA
+  - DOM
+  - ECU
+  - FLK
+  - GLP
+  - GRD
+  - GTM
+  - GUF
+  - GUY
+  - HND
+  - HTI
+  - JAM
+  - KNA
+  - LCA
+  - MSR
+  - MTQ
+  - NIC
+  - PAN
+  - PER
+  - PRI
+  - PRY
+  - SLV
+  - SUR
+  - TTO
+  - URY
+  - VCT
+  - VEN
+  - VIR

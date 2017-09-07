@@ -2,7 +2,7 @@
 % Please edit documentation in R/model-downscale.R
 \name{load_preprocessed_data}
 \alias{load_preprocessed_data}
-\title{Load the data submitted by the individual models, cleaned and placed into a common folder}
+\title{Load the data submitted by the individual models}
 \usage{
 load_preprocessed_data(model_data_folder)
 }
@@ -10,9 +10,11 @@ load_preprocessed_data(model_data_folder)
 \item{model_data_folder}{folder where the pre-processed model output data is located}
 }
 \description{
-Load the data submitted by the individual models, cleaned and placed into a common folder
+Load the data submitted by the individual models
 }
 \details{
-Assumes that the model data are all in the same folder, named with the extension ".csv",
-and that no other csv files are in the same folder
+Requires that the model output data are generally cleaned and appropriately formatted,
+and placed into a common folder.
+Individual data files should be the model name plus the extension ".csv",
+and there should be no other csv files in the same folder.
 }

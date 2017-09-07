@@ -1,0 +1,266 @@
+# iTEM2 (generated from map_cntry_region_ALL.csv)
+Africa:
+  countries:
+  - AGO
+  - BDI
+  - BEN
+  - BFA
+  - BWA
+  - CAF
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COM
+  - CPV
+  - DJI
+  - DZA
+  - EGY
+  - ERI
+  - ESH
+  - ETH
+  - GAB
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - KEN
+  - LBR
+  - LBY
+  - LSO
+  - MAR
+  - MDG
+  - MLI
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - NAM
+  - NER
+  - NGA
+  - REU
+  - RWA
+  - SDN
+  - SEN
+  - SLE
+  - SOM
+  - STP
+  - SWZ
+  - TCD
+  - TGO
+  - TUN
+  - TZA
+  - UGA
+  - ZAF
+  - ZMB
+  - ZWE
+
+Asia:
+  countries:
+  - AFG
+  - ASM
+  - BGD
+  - BRN
+  - BTN
+  - CCK
+  - COK
+  - CXR
+  - FJI
+  - FSM
+  - GUM
+  - IDN
+  - KHM
+  - KIR
+  - LAO
+  - LKA
+  - MDV
+  - MHL
+  - MMR
+  - MNG
+  - MNP
+  - MYS
+  - MYT
+  - NCL
+  - NFK
+  - NIU
+  - NPL
+  - NRU
+  - PAK
+  - PCI
+  - PCN
+  - PHL
+  - PLW
+  - PNG
+  - PRK
+  - PYF
+  - SGP
+  - SLB
+  - SYC
+  - THA
+  - TKL
+  - TLS
+  - TON
+  - TUV
+  - VNM
+  - VUT
+  - WSM
+
+China + India:
+  countries:
+  - CHN
+  - HKG
+  - IND
+  - MAC
+  - TWN
+
+EEA + Turkey:
+  countries:
+  - AND
+  - AUT
+  - BEL
+  - BGR
+  - CHE
+  - CHI
+  - CYP
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - FRO
+  - GBR
+  - GIB
+  - GRC
+  - GRL
+  - HUN
+  - IMN
+  - IRL
+  - ISL
+  - ITA
+  - LIE
+  - LUX
+  - MCO
+  - MLT
+  - NLD
+  - NOR
+  - POL
+  - PRT
+  - ROM
+  - ROU
+  - SHN
+  - SJM
+  - SMR
+  - SPM
+  - SVK
+  - SVN
+  - SWE
+  - TCA
+  - TUR
+  - VAT
+  - VGB
+  - WLF
+
+Latin America:
+  countries:
+  - ABW
+  - AIA
+  - ANT
+  - ARG
+  - ATG
+  - BHS
+  - BLZ
+  - BMU
+  - BOL
+  - BRA
+  - BRB
+  - CHL
+  - COL
+  - CRI
+  - CUB
+  - CYM
+  - DMA
+  - DOM
+  - ECU
+  - FLK
+  - GLP
+  - GRD
+  - GTM
+  - GUF
+  - GUY
+  - HND
+  - HTI
+  - JAM
+  - KNA
+  - LCA
+  - MSR
+  - MTQ
+  - NIC
+  - PAN
+  - PER
+  - PRI
+  - PRY
+  - SLV
+  - SUR
+  - TTO
+  - URY
+  - VCT
+  - VEN
+  - VIR
+
+Middle East:
+  countries:
+  - ARE
+  - BHR
+  - IRN
+  - IRQ
+  - ISR
+  - JOR
+  - KWT
+  - LBN
+  - OMN
+  - PSE
+  - QAT
+  - SAU
+  - SYR
+  - YEM
+
+North America:
+  countries:
+  - CAN
+  - MEX
+  - USA
+
+OECD Pacific:
+  countries:
+  - AUS
+  - JPN
+  - KOR
+  - NZL
+
+Transition:
+  countries:
+  - ALB
+  - ARM
+  - AZE
+  - BIH
+  - BLR
+  - EST
+  - GEO
+  - HRV
+  - KAZ
+  - KGZ
+  - LTU
+  - LVA
+  - MDA
+  - MKD
+  - MNE
+  - RUS
+  - SCG
+  - SRB
+  - TJK
+  - TKM
+  - UKR
+  - UZB
+  - YUG

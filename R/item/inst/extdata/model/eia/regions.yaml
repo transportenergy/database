@@ -1,0 +1,287 @@
+# iTEM2 (generated from map_cntry_region_ALL.csv)
+AFR:
+  countries:
+  - AGO
+  - BDI
+  - BEN
+  - BFA
+  - BWA
+  - CAF
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COM
+  - CPV
+  - DJI
+  - DZA
+  - EGY
+  - ERI
+  - ESH
+  - ETH
+  - GAB
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - KEN
+  - LBR
+  - LBY
+  - LSO
+  - MAR
+  - MDG
+  - MLI
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - NAM
+  - NER
+  - NGA
+  - REU
+  - RWA
+  - SDN
+  - SEN
+  - SLE
+  - SOM
+  - STP
+  - SWZ
+  - TCD
+  - TGO
+  - TUN
+  - TZA
+  - UGA
+  - ZAF
+  - ZMB
+  - ZWE
+
+ANZ:
+  countries:
+  - AUS
+  - NZL
+
+BRZ:
+  countries:
+  - BRA
+
+CAN:
+  countries:
+  - CAN
+
+CHI:
+  countries:
+  - CHN
+  - TWN
+
+CSA:
+  countries:
+  - ABW
+  - AIA
+  - ANT
+  - ARG
+  - ATG
+  - BHS
+  - BLZ
+  - BMU
+  - BOL
+  - BRB
+  - COL
+  - CRI
+  - CUB
+  - CYM
+  - DMA
+  - DOM
+  - ECU
+  - FLK
+  - GLP
+  - GRD
+  - GTM
+  - GUF
+  - GUY
+  - HND
+  - HTI
+  - JAM
+  - KNA
+  - LCA
+  - MSR
+  - MTQ
+  - NIC
+  - PAN
+  - PER
+  - PRI
+  - PRY
+  - SLV
+  - SUR
+  - TTO
+  - URY
+  - VCT
+  - VEN
+  - VGB
+  - VIR
+
+EUR:
+  countries:
+  - AUT
+  - BEL
+  - CHE
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - FRO
+  - GBR
+  - GRC
+  - GRL
+  - HUN
+  - IRL
+  - ISL
+  - ITA
+  - LUX
+  - LVA
+  - NLD
+  - NOR
+  - POL
+  - PRT
+  - SJM
+  - SVK
+  - SVN
+  - SWE
+  - TUR
+  - VAT
+  - WLF
+
+IND:
+  countries:
+  - IND
+
+JPN:
+  countries:
+  - JPN
+
+MID:
+  countries:
+  - ARE
+  - BHR
+  - IRN
+  - IRQ
+  - ISR
+  - JOR
+  - KWT
+  - LBN
+  - OMN
+  - PSE
+  - QAT
+  - SAU
+  - SYR
+  - YEM
+
+MXC:
+  countries:
+  - CHL
+  - MEX
+
+OAS:
+  countries:
+  - AFG
+  - ASM
+  - BGD
+  - BRN
+  - BTN
+  - CCK
+  - COK
+  - CXR
+  - FJI
+  - FSM
+  - GUM
+  - HKG
+  - IDN
+  - KHM
+  - KIR
+  - LAO
+  - LKA
+  - MAC
+  - MDV
+  - MHL
+  - MMR
+  - MNG
+  - MNP
+  - MYS
+  - MYT
+  - NCL
+  - NFK
+  - NIU
+  - NPL
+  - NRU
+  - PAK
+  - PCI
+  - PCN
+  - PHL
+  - PLW
+  - PNG
+  - PRK
+  - PYF
+  - SGP
+  - SLB
+  - SYC
+  - THA
+  - TKL
+  - TLS
+  - TON
+  - TUV
+  - VNM
+  - VUT
+  - WSM
+
+RUS:
+  countries:
+  - RUS
+
+SKO:
+  countries:
+  - KOR
+
+URA:
+  countries:
+  - ALB
+  - AND
+  - ARM
+  - AZE
+  - BGR
+  - BIH
+  - BLR
+  - CHI
+  - CYP
+  - GEO
+  - GIB
+  - HRV
+  - IMN
+  - KAZ
+  - KGZ
+  - LIE
+  - LTU
+  - MCO
+  - MDA
+  - MKD
+  - MLT
+  - MNE
+  - ROM
+  - ROU
+  - SCG
+  - SHN
+  - SMR
+  - SPM
+  - SRB
+  - TCA
+  - TJK
+  - TKM
+  - UKR
+  - UZB
+  - YUG
+
+USA:
+  countries:
+  - USA

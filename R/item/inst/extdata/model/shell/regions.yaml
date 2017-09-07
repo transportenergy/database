@@ -1,0 +1,269 @@
+# iTEM2 (generated from map_cntry_region_ALL.csv)
+China:
+  countries:
+  - CHN
+
+EU:
+  countries:
+  - AUT
+  - BEL
+  - BGR
+  - CYP
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - GRL
+  - HRV
+  - HUN
+  - IRL
+  - ITA
+  - LTU
+  - LUX
+  - LVA
+  - MLT
+  - NLD
+  - POL
+  - PRT
+  - ROM
+  - ROU
+  - SVK
+  - SVN
+  - SWE
+
+India:
+  countries:
+  - IND
+
+Latin America & Caribbean:
+  countries:
+  - ABW
+  - AIA
+  - ANT
+  - ARG
+  - ATG
+  - BHS
+  - BLZ
+  - BMU
+  - BOL
+  - BRA
+  - BRB
+  - CHL
+  - COL
+  - CRI
+  - CUB
+  - CYM
+  - DMA
+  - DOM
+  - ECU
+  - FLK
+  - GLP
+  - GRD
+  - GTM
+  - GUF
+  - GUY
+  - HND
+  - HTI
+  - JAM
+  - KNA
+  - LCA
+  - MEX
+  - MSR
+  - MTQ
+  - NIC
+  - PAN
+  - PER
+  - PRI
+  - PRY
+  - SLV
+  - SPM
+  - SUR
+  - TCA
+  - TTO
+  - URY
+  - VCT
+  - VEN
+  - VGB
+  - VIR
+
+Middle East & North Africa:
+  countries:
+  - ARE
+  - BHR
+  - DZA
+  - EGY
+  - IRN
+  - IRQ
+  - ISR
+  - JOR
+  - KWT
+  - LBN
+  - LBY
+  - MAR
+  - OMN
+  - PSE
+  - QAT
+  - SAU
+  - SYR
+  - TUN
+  - YEM
+
+OECD Asia & Oceania:
+  countries:
+  - AUS
+  - JPN
+  - KOR
+  - NZL
+
+Other Asia & Oceania:
+  countries:
+  - AFG
+  - ASM
+  - BGD
+  - BRN
+  - BTN
+  - CCK
+  - COK
+  - CXR
+  - FJI
+  - FSM
+  - GUM
+  - HKG
+  - IDN
+  - KAZ
+  - KGZ
+  - KHM
+  - KIR
+  - LAO
+  - LKA
+  - MAC
+  - MDV
+  - MHL
+  - MMR
+  - MNG
+  - MNP
+  - MYS
+  - MYT
+  - NCL
+  - NFK
+  - NIU
+  - NPL
+  - NRU
+  - PAK
+  - PCI
+  - PCN
+  - PHL
+  - PLW
+  - PNG
+  - PRK
+  - PYF
+  - SGP
+  - SLB
+  - SYC
+  - THA
+  - TJK
+  - TKL
+  - TKM
+  - TLS
+  - TON
+  - TUV
+  - TWN
+  - UZB
+  - VNM
+  - VUT
+  - WSM
+
+Other Europe:
+  countries:
+  - ALB
+  - AND
+  - ARM
+  - AZE
+  - BIH
+  - BLR
+  - CHE
+  - CHI
+  - FRO
+  - GEO
+  - GIB
+  - IMN
+  - ISL
+  - LIE
+  - MCO
+  - MDA
+  - MKD
+  - MNE
+  - NOR
+  - RUS
+  - SCG
+  - SHN
+  - SJM
+  - SMR
+  - SRB
+  - TUR
+  - UKR
+  - VAT
+  - WLF
+  - YUG
+
+Sub-Saharan Africa:
+  countries:
+  - AGO
+  - BDI
+  - BEN
+  - BFA
+  - BWA
+  - CAF
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COM
+  - CPV
+  - DJI
+  - ERI
+  - ESH
+  - ETH
+  - GAB
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - KEN
+  - LBR
+  - LSO
+  - MDG
+  - MLI
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - NAM
+  - NER
+  - NGA
+  - REU
+  - RWA
+  - SDN
+  - SEN
+  - SLE
+  - SOM
+  - STP
+  - SWZ
+  - TCD
+  - TGO
+  - TZA
+  - UGA
+  - ZAF
+  - ZMB
+  - ZWE
+
+USA & Canada:
+  countries:
+  - CAN
+  - USA
