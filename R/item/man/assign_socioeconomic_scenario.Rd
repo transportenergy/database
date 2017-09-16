@@ -2,23 +2,25 @@
 % Please edit documentation in R/model-downscale.R
 \name{assign_socioeconomic_scenario}
 \alias{assign_socioeconomic_scenario}
-\title{Assign country-level socioeconomic scenario to each model/scenario}
+\title{Assign country-level socioeconomic realization to each model+scenario}
 \usage{
-assign_socioeconomic_scenario(data_list, method = "exogenous",
+assign_socioeconomic_scenario(model_data_list, method = "SSE",
   SSE_variable = "PPP-GDP")
 }
 \arguments{
-\item{data_list}{list of data tables wherein each element is a model-specific dataframe}
+\item{model_data_list}{list of data tables of model-specific pre-processed, prepared data}
 
-\item{method}{select a method for assigning scenarios.
-SSE: minimize sum of squared errors.
-exogenous: use a default socioeconomic scenario for downscaling all models and scenarios. can be
-over-ridden for specific model x scenario in exogenous mapping files.}
+\item{method}{method used for assigning scenarios. SSE: default behavior; minimize sum of squared errors in future
+ratios of variable indicated, by year and model region. exogenous: use exogenously provided assignments between
+model+scenario and nation-level socioeconomic realization for downscaling model output.}
 
-\item{variable}{variable to use in determining the assignments; can be population or gdp}
+\item{variable}{variable to use in determining the socioeconomic assignment; can be population or gdp}
 }
 \description{
-Assign country-level socioeconomic scenario to each model/scenario
+Takes in list of model output data from \code{\link{prepare_preprocessed_data}} and returns a list of model-
+specific dataframes mapping model scenarios to named nation-level socioeconomic realizations. Default behavior
+is to compute these assignments by minimizing sum of squared errors in future GDP ratios by model region and
+time period.
 }
 \details{
 Returns a list of dataframes where each model is an element. Data frames assign model's scenarios

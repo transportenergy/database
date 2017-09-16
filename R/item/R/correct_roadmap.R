@@ -48,6 +48,6 @@ correct_roadmap <- function( x ){
   }
   x_final <- do.call(bind_rows, x_list)
   # Finally, re-sort for the correct column order
-  x_final <- x_final[c( index_names, "year", "value")]
+  x_final <- x_final[ITEM_DATA_COLUMNS]
     return(x_final)
 }

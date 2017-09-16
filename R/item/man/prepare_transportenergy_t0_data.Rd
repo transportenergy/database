@@ -2,7 +2,7 @@
 % Please edit documentation in R/model-downscale.R
 \name{prepare_transportenergy_t0_data}
 \alias{prepare_transportenergy_t0_data}
-\title{Generate base-year transportation dataset from which to construct the downscaling proxy}
+\title{Generate base-year transportation dataset from which to construct the transport energy downscaling proxy}
 \usage{
 prepare_transportenergy_t0_data(country_data, use_modal_detail = TRUE,
   mode_mapping_fn = "downscale/map_mode_IEA.csv", ...)
@@ -13,9 +13,11 @@ prepare_transportenergy_t0_data(country_data, use_modal_detail = TRUE,
 \item{mode_mapping_file}{mapping from mode in the transportation energy data to the iTEM modes}
 }
 \description{
-Generate base-year transportation dataset from which to construct the downscaling proxy
+Perform some pre-processing of the base-year transportation data that will be expanded to all years and used as a
+downscaling proxy in \code{\link{generate_ds_proxy_data}}.
 }
 \details{
-Derives country-level transportation energy consumption in the base-year by iTEM mode that will
-be used for constructing the downscaling proxy dataset for transportation-related variables
+The transportation proxy data has modes which may or may not be used, and if they are used, they are
+  somewhat different from the iTEM modes. This function performs the modal pre-processing to construct a useful
+  base-year dataset which can be expanded to all iTEM years for each socioeconomic realization.
 }

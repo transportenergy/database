@@ -2,24 +2,26 @@
 % Please edit documentation in R/model-downscale.R
 \name{prepare_preprocessed_data}
 \alias{prepare_preprocessed_data}
-\title{Apply corrections to pre-processed data, with options to unlist and interpolate years}
+\title{Apply corrections to pre-processed data}
 \usage{
-prepare_preprocessed_data(data, collapse_list = FALSE,
+prepare_preprocessed_data(model_data_list, collapse_list = FALSE,
   interpolate_years = TRUE)
 }
 \arguments{
-\item{data}{list of data frames with model-specific data}
+\item{model_data_list}{list of data frames with model-specific data}
 
-\item{collapse_list}{logical indicating whether to collapse the output data into a single data
-frame, or keep it as a list of data frames}
+\item{collapse_list}{logical (default = FALSE) indicating whether to collapse the list into a single data frame
+(TRUE), or keep it as a list of data frames where each model is an element (FALSE).}
 
-\item{interpolate_years}{logical indicating whether to interpolate years (no extrapolation option)}
+\item{interpolate_years}{logical (default = TRUE) indicating whether to interpolate years.}
 }
 \description{
-Apply corrections to pre-processed data, with options to unlist and interpolate years
+Addresses errors and omissions in submitted model data loaded by \code{\link{load_preprocessed_data}} prior to
+performing any data processing. Where necessary, corrections are performed by calling model-specific functions. This
+function also linearly interpolates submitted data in order to standardize iTEM analysis years.
 }
 \details{
-Applies model-specific functions, matching the named element of the list to a
-corresponding function containing the same string ("correct_" + model name). Also interpolates
-years, where expected years are not provided.
+Applies model-specific functions, searching for correction functions for each model name in the list (i.e.,
+  "correct_" + model name). The interpolation function does not extrapolate, so the data from any model does not
+  necessarily include all iTEM analysis years.
 }

@@ -10,11 +10,11 @@ load_preprocessed_data(model_data_folder)
 \item{model_data_folder}{folder where the pre-processed model output data is located}
 }
 \description{
-Load the data submitted by the individual models
+Load model-submitted data into a list of data frames where each element is a single model's output (i.e., all
+scenarios in a single data frame).
 }
 \details{
-Requires that the model output data are generally cleaned and appropriately formatted,
-and placed into a common folder.
-Individual data files should be the model name plus the extension ".csv",
-and there should be no other csv files in the same folder.
+Requires that the model output data are generally cleaned and appropriately formatted, and placed into a
+  common folder. Individual data files should be the model name plus the extension ".csv", and there should be no
+  other csv files in the same folder.
 }
