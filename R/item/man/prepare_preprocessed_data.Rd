@@ -5,7 +5,7 @@
 \title{Apply corrections to pre-processed data}
 \usage{
 prepare_preprocessed_data(model_data_list, collapse_list = FALSE,
-  interpolate_years = TRUE)
+  interpolate_years = TRUE, drop_na = TRUE)
 }
 \arguments{
 \item{model_data_list}{list of data frames with model-specific data}
@@ -14,6 +14,9 @@ prepare_preprocessed_data(model_data_list, collapse_list = FALSE,
 (TRUE), or keep it as a list of data frames where each model is an element (FALSE).}
 
 \item{interpolate_years}{logical (default = TRUE) indicating whether to interpolate years.}
+
+\item{drop_na}{logical (default = TRUE) indicating whether to drop missing observations from model-submitted data.
+If FALSE, missing values are set to zero.}
 }
 \description{
 Addresses errors and omissions in submitted model data loaded by \code{\link{load_preprocessed_data}} prior to

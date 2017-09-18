@@ -51,13 +51,16 @@ load_preprocessed_data <- function(model_data_folder){
 #' @param collapse_list logical (default = FALSE) indicating whether to collapse the list into a single data frame
 #'   (TRUE), or keep it as a list of data frames where each model is an element (FALSE).
 #' @param interpolate_years logical (default = TRUE) indicating whether to interpolate years.
+#' @param drop_na logical (default = TRUE) indicating whether to drop missing observations from model-submitted data.
+#' If FALSE, missing values are set to zero.
 #' @details Applies model-specific functions, searching for correction functions for each model name in the list (i.e.,
 #'   "correct_" + model name). The interpolation function does not extrapolate, so the data from any model does not
 #'   necessarily include all iTEM analysis years.
 #' @importFrom assertthat assert_that
 #' @importFrom dplyr bind_rows mutate group_by ungroup
 #' @importFrom magrittr "%>%"
-prepare_preprocessed_data <- function(model_data_list, collapse_list = FALSE, interpolate_years = TRUE){
+prepare_preprocessed_data <- function(model_data_list, collapse_list = FALSE,
+                                      interpolate_years = TRUE, drop_na = TRUE){
   assert_that(is.list(model_data_list))
   assert_that(is.logical(collapse_list))
   assert_that(is.logical(interpolate_years))
@@ -77,11 +80,18 @@ prepare_preprocessed_data <- function(model_data_list, collapse_list = FALSE, in
     # together in a single data frame, and it didn't matter wrt system time.
     if(interpolate_years){
       print( paste0( "Interpolating years from model: ", model ))
-      model_data_list[[model]] %>%
+      model_data_list[[model]] <- model_data_list[[model]] %>%
         group_by(scenario, region, variable, mode, technology, fuel) %>%
         mutate(value = approx_fun(year, value)) %>%
         ungroup()
     } # end if(interpolate_years)
+    if(drop_na){
+      model_data_list[[model]] <- model_data_list[[model]] %>%
+        filter(!is.na(value))
+    } else {
+      model_data_list[[model]] <- model_data_list[[model]] %>%
+        mutate(value = if_else(is.na(value), 0, value))
+    } #end if(drop_na) else
   } # end for(model in names(model_data_list))
   # If collapse_list, bind the rows of each data frame in the list into a single data frame
   # Note: this step requires equivalent variable names for all data frames
@@ -107,6 +117,8 @@ prepare_preprocessed_data <- function(model_data_list, collapse_list = FALSE, in
 #'   within-region shares
 #' @param variable_ds_proxy_fn file path for mapping from each quantity (i.e., annual flow) variable to the appropriate
 #'   downscaling proxy. Defaults to an internal mapping file supplied with the package.
+#' @param collapse_list logical (default = TRUE) indicating whether to return output as a single data frame (TRUE) or a
+#'   list of model-specific data frames (FALSE).
 #' @details Takes in three lists; the named elements of each of these lists should be the model names, and they must
 #'   be standardized. All models and scenarios in \code{model_data_list} must be available in \code{model_socio_list},
 #'   though there is no problem if the latter contains additional models and/or scenarios. Similarly, all models and
@@ -115,16 +127,18 @@ prepare_preprocessed_data <- function(model_data_list, collapse_list = FALSE, in
 #'   Finally, all reported quantity variables must be assigned to a downscaling proxy in \code{variable_ds_proxy_fn}
 #'   that is also available in \code{country_share_list}.
 #' @importFrom assertthat assert_that
-#' @importFrom dplyr right_join left_join select mutate filter select_ arrange_ bind_rows
+#' @importFrom dplyr right_join left_join select mutate filter select_ arrange_ bind_rows group_by_ summarise ungroup
 #' @importFrom magrittr "%>%"
 downscale_flow_variables <- function(model_data_list,
                                      model_socio_list,
                                      country_share_list,
-                                     variable_ds_proxy_fn = "downscale/variable_ds_proxy.csv"){
+                                     variable_ds_proxy_fn = "downscale/variable_ds_proxy.csv",
+                                     collapse_list = TRUE){
   assert_that(is.list(model_data_list))
   assert_that(is.list(model_socio_list))
   assert_that(is.list(country_share_list))
   assert_that(is.character(variable_ds_proxy_fn))
+  assert_that(is.logical(collapse_list))
 
   # load the variable-to-downscaling-proxy mapping file
   variable_ds_proxy <- load_data_file(variable_ds_proxy_fn, quiet = TRUE) %>%
@@ -137,7 +151,7 @@ downscale_flow_variables <- function(model_data_list,
     downscaled_data_list[[model_name]] <- list()
     for(proxy_name in names(country_share_list[[model_name]])){
       print(paste0("Downscaling quantity flows from model ", model_name,
-                   ", assigned to downscaling proxy ", proxy_name))
+                   " assigned to downscaling proxy ", proxy_name))
       # country share data: keep only relevant socioeconomic realization(s),
       # repeat as necessary by model scenario
       country_share_list[[model_name]][[proxy_name]] <-
@@ -153,19 +167,28 @@ downscale_flow_variables <- function(model_data_list,
         model_data_list[[model_name]] %>%
         left_join(variable_ds_proxy, by = "variable" ) %>%
         filter(ds_proxy == proxy_name) %>%
+        # If any model-reported techs were re-mapped to a more aggregate form (e.g., from LHDT/MHDT/HHDT to HDT),
+        # then multiple classes means that aggregation of quantity variables within existing IDs is necessary
+        group_by_(.dots = lapply(c(ITEM_ID_COLUMNS, "ds_proxy"), as.symbol)) %>%
+        summarise( value = sum(value)) %>%
+        ungroup() %>%
         left_join(country_share_list[[model_name]][[proxy_name]],
                   by = join_fields, suffix = c("_reg_total", "_country_share")) %>%
         filter(!is.na(iso)) %>%
         mutate(value = value_reg_total * value_country_share) %>%
         select_(.dots = lapply(DS_DATA_COLUMNS, as.symbol))
     } #end for(proxy_name in names(country_share_list[[model_name]]))
-
     # Bind the different proxies within each model
     downscaled_data_list[[model_name]] <-
       do.call(bind_rows, downscaled_data_list[[model_name]]) %>%
       arrange_(.dots = lapply(DS_DATA_COLUMNS, as.symbol))
   } # end for( model_name in names(model_data_list))
-  return(downscaled_data_list)
+  if(collapse_list){
+    downscaled_data <- do.call(bind_rows, downscaled_data_list)
+    return(downscaled_data)
+  } else {
+    return(downscaled_data_list)
+  }
 } # end function
 
 #' Compute country shares for model output by native model region
@@ -231,6 +254,8 @@ compute_country_shares <- function(model_data_list,
         left_join(region_map, by="iso") %>%
         left_join(ds_proxy_region, by = group_columns) %>%
         mutate(value = value / reg_total) %>%
+        # Get rid of any missing values from dividing by zero (assuming these are all too small to matter)
+        mutate(value = if_else(is.na(value), 0, value)) %>%
         select(-reg_total) %>%
         # The socioeconomic scenario is named "socio"
         rename(socio = scenario)
@@ -542,21 +567,38 @@ prepare_transportenergy_t0_data <- function( country_data,
 #' Helper function to compute global totals from either country-level or region-level flow (i.e. quantity) data
 #'
 #' @param input_data data table with quantity (flow) variables
-#' @param append_totals logical (default = TRUE) indicating whether to return a data table with the global totals
+#' @param region_col string indicating the name of the region column that is to be aggregated
+#' @param append_to_df logical (default = TRUE) indicating whether to return a data table with the global totals
 #'   appended to the initial data table (TRUE), or whether to only return the global totals (FALSE)
 #' @details The method implemented here assumes that all itemized countries or regions add to a global total. Any
 #'   excluded countries/regions will not be part of the reported global total, and redundant regions (e.g., OECD,
 #'   Europe) will be double counted.
 #' @importFrom assertthat assert_that
-#' @importFrom dplyr left_join group_by summarise select mutate rename ungroup
+#' @importFrom dplyr group_by summarise ungroup bind_rows
 #' @importFrom magrittr "%>%"
-compute_global_totals <- function(input_data, append_totals = TRUE){
+compute_global_totals <- function(input_data, region_col = "region", append_to_df = TRUE){
   assert_that(is.data.frame(input_data))
-  assert_that(is.logical(append_totals))
+  assert_that(is.character(region_col))
+  assert_that(is.logical(append_to_df))
 
+  print("computing global totals")
+  global_data <- input_data
+  global_data[[region_col]] <- "Global"
+  group_columns <- names(global_data)[ names(global_data) != "value"]
+  dots <- lapply(group_columns, as.symbol)
+  global_data <- global_data %>%
+    group_by_(.dots = dots) %>%
+    summarise(value = sum(value)) %>%
+    ungroup()
+  if(append_to_df){
+    output_data <- bind_rows(input_data, global_data)
+  } else {
+    output_data <- global_data
+  }
+  return(output_data)
 }
 
 # aggregate_regions()
 # compute_indicator_variables()
-
+# export_data()
 

@@ -2,8 +2,8 @@
 COMMENT_CHAR <- "#"
 YEAR_PATTERN <- "^(1|2)[0-9]{3}$"   # a 1 or 2 followed by three digits, and nothing else
 ITEM_YEARS <- c(seq(2005, 2040, 5), seq( 2050, 2100, 10))
-ITEM_DATA_COLUMNS <- c("model", "scenario", "region", "variable", "mode", "technology",
-                       "fuel", "unit", "year", "value")
+ITEM_ID_COLUMNS <- c("model", "scenario", "region", "variable", "mode", "technology", "fuel", "unit", "year")
+ITEM_DATA_COLUMNS <- c(ITEM_ID_COLUMNS, "value")
 DS_DATA_COLUMNS <- ITEM_DATA_COLUMNS
    DS_DATA_COLUMNS[which(DS_DATA_COLUMNS == "region")] <- "iso"
 CONV_ZJ_PJ <- 1e-6    #convert from zetajoules to petajoules

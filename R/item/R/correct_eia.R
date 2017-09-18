@@ -6,7 +6,7 @@
 #' @importFrom dplyr filter mutate if_else
 #' @importFrom magrittr "%>%"
 correct_eia <- function( x ){
-  x %>%
+  x <- x %>%
     # WEPS+ has "All" as a level of Mode, for Variables "energy" and "tkm"
     # This would cause issues for the downscaling to country,
     # where we only want to downscale "All" when no mode-level detail is available

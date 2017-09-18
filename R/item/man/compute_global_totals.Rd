@@ -4,12 +4,15 @@
 \alias{compute_global_totals}
 \title{Compute global totals for quantity (flow) data}
 \usage{
-compute_global_totals(input_data, append_totals = TRUE)
+compute_global_totals(input_data, region_col = "region",
+  append_to_df = TRUE)
 }
 \arguments{
 \item{input_data}{data table with quantity (flow) variables}
 
-\item{append_totals}{logical (default = TRUE) indicating whether to return a data table with the global totals
+\item{region_col}{string indicating the name of the region column that is to be aggregated}
+
+\item{append_to_df}{logical (default = TRUE) indicating whether to return a data table with the global totals
 appended to the initial data table (TRUE), or whether to only return the global totals (FALSE)}
 }
 \description{

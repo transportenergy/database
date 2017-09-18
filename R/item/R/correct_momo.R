@@ -6,7 +6,7 @@
 #' @importFrom dplyr left_join
 #' @importFrom magrittr "%>%"
 correct_momo <- function( x ){
-  x %>%
+  x <- x %>%
     # Energy is reported in zetajoules; convert to petajoules
     mutate(value = if_else(variable == "energy", value * CONV_ZJ_PJ, value)) %>%
     #Population is in billions and GDP is in trillions. Convert to millions and billions, respectively.
@@ -14,7 +14,7 @@ correct_momo <- function( x ){
     mutate(value = if_else(variable == "PPP-GDP", value * CONV_TRIL_BIL, value)) %>%
     #The 4DS scenario is reported as zero in all years.
     filter(!(variable == "PPP-GDP" & scenario == "4DS")) %>%
-    filter(!(variable == "Population" & scenario == "4DS")) -> x
+    filter(!(variable == "Population" & scenario == "4DS"))
   x_4ds_socio <- subset(x, variable %in% c( "PPP-GDP", "Population"))
   x_4ds_socio$scenario <- "4DS"
   x <- bind_rows(x, x_4ds_socio)
