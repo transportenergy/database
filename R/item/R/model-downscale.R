@@ -45,60 +45,100 @@ load_preprocessed_data <- function(model_data_folder){
 #'
 #' Addresses errors and omissions in submitted model data loaded by \code{\link{load_preprocessed_data}} prior to
 #' performing any data processing. Where necessary, corrections are performed by calling model-specific functions. This
-#' function also linearly interpolates submitted data in order to standardize iTEM analysis years.
+#' function also performs a number of processing steps that are optional but default to true. These include: subsetting
+#' only quantity flow variables (the methods assume that the components to all indicator variables are reported as
+#' quantity flows, and can be re-computed post-hoc from various levels of regional aggregation), removing "All"
+#' categories when the consituent components are available (\code{\link{remove_redundant_alls}}), interpolating years
+#' where necessary for harmonized reporting years, dropping missing values (the alternative is setting them to zero),
+#' and aggregating redundant categories (as category re-assignment may cause multiple values with the same ID info).
 #'
 #' @param model_data_list list of data frames with model-specific data
-#' @param collapse_list logical (default = FALSE) indicating whether to collapse the list into a single data frame
-#'   (TRUE), or keep it as a list of data frames where each model is an element (FALSE).
+#' @param subset_quantity_flows logical (default = TRUE) indicating whether to subset only quantity flow variables
+#' @param remove_redundant_alls logical (default = TRUE) indicating whether to remove observations with "All" that could
+#'   be calculated instead by adding provided components. These "All" values should not be downscaled.
 #' @param interpolate_years logical (default = TRUE) indicating whether to interpolate years.
-#' @param drop_na logical (default = TRUE) indicating whether to drop missing observations from model-submitted data.
-#' If FALSE, missing values are set to zero.
-#' @details Applies model-specific functions, searching for correction functions for each model name in the list (i.e.,
-#'   "correct_" + model name). The interpolation function does not extrapolate, so the data from any model does not
-#'   necessarily include all iTEM analysis years.
+#' @param drop_na_values logical (default = TRUE) indicating whether to drop observations with no value in model-
+#'   submitted data. If FALSE, missing values are set to zero.
+#' @param aggregate_redundant_categories logical (default = TRUE) indicating whether to add up categories that are
+#' redundant (i.e., all ID information the same), which generally result from re-setting variables from model-
+#' reported data to more aggregate categories.
+#' @details To apply model-specific functions, this function searches for a correction function containing each model
+#'   name in the list (i.e., "correct_" + model name). This step is applied prior to all others. The interpolation
+#'   function does not extrapolate, so the data from any model does not necessarily include all iTEM analysis years. In
+#'   its present form, this function does not call additional functions to compute quantity flows from indicator
+#'   variables, though such capacity may be added for an expanded variable set. For example, to process fuel prices,
+#'   fuel expenditures would be calculated as reported prices times consumption.
 #' @importFrom assertthat assert_that
 #' @importFrom dplyr bind_rows mutate group_by ungroup
 #' @importFrom magrittr "%>%"
-prepare_preprocessed_data <- function(model_data_list, collapse_list = FALSE,
-                                      interpolate_years = TRUE, drop_na = TRUE){
+#' @export
+prepare_preprocessed_data <- function(model_data_list,
+                                      subset_quantity_flows = TRUE,
+                                      remove_redundant_alls = TRUE,
+                                      interpolate_years = TRUE,
+                                      drop_na_values = TRUE,
+                                      aggregate_redundant_categories = TRUE, ...){
   assert_that(is.list(model_data_list))
-  assert_that(is.logical(collapse_list))
+  assert_that(is.logical(subset_quantity_flows))
+  assert_that(is.logical(remove_redundant_alls))
   assert_that(is.logical(interpolate_years))
+  assert_that(is.logical(drop_na_values))
+  assert_that(is.logical(aggregate_redundant_categories))
+
+  if(subset_quantity_flows){
+    print("Note: Only retaining quantity flow variables from submitted model data.")
+    # load the variable type mapping, and derive a vector of quantity flow variables to be retained
+    flow_variables <- get_variable_mapping(...)
+    flow_variables <- flow_variables$variable[flow_variables$variable_type == "quantity"]
+  }
+
   for(model in names(model_data_list)){
-    # Rename world as global, where applicable
+    # Standardize on a region name for Global
     model_data_list[[model]] <- model_data_list[[model]] %>%
-      mutate(region = sub("World", "Global", region))
+      mutate(if_else(region %in% c("World", "Wor"), "Global", region))
     # Apply any model-specific correction functions, as necessary
     if( exists(paste0("correct_", model), mode = "function")){
       print( paste0( "Applying model-specific corrections to data from model: ", model ))
       correction_function <- get( paste0("correct_", model))
       model_data_list[[model]] <- correction_function(model_data_list[[model]])
     }
-    # Interpolate the years
-    # Note: Using rule=1 (always, no other option provided) to avoid extrapolating beyond given years.
-    # Note: this was tested doing interpolations separately for each element in the list, and
-    # together in a single data frame, and it didn't matter wrt system time.
+    # Subset quantity flows, if indicated
+    if(subset_quantity_flows){
+      model_data_list[[model]] <- subset(model_data_list[[model]],
+                                         variable %in% flow_variables)
+    }
+    # Remove redundant "All" values of selected ID variables, if indicated
+    if(remove_redundant_alls){
+      model_data_list[[model]] <- remove_redundant_alls(model_data_list[[model]])
+    }
+    # Interpolate the years provided, if indicated
     if(interpolate_years){
       print( paste0( "Interpolating years from model: ", model ))
       model_data_list[[model]] <- model_data_list[[model]] %>%
         group_by(scenario, region, variable, mode, technology, fuel) %>%
         mutate(value = approx_fun(year, value)) %>%
         ungroup()
-    } # end if(interpolate_years)
-    if(drop_na){
+    }
+    if(drop_na_values){
       model_data_list[[model]] <- model_data_list[[model]] %>%
         filter(!is.na(value))
     } else {
       model_data_list[[model]] <- model_data_list[[model]] %>%
         mutate(value = if_else(is.na(value), 0, value))
-    } #end if(drop_na) else
+    }
+    # Aggregate redundant quantities, if indicated
+    if( aggregate_redundant_categories){
+      #For any model-reported categories that were re-assigned to a more aggregate categories (e.g., from different
+      #sizes of trucks (LHDT, MHDT, HHDT) to trucks (HDT)), then these should be aggregated. If no such re-assignments
+      #took place, then this step won't do anything. First, make sure that only quantity variables are subsetted, as we
+      #don't want to be adding indicator variables
+      assert_that(subset_quantity_flows)
+      model_data_list[[model]] <- model_data_list[[model]] %>%
+        group_by_(.dots = lapply(ITEM_ID_COLUMNS, as.symbol)) %>%
+        summarise( value = sum(value)) %>%
+        ungroup()
+    }
   } # end for(model in names(model_data_list))
-  # If collapse_list, bind the rows of each data frame in the list into a single data frame
-  # Note: this step requires equivalent variable names for all data frames
-  if(collapse_list){
-    print("Combining each model's data into a single data frame for downscaling")
-    model_data_list <- do.call(bind_rows, model_data_list)
-  }
   return(model_data_list)
 } # end function
 
@@ -115,8 +155,6 @@ prepare_preprocessed_data <- function(model_data_list, collapse_list = FALSE,
 #'   socioeconomic scenario
 #' @param country_share_list list of model-specific lists of downscaling proxy dataframes indicating country-
 #'   within-region shares
-#' @param variable_ds_proxy_fn file path for mapping from each quantity (i.e., annual flow) variable to the appropriate
-#'   downscaling proxy. Defaults to an internal mapping file supplied with the package.
 #' @param collapse_list logical (default = TRUE) indicating whether to return output as a single data frame (TRUE) or a
 #'   list of model-specific data frames (FALSE).
 #' @details Takes in three lists; the named elements of each of these lists should be the model names, and they must
@@ -129,19 +167,18 @@ prepare_preprocessed_data <- function(model_data_list, collapse_list = FALSE,
 #' @importFrom assertthat assert_that
 #' @importFrom dplyr right_join left_join select mutate filter select_ arrange_ bind_rows group_by_ summarise ungroup
 #' @importFrom magrittr "%>%"
+#' @export
 downscale_flow_variables <- function(model_data_list,
                                      model_socio_list,
                                      country_share_list,
-                                     variable_ds_proxy_fn = "downscale/variable_ds_proxy.csv",
-                                     collapse_list = TRUE){
+                                     collapse_list = TRUE, ...){
   assert_that(is.list(model_data_list))
   assert_that(is.list(model_socio_list))
   assert_that(is.list(country_share_list))
-  assert_that(is.character(variable_ds_proxy_fn))
   assert_that(is.logical(collapse_list))
 
   # load the variable-to-downscaling-proxy mapping file
-  variable_ds_proxy <- load_data_file(variable_ds_proxy_fn, quiet = TRUE) %>%
+  variable_ds_proxy <- get_variable_mapping(...) %>%
     filter(variable_type == "quantity") %>%
     select(-variable_type)
   # generate the new list with country-level model output, and indicate the column names
@@ -167,11 +204,6 @@ downscale_flow_variables <- function(model_data_list,
         model_data_list[[model_name]] %>%
         left_join(variable_ds_proxy, by = "variable" ) %>%
         filter(ds_proxy == proxy_name) %>%
-        # If any model-reported techs were re-mapped to a more aggregate form (e.g., from LHDT/MHDT/HHDT to HDT),
-        # then multiple classes means that aggregation of quantity variables within existing IDs is necessary
-        group_by_(.dots = lapply(c(ITEM_ID_COLUMNS, "ds_proxy"), as.symbol)) %>%
-        summarise( value = sum(value)) %>%
-        ungroup() %>%
         left_join(country_share_list[[model_name]][[proxy_name]],
                   by = join_fields, suffix = c("_reg_total", "_country_share")) %>%
         filter(!is.na(iso)) %>%
@@ -213,6 +245,7 @@ downscale_flow_variables <- function(model_data_list,
 #' @importFrom dplyr group_by_ summarise select mutate ungroup filter left_join rename
 #' @importFrom magrittr "%>%"
 #' @importFrom readr write_csv
+#' @export
 compute_country_shares <- function(model_data_list,
                                    ds_proxy_data = generate_ds_proxy_data(),
                                    save_output = TRUE, create_dir = TRUE,
@@ -290,6 +323,7 @@ compute_country_shares <- function(model_data_list,
 #' @importFrom dplyr full_join group_by summarise select mutate rename ungroup filter left_join slice
 #' @importFrom magrittr "%>%"
 #' @importFrom data.table rbindlist
+#' @export
 assign_socioeconomic_scenario <- function( model_data_list,
                                            method = "SSE",
                                            SSE_variable = "PPP-GDP"){
@@ -576,12 +610,13 @@ prepare_transportenergy_t0_data <- function( country_data,
 #' @importFrom assertthat assert_that
 #' @importFrom dplyr group_by summarise ungroup bind_rows
 #' @importFrom magrittr "%>%"
+#' @export
 compute_global_totals <- function(input_data, region_col = "region", append_to_df = TRUE){
   assert_that(is.data.frame(input_data))
   assert_that(is.character(region_col))
   assert_that(is.logical(append_to_df))
 
-  print("computing global totals")
+  print("Computing global totals of quantity flow variables")
   global_data <- input_data
   global_data[[region_col]] <- "Global"
   group_columns <- names(global_data)[ names(global_data) != "value"]
@@ -596,6 +631,50 @@ compute_global_totals <- function(input_data, region_col = "region", append_to_d
     output_data <- global_data
   }
   return(output_data)
+}
+
+#' Get internal variable mapping assignments (with option to pull an external file instead)
+#'
+#' @param mapping_fn file path and name of variable mapping
+#' @details Takes in a csv table with variables and associated categories. Defaults to the one provided with the item
+#' package, but can be set to a different one.
+#' @importFrom assertthat assert_that
+get_variable_mapping <- function(mapping_fn = "downscale/variable_ds_proxy.csv"){
+  assert_that(is.character(mapping_fn))
+  variable_mapping <- load_data_file(mapping_fn, quiet = TRUE)
+  return(variable_mapping)
+}
+
+#' Remove redundant "All" values from selected variables (columns)
+#'
+#' An "All" value for an ID column may be the only data available, or it may be derived from the sum of available
+#' components. Except for diagnostic purposes, "All" and its sub-components should never be downscaled independently due
+#' to potentially different proxies. Instead, where component-level data are available, "All" should be computed
+#' post-hoc as the sum of the components. This function drops redundant "All" values (i.e., values that could be
+#' computed from provided components.
+#'
+#' Note that the method assumes that if any components are provided for a given variable that has "All" reported, then
+#' all necessary components to re-calcualate the reported "All" value are provided. However this condition is not
+#' checked numerically, and the method will result in a loss of data if a model provided a category called "All", and
+#' some but not all of its sub-components.
+#'
+#' @param data data frame with model-reported quantity variables
+#' @param variables data frame with model-reported quantity variables
+#' @details
+#' @importFrom assertthat assert_that
+remove_redundant_alls <- function(data, variables = ITEM_IDVARS_WITH_ALLS){
+  assert_that(is.data.frame(data))
+  assert_that(is.character(variables))
+
+  for(idvar in variables){
+    other_idvars <- ITEM_ID_COLUMNS[which(ITEM_ID_COLUMNS != idvar)] #"by" variables for anti-join
+    data_na <- data[ is.na(data[[idvar]]), ]  #Need to keep all observations with NA for this variable
+    data_no_alls <- data[ data[[idvar]] != "All" & !is.na(data[[idvar]]), ]
+    data_alls <- data[ data[[idvar]] == "All" & !is.na(data[[idvar]]), ] %>%
+      anti_join(data_no_alls, by = other_idvars)
+    data <- bind_rows(data_na, data_no_alls, data_alls)
+  }
+  return(data)
 }
 
 # aggregate_regions()

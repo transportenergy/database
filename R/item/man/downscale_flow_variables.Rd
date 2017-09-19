@@ -5,8 +5,7 @@
 \title{Downscale annual flow variables from model regions to countries}
 \usage{
 downscale_flow_variables(model_data_list, model_socio_list, country_share_list,
-  variable_ds_proxy_fn = "downscale/variable_ds_proxy.csv",
-  collapse_list = TRUE)
+  collapse_list = TRUE, ...)
 }
 \arguments{
 \item{model_data_list}{list of model-specific dataframes with cleaned and pre-processed output}
@@ -16,9 +15,6 @@ socioeconomic scenario}
 
 \item{country_share_list}{list of model-specific lists of downscaling proxy dataframes indicating country-
 within-region shares}
-
-\item{variable_ds_proxy_fn}{file path for mapping from each quantity (i.e., annual flow) variable to the appropriate
-downscaling proxy. Defaults to an internal mapping file supplied with the package.}
 
 \item{collapse_list}{logical (default = TRUE) indicating whether to return output as a single data frame (TRUE) or a
 list of model-specific data frames (FALSE).}

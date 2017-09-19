@@ -4,19 +4,26 @@
 \alias{prepare_preprocessed_data}
 \title{Apply corrections to pre-processed data}
 \usage{
-prepare_preprocessed_data(model_data_list, collapse_list = FALSE,
-  interpolate_years = TRUE, drop_na = TRUE)
+prepare_preprocessed_data(model_data_list, subset_quantity_flows = TRUE,
+  remove_redundant_alls = TRUE, interpolate_years = TRUE,
+  drop_na_values = TRUE, aggregate_redundant_categories = TRUE, ...)
 }
 \arguments{
 \item{model_data_list}{list of data frames with model-specific data}
 
-\item{collapse_list}{logical (default = FALSE) indicating whether to collapse the list into a single data frame
-(TRUE), or keep it as a list of data frames where each model is an element (FALSE).}
+\item{subset_quantity_flows}{logical (default = TRUE) indicating whether to subset only quantity flow variables}
+
+\item{remove_redundant_alls}{logical (default = TRUE) indicating whether to remove observations with "All" that could
+be calculated instead by adding provided components. These "All" values should not be downscaled.}
 
 \item{interpolate_years}{logical (default = TRUE) indicating whether to interpolate years.}
 
-\item{drop_na}{logical (default = TRUE) indicating whether to drop missing observations from model-submitted data.
-If FALSE, missing values are set to zero.}
+\item{drop_na_values}{logical (default = TRUE) indicating whether to drop observations with no value in model-
+submitted data. If FALSE, missing values are set to zero.}
+
+\item{aggregate_redundant_categories}{logical (default = TRUE) indicating whether to add up categories that are
+redundant (i.e., all ID information the same), which generally result from re-setting variables from model-
+reported data to more aggregate categories.}
 }
 \description{
 Addresses errors and omissions in submitted model data loaded by \code{\link{load_preprocessed_data}} prior to
