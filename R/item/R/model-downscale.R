@@ -93,9 +93,9 @@ prepare_preprocessed_data <- function(model_data_list,
   }
 
   for(model in names(model_data_list)){
-    # Standardize on a region name for Global
+    # Standardize on a region name for the global/world region. Setting to "All" allows removal of redundant reporting
     model_data_list[[model]] <- model_data_list[[model]] %>%
-      mutate(if_else(region %in% c("World", "Wor"), "Global", region))
+      mutate(region = if_else(region %in% c("World", "Wor", "Global"), "All", region))
     # Apply any model-specific correction functions, as necessary
     if( exists(paste0("correct_", model), mode = "function")){
       print( paste0( "Applying model-specific corrections to data from model: ", model ))
@@ -119,6 +119,7 @@ prepare_preprocessed_data <- function(model_data_list,
         mutate(value = approx_fun(year, value)) %>%
         ungroup()
     }
+    # Either drop NA values or or set them to zero
     if(drop_na_values){
       model_data_list[[model]] <- model_data_list[[model]] %>%
         filter(!is.na(value))
@@ -342,7 +343,7 @@ assign_socioeconomic_scenario <- function( model_data_list,
         select(scenario, socio)
     } # end if(method == "exogenous")
     if(method == "SSE"){
-      print(paste0("determining country-level socioeconomic scenarios for model: ", model_name))
+      print(paste0("Determining country-level socioeconomic scenarios for model: ", model_name))
       # Get the country-to-region assignments for the given model
       region_assignment <- get_country_region_map(model_name)
       # Need to figure out if the model provided socioeconomic information. If not, the data frame can be written here
@@ -618,7 +619,7 @@ compute_global_totals <- function(input_data, region_col = "region", append_to_d
 
   print("Computing global totals of quantity flow variables")
   global_data <- input_data
-  global_data[[region_col]] <- "Global"
+  global_data[[region_col]] <- "All"
   group_columns <- names(global_data)[ names(global_data) != "value"]
   dots <- lapply(group_columns, as.symbol)
   global_data <- global_data %>%
@@ -662,6 +663,7 @@ get_variable_mapping <- function(mapping_fn = "downscale/variable_ds_proxy.csv")
 #' @param variables data frame with model-reported quantity variables
 #' @details
 #' @importFrom assertthat assert_that
+#' @importFrom dplyr anti_join
 remove_redundant_alls <- function(data, variables = ITEM_IDVARS_WITH_ALLS){
   assert_that(is.data.frame(data))
   assert_that(is.character(variables))
@@ -677,7 +679,38 @@ remove_redundant_alls <- function(data, variables = ITEM_IDVARS_WITH_ALLS){
   return(data)
 }
 
+#' Extract global data from model-specific data list to a data frame.
+#'
+#' Simple wrapper function to extract global data (region == "All") from list of model output data. Returns global-only
+#' data if executed after (\code{\link{remove_redundant_alls}}), as called from
+#' (\code{\link{prepare_preprocessed_data}})
+#'
+#' @param model_data list of model-specific data frames from which to extract the global data
+#' @param input_region_col name of the region column in the input data
+#' @param output_region_col name of the region column in the output (return) data
+#' @details Modeling teams may provide some data at the global level only, i.e., with no regional detail available. Such
+#'   data is neither downscaled to countries/regions nor dropped. This function generates a data frame with global-only
+#'   data from all models that can be binded to other data frames with regional detail.
+#' @importFrom assertthat assert_that
+#' @importFrom dplyr bind_rows
+#' @export
+extract_global_data_to_df <- function(model_data, input_region_col = "region", output_region_col = "region"){
+  assert_that(is.list(model_data))
+  assert_that(is.character(input_region_col))
+  assert_that(is.character(output_region_col))
+
+  global_data <- do.call(
+    bind_rows,
+    lapply(model_data, function(x){
+      x <- x[x[[input_region_col]] == "All", ]
+      })
+  )
+  names(global_data)[ names(global_data) == input_region_col] <- output_region_col
+  return(global_data)
+}
+
 # aggregate_regions()
 # compute_indicator_variables()
+# get_indicator_variable_derivations()
 # export_data()
 

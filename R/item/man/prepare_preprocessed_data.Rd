@@ -28,10 +28,18 @@ reported data to more aggregate categories.}
 \description{
 Addresses errors and omissions in submitted model data loaded by \code{\link{load_preprocessed_data}} prior to
 performing any data processing. Where necessary, corrections are performed by calling model-specific functions. This
-function also linearly interpolates submitted data in order to standardize iTEM analysis years.
+function also performs a number of processing steps that are optional but default to true. These include: subsetting
+only quantity flow variables (the methods assume that the components to all indicator variables are reported as
+quantity flows, and can be re-computed post-hoc from various levels of regional aggregation), removing "All"
+categories when the consituent components are available (\code{\link{remove_redundant_alls}}), interpolating years
+where necessary for harmonized reporting years, dropping missing values (the alternative is setting them to zero),
+and aggregating redundant categories (as category re-assignment may cause multiple values with the same ID info).
 }
 \details{
-Applies model-specific functions, searching for correction functions for each model name in the list (i.e.,
-  "correct_" + model name). The interpolation function does not extrapolate, so the data from any model does not
-  necessarily include all iTEM analysis years.
+To apply model-specific functions, this function searches for a correction function containing each model
+  name in the list (i.e., "correct_" + model name). This step is applied prior to all others. The interpolation
+  function does not extrapolate, so the data from any model does not necessarily include all iTEM analysis years. In
+  its present form, this function does not call additional functions to compute quantity flows from indicator
+  variables, though such capacity may be added for an expanded variable set. For example, to process fuel prices,
+  fuel expenditures would be calculated as reported prices times consumption.
 }

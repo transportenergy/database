@@ -3,7 +3,8 @@ COMMENT_CHAR <- "#"
 YEAR_PATTERN <- "^(1|2)[0-9]{3}$"   # a 1 or 2 followed by three digits, and nothing else
 ITEM_YEARS <- c(seq(2005, 2040, 5), seq( 2050, 2100, 10))
 ITEM_ID_COLUMNS <- c("model", "scenario", "region", "variable", "mode", "technology", "fuel", "unit", "year")
-ITEM_IDVARS_WITH_ALLS <- c( "mode", "technology", "fuel") # Just the ID columns that may be collapsed to "All"
+# Object to indicate ID columns that may report "All" and possibly the sub-components necessary to re-construct "All"
+ITEM_IDVARS_WITH_ALLS <- c("region", "mode", "technology", "fuel")
 ITEM_DATA_COLUMNS <- c(ITEM_ID_COLUMNS, "value")
 DS_DATA_COLUMNS <- ITEM_DATA_COLUMNS
    DS_DATA_COLUMNS[which(DS_DATA_COLUMNS == "region")] <- "iso"
