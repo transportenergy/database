@@ -597,39 +597,43 @@ prepare_transportenergy_t0_data <- function( country_data,
   }
 }
 
-#' Compute global totals for quantity (flow) data
+#' Aggregate across selected categories of quantity flow data, looping through all permutations
 #'
-#' Helper function to compute global totals from either country-level or region-level flow (i.e. quantity) data
+#' Inputs are a data frame with model data, and a character vector of ID variables to loop through. All possible
+#' permutations of the variables provided are returned in the output, with no redundant categories written out.
+#' Returns the intial data frame with permutations appended.
 #'
 #' @param input_data data table with quantity (flow) variables
-#' @param region_col string indicating the name of the region column that is to be aggregated
-#' @param append_to_df logical (default = TRUE) indicating whether to return a data table with the global totals
-#'   appended to the initial data table (TRUE), or whether to only return the global totals (FALSE)
-#' @details The method implemented here assumes that all itemized countries or regions add to a global total. Any
-#'   excluded countries/regions will not be part of the reported global total, and redundant regions (e.g., OECD,
-#'   Europe) will be double counted.
+#' @param variables character string indicating the variables to loop over
+#' @details The method implemented here assumes that all itemized elements of each variable to add to the total. Any
+#'   excluded elements will not be part of the reported total, and redundant categories (e.g., gasoline,
+#'   total liquid fuels) will be double counted.
 #' @importFrom assertthat assert_that
-#' @importFrom dplyr group_by summarise ungroup bind_rows
+#' @importFrom dplyr group_by_ summarise ungroup bind_rows
 #' @importFrom magrittr "%>%"
 #' @export
-compute_global_totals <- function(input_data, region_col = "region", append_to_df = TRUE){
+aggregate_all_permutations <- function(input_data, variables = ITEM_IDVARS_WITH_ALLS){
   assert_that(is.data.frame(input_data))
-  assert_that(is.character(region_col))
-  assert_that(is.logical(append_to_df))
+  assert_that(is.character(variables))
 
-  print("Computing global totals of quantity flow variables")
-  global_data <- input_data
-  global_data[[region_col]] <- "All"
-  group_columns <- names(global_data)[ names(global_data) != "value"]
+  output_data <- input_data
+  group_columns <- names(output_data)[ names(output_data) != "value"]
   dots <- lapply(group_columns, as.symbol)
-  global_data <- global_data %>%
-    group_by_(.dots = dots) %>%
-    summarise(value = sum(value)) %>%
-    ungroup()
-  if(append_to_df){
-    output_data <- bind_rows(input_data, global_data)
-  } else {
-    output_data <- global_data
+
+  for(var in variables){
+    print(paste0("Collapsing ", var, " to All and appending"))
+    # Where this variable is already "All", exclude from the aggregation (would result in double counting)
+    # Exclude missing values
+    output_thisvar <- output_data[ output_data[[var]] != "All" & !is.na(output_data[[var]]),]
+    if(nrow(output_thisvar) > 0){
+      output_thisvar[[var]] <- "All"
+      output_thisvar <- output_thisvar %>%
+        group_by_(.dots = dots) %>%
+        summarise(value = sum(value)) %>%
+        ungroup()
+      output_data <- bind_rows(output_data, output_thisvar)
+    }
+    # the output of each loop is passed to the input of the next loop, generating all permutations
   }
   return(output_data)
 }
