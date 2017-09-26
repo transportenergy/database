@@ -4,11 +4,13 @@
 \alias{assign_socioeconomic_scenario}
 \title{Assign country-level socioeconomic realization to each model+scenario}
 \usage{
-assign_socioeconomic_scenario(model_data_list, method = "SSE",
-  SSE_variable = "PPP-GDP")
+assign_socioeconomic_scenario(model_data_list, country_region_map_list,
+  method = "SSE", SSE_variable = "PPP-GDP")
 }
 \arguments{
 \item{model_data_list}{list of data tables of model-specific pre-processed, prepared data}
+
+\item{country_region_map_list}{list of data tables of model-specific country-to-region mappings}
 
 \item{method}{method used for assigning scenarios. SSE: default behavior; minimize sum of squared errors in future
 ratios of variable indicated, by year and model region. exogenous: use exogenously provided assignments between

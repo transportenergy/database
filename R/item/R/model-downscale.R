@@ -228,11 +228,12 @@ downscale_flow_variables <- function(model_data_list,
 #'
 #' Compute country-with-model-region shares for models, downscaling proxies, nation-level socioeconomic realizations,
 #' and years. Takes in list of model data from \code{\link{prepare_preprocessed_data}}, each model's country-to-region
-#' mapping from \code{\link{get_country_region_map}}, and country-level downscaling proxy data from
+#' mapping from \code{\link{load_country_region_mappings}}, and country-level downscaling proxy data from
 #' \code{\link{generate_ds_proxy_data}}. Returns a list with all combinations of model, downscaling proxy, country-level
 #' socioeconomic realization, and year.
 #'
 #' @param model_data_list list of model output data that has been cleaned, pre-processed, and prepared (i.e., corrected)
+#' @param country_region_map_list list of model-specific dataframes with country-to-region mapping
 #' @param ds_proxy_data list of downscaling proxy dataframes
 #' @param save_output logical indicating whether to save the output of this function
 #' @param create_dir logical indicating whether to create a new directory for the output (if one with the expected name
@@ -248,10 +249,12 @@ downscale_flow_variables <- function(model_data_list,
 #' @importFrom readr write_csv
 #' @export
 compute_country_shares <- function(model_data_list,
+                                   country_region_map_list,
                                    ds_proxy_data = generate_ds_proxy_data(),
                                    save_output = TRUE, create_dir = TRUE,
                                    output_dir = DS_OUTPUT_DIR){
   assert_that(is.list(model_data_list))
+  assert_that(is.list(country_region_map_list))
   assert_that(is.list(ds_proxy_data))
   assert_that(is.logical(save_output))
   assert_that(is.logical(create_dir))
@@ -262,7 +265,7 @@ compute_country_shares <- function(model_data_list,
   # Process each model separately in a for loop
   for(model_name in names(model_data_list)){
     # get the country-to-region mapping for the given model
-    region_map <- get_country_region_map(model_name)
+    region_map <- country_region_map_list[[model_name]]
     # figure out which years this will be written out for
     model_years <- sort(unique(model_data_list[[model_name]]$year))
     # each model in the list will also be a list of downscaling proxies
@@ -313,6 +316,7 @@ compute_country_shares <- function(model_data_list,
 #' time period.
 #'
 #' @param model_data_list list of data tables of model-specific pre-processed, prepared data
+#' @param country_region_map_list list of data tables of model-specific country-to-region mappings
 #' @param method method used for assigning scenarios. SSE: default behavior; minimize sum of squared errors in future
 #'   ratios of variable indicated, by year and model region. exogenous: use exogenously provided assignments between
 #'   model+scenario and nation-level socioeconomic realization for downscaling model output.
@@ -326,9 +330,11 @@ compute_country_shares <- function(model_data_list,
 #' @importFrom data.table rbindlist
 #' @export
 assign_socioeconomic_scenario <- function( model_data_list,
+                                           country_region_map_list,
                                            method = "SSE",
                                            SSE_variable = "PPP-GDP"){
   assert_that(is.list(model_data_list))
+  assert_that(is.list(country_region_map_list))
   assert_that(method %in% c("exogenous", "SSE"))
   assert_that(SSE_variable %in% c("PPP-GDP", "Population"))
 
@@ -345,7 +351,7 @@ assign_socioeconomic_scenario <- function( model_data_list,
     if(method == "SSE"){
       print(paste0("Determining country-level socioeconomic scenarios for model: ", model_name))
       # Get the country-to-region assignments for the given model
-      region_assignment <- get_country_region_map(model_name)
+      region_assignment <- country_region_map_list[[model_name]]
       # Need to figure out if the model provided socioeconomic information. If not, the data frame can be written here
       if(!SSE_variable %in% unique( model_data_list[[model_name]]$variable)){
         scenario_assignment <- data.frame(scenario = unique(model_data_list[[model_name]]$scenario),
@@ -521,26 +527,55 @@ generate_ds_proxy_data <- function(pop_data_fn = "downscale/SSP_Population.csv",
   return(proxy_list)
 }
 
-#' Get the country-to-region mapping for a given model
+#' Get the country-to-region mappings for the project and optionally for a set of models
 #'
-#' @param model_name name of model whose country-to-region mapping is to be returned
-#' @details Takes in yaml lists of countries in each model region, and returns a data frame with two columns: iso and
-#'   region
+#' Returns a list of data frames, each named according to the data source/model, each of which has two columns:
+#' iso and region.
+#'
+#' @param model_data_folder folder where the pre-processed model output data is located. If NA, this will default
+#' to an internal (included with the package) country-to-region mapping list for iTEM project regions.
+#' @param item_map_name the name of the dataframe with the iTEM project country-to-region mapping
+#' @details This function is designed to return country-to-region mapping assignments as required by other functions in
+#'   the package. If a model data folder is provided, the function requires that the mapping lists be within this folder
+#'   as model/regions.yaml. If no such folder is provided, then the returned list will only have the internal
+#'   (i.e., this project's) country-to-region mapping.
 #' @importFrom assertthat assert_that
 #' @importFrom yaml yaml.load_file
 #' @importFrom dplyr rename
 #' @importFrom magrittr "%>%"
 #' @importFrom data.table rbindlist
-get_country_region_map <- function(model_name){
-  assert_that(is.character(model_name))
+#' @export
+load_country_region_mappings <- function(model_data_folder = NA, item_map_name = "item"){
 
-  region_assignment <- load_data_file(paste0("model/",model_name,"/regions.yaml"), quiet = TRUE)
-  # strip any meta-info other than the country names
-  region_assignment <- lapply(region_assignment, function(x){x <- x['countries']}) %>%
+  assert_that(is.character(item_map_name))
+  country_region_maps <- list()
+  item_region_assignment <- load_data_file("downscale/regions.yaml", quiet = TRUE) %>%
+    # Strip any other meta-info and transform the yaml list into a dataframe of regions and countries
+    lapply(function(x){x <- x['countries']}) %>%
     rbindlist(idcol = "region") %>%
     rename(iso = countries)
-  return(region_assignment)
-} # end function
+  country_region_maps[[item_map_name]] <- item_region_assignment
+  if(!is.na(model_data_folder)){
+    assert_that(is.character(model_data_folder))
+    domain <- paths[[model_data_folder]]
+    if(is.null(domain)){
+      print(paste('unrecognized path:', model_data_folder))
+      return()
+    }
+    model_names <- list.dirs(domain, full.names = FALSE, recursive = FALSE)
+
+    # If a folder with model-specific mappings is provided, add each model to the list
+    for(model_name in model_names){
+      fqfn <- paste0(domain, "/", model_name, "/regions.yaml")
+      model_region_assignment <- yaml.load_file(fqfn) %>%
+        lapply(function(x){x <- x['countries']}) %>%
+        rbindlist(idcol = "region") %>%
+        rename(iso = countries)
+      country_region_maps[[model_name]] <- model_region_assignment
+      } #end for(model_name in model_names)
+    } # end if(!is.na(model_data_folder))
+    return(country_region_maps)
+  } # end function
 
 #' Generate base-year transportation dataset from which to construct the transport energy downscaling proxy
 #'
@@ -713,7 +748,47 @@ extract_global_data_to_df <- function(model_data, input_region_col = "region", o
   return(global_data)
 }
 
-# aggregate_regions()
+#' Aggregate country-level quantity flow data to iTEM analysis regions
+#'
+#' This function takes in a data frame with quantity flow data by ISO code and a mapping from ISO code to iTEM region.
+#' It joins in the appropriate iTEM region for each country ISO code, aggregates by these regions, and returns a
+#' dataframe.
+#'
+#' @param downscaled_data data frame with downscaled (i.e. country-level) data. Can also include global totals, assigned
+#'   to iso code "All".
+#' @param item_region_map data table mapping from 3-digit ISO code to iTEM region, called from
+#'   (\code{\link{load_country_region_mappings}})
+#' @param compute_global_totals logical indicating whether to compute the global totals. The default is FALSE, as it is
+#'   assumed that this step has been conducted under (\code{\link{aggregate_all_permutations}}).
+#' @details The mapping from ISO code to iTEM region is user-specified with a provided default.
+#' @importFrom assertthat assert_that
+#' @importFrom dplyr left_join group_by_ summarise ungroup
+#' @export
+aggregate_item_regions <- function(downscaled_data,
+                                   item_region_map = load_country_region_mappings()[['item']],
+                                   compute_global_totals = FALSE){
+  assert_that(is.data.frame(downscaled_data))
+  assert_that(is.data.frame(item_region_map))
+  assert_that(is.logical(compute_global_totals))
+
+  dots <- lapply(ITEM_ID_COLUMNS, as.symbol)
+  global_data <- downscaled_data %>%
+    filter(iso == "All") %>%
+    rename(region = iso)
+  region_data <- downscaled_data %>%
+    filter(iso != "All") %>%
+    left_join(item_region_map, by = "iso") %>%
+    group_by_(.dots = dots) %>%
+    summarise(value = sum(value)) %>%
+    ungroup() %>%
+    bind_rows(global_data)
+  if(compute_global_totals){
+    region_data <- region_data %>%
+      aggregate_all_permutations(variables = "region")
+  }
+  return(region_data)
+}
+
 # compute_indicator_variables()
 # get_indicator_variable_derivations()
 # export_data()

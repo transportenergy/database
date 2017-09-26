@@ -60,13 +60,13 @@ init_paths <- function (path_args=list()) {
   init_path('models-2', paths[['model database']], '2.csv')
 }
 
-#' find_csv_file
+#' find_data_file
 #'
 #' Find an internal, i.e. included with the package, data file.
 #' @param filename Filename (extension optional) to find
 #' @param optional Logical: file optional to find?
 #' @param quiet Logical - suppress messages?
-#' @return Full name of file, or NULL if file not found but is optional.
+#' @return Fully qualified file name, or NULL if file not found but is optional.
 #' @details Throws an error if file not found (and file is not optional).
 #' @importFrom assertthat assert_that
 find_data_file <- function(filename, optional = FALSE, quiet = FALSE) {
@@ -94,7 +94,7 @@ find_data_file <- function(filename, optional = FALSE, quiet = FALSE) {
 #'
 #' Load an internal, i.e. included with the package, data file.
 #' @param filename filename of file to load
-#' @param optionals Logical indicating whether file is optional
+#' @param optional Logical indicating whether file is optional
 #' @param quiet Logical - suppress messages?
 #' @details Optional files that are not found are returned as NA.
 #' @return A data frame (csv) or yaml list.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/common.R
 \name{find_data_file}
 \alias{find_data_file}
-\title{find_csv_file}
+\title{find_data_file}
 \usage{
 find_data_file(filename, optional = FALSE, quiet = FALSE)
 }
@@ -14,7 +14,7 @@ find_data_file(filename, optional = FALSE, quiet = FALSE)
 \item{quiet}{Logical - suppress messages?}
 }
 \value{
-Full name of file, or NULL if file not found but is optional.
+Fully qualified file name, or NULL if file not found but is optional.
 }
 \description{
 Find an internal, i.e. included with the package, data file.

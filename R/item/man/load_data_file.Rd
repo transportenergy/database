@@ -9,9 +9,9 @@ load_data_file(filename, optional = FALSE, quiet = FALSE)
 \arguments{
 \item{filename}{filename of file to load}
 
-\item{quiet}{Logical - suppress messages?}
+\item{optional}{Logical indicating whether file is optional}
 
-\item{optionals}{Logical indicating whether file is optional}
+\item{quiet}{Logical - suppress messages?}
 }
 \value{
 A data frame (csv) or yaml list.

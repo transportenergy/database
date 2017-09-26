@@ -4,12 +4,14 @@
 \alias{compute_country_shares}
 \title{Compute country shares for model output by native model region}
 \usage{
-compute_country_shares(model_data_list,
+compute_country_shares(model_data_list, country_region_map_list,
   ds_proxy_data = generate_ds_proxy_data(), save_output = TRUE,
   create_dir = TRUE, output_dir = DS_OUTPUT_DIR)
 }
 \arguments{
 \item{model_data_list}{list of model output data that has been cleaned, pre-processed, and prepared (i.e., corrected)}
+
+\item{country_region_map_list}{list of model-specific dataframes with country-to-region mapping}
 
 \item{ds_proxy_data}{list of downscaling proxy dataframes}
 
@@ -23,7 +25,7 @@ doesn't already exist)}
 \description{
 Compute country-with-model-region shares for models, downscaling proxies, nation-level socioeconomic realizations,
 and years. Takes in list of model data from \code{\link{prepare_preprocessed_data}}, each model's country-to-region
-mapping from \code{\link{get_country_region_map}}, and country-level downscaling proxy data from
+mapping from \code{\link{load_country_region_mappings}}, and country-level downscaling proxy data from
 \code{\link{generate_ds_proxy_data}}. Returns a list with all combinations of model, downscaling proxy, country-level
 socioeconomic realization, and year.
 }
