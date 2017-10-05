@@ -155,13 +155,14 @@ approx_fun <- function(year, value, rule = 1) {
 #' elements of a list of data frames
 #' @details The folder should be one of the folders specified in init_paths()
 #' @importFrom readr write_csv
+#' @export
 save_output <- function(data, output_folder, filename = NA){
   # Figure out the directory where the output will be saved
   domain <- paths[[output_folder]]
   if( is.data.frame(data)){
     if(is.na(filename)){
       # If no filename is specified, default it to the name of the object plus ".csv"
-      filename <- paste0(deparse(substitute(data)), ".csv")
+      filename <- sprintf('%s.csv', deparse(substitute(data)))
     }
     fqfn <- paste0(domain, "/", filename)
     if(!endsWith(filename, ".csv")) fqfn <- paste0( fqfn, ".csv")
