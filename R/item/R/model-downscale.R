@@ -73,20 +73,26 @@ load_preprocessed_data <- function(model_data_folder){
 #' @importFrom magrittr "%>%"
 #' @export
 prepare_preprocessed_data <- function(model_data_list,
+                                      derive_weighted_indicators = TRUE,
                                       subset_quantity_flows = TRUE,
                                       remove_redundant_alls = TRUE,
                                       interpolate_years = TRUE,
                                       drop_na_values = TRUE,
                                       aggregate_redundant_categories = TRUE, ...){
   assert_that(is.list(model_data_list))
+  assert_that(is.logical(derive_weighted_indicators))
   assert_that(is.logical(subset_quantity_flows))
   assert_that(is.logical(remove_redundant_alls))
   assert_that(is.logical(interpolate_years))
   assert_that(is.logical(drop_na_values))
   assert_that(is.logical(aggregate_redundant_categories))
 
+  if(derive_weighted_indicators){
+    print("Note: Deriving weighted quantity flows from provided indicator variables")
+    weighted_indicator_mapping <- get_variable_mapping("downscale/weighted_indicators.csv")
+  }
   if(subset_quantity_flows){
-    print("Note: Only retaining quantity flow variables from submitted model data.")
+    print("Note: Only retaining quantity flow variables from submitted model data")
     # load the variable type mapping, and derive a vector of quantity flow variables to be retained
     flow_variables <- get_variable_mapping(...)
     flow_variables <- flow_variables$variable[flow_variables$variable_type == "quantity"]
@@ -101,6 +107,14 @@ prepare_preprocessed_data <- function(model_data_list,
       print( paste0( "Applying model-specific corrections to data from model: ", model ))
       correction_function <- get( paste0("correct_", model))
       model_data_list[[model]] <- correction_function(model_data_list[[model]])
+    }
+    # If indicator variables are provided without the necessary weighting factors (e.g., new vehicle
+    # efficiency but not vkm and energy consumption by new vehicles), this step computes weighted
+    # variables that can be used
+    if(derive_weighted_indicators){
+      model_data_list[[model]] <- derive_variables(model_data_list[[model]],
+                                                   mapping = weighted_indicator_mapping,
+                                                   bind_data = TRUE)
     }
     # Subset quantity flows, if indicated
     if(subset_quantity_flows){
@@ -702,6 +716,7 @@ get_variable_mapping <- function(mapping_fn = "downscale/variable_ds_proxy.csv")
 #' @param variables data frame with model-reported quantity variables
 #' @details
 #' @importFrom assertthat assert_that
+#' @importFrom magrittr "%>%"
 #' @importFrom dplyr anti_join
 remove_redundant_alls <- function(data, variables = ITEM_IDVARS_WITH_ALLS){
   assert_that(is.data.frame(data))
@@ -762,6 +777,7 @@ extract_global_data_to_df <- function(model_data, input_region_col = "region", o
 #'   assumed that this step has been conducted under (\code{\link{aggregate_all_permutations}}).
 #' @details The mapping from ISO code to iTEM region is user-specified with a provided default.
 #' @importFrom assertthat assert_that
+#' @importFrom magrittr "%>%"
 #' @importFrom dplyr left_join group_by_ summarise ungroup
 #' @export
 aggregate_item_regions <- function(downscaled_data,
@@ -789,7 +805,76 @@ aggregate_item_regions <- function(downscaled_data,
   return(region_data)
 }
 
-# compute_indicator_variables()
-# get_indicator_variable_derivations()
+#' Derive new variables from existing variables in a dataset
+#'
+#' This function takes in a dataframe with model data, and a variable derivation CSV table with
+#' instructions detailing what the new variables will be named, how they will be calculated, and what
+#' their units will be.
+#'
+#' @param model_data_df data frame with pre-processed/corrected iTEM data in the appropriate format
+#' @param mapping dataframe specifying the variables to be created, along with instructions
+#' for creating them and the units of the new variable
+#' @param bind_data logical (default = FALSE) indicating whether to return a data frame with the original model
+#'   data bound to the output of this function (TRUE), or to only return the variables calculated by this function
+#' @details This function derives new variables from existing variables in the data frame. Each new variable is derived
+#'   from two and only two existing variables. The operations allowed are +, *, and /. Unit conversions are applied
+#'   multiplicatively. If the operation is addition and there is a unit conversion provided, the conversion is applied
+#'   to the second variable in the derivation.
+#' @importFrom assertthat assert_that
+#' @importFrom magrittr %>%
+#' @importFrom dplyr inner_join bind_rows mutate
+#' @export
+derive_variables <- function(model_data_df,
+                             mapping = get_variable_mapping("downscale/indicators.csv"),
+                             bind_data = FALSE){
+  assert_that(is.data.frame(model_data_df))
+  assert_that(is.data.frame(mapping))
+  assert_that(is.logical(bind_data))
+
+  output_data_cols <- names(model_data_df)
+  derived_data <- list()
+  joinvars <- output_data_cols[-which(output_data_cols %in% c("variable", "unit", "value"))]
+  for(i in 1:nrow(mapping)){
+    model_data_var1 <- subset( model_data_df, variable == mapping$var1[i])
+    model_data_var2 <- subset(model_data_df, variable == mapping$var2[i])
+    # The operations allowed are +, *, and /
+    assert_that(mapping$operation[i] %in% c("+", "*", "/"))
+    # Join the common data between var1 and var2. The rest of the operations are all conditional
+    derived_data[[i]] <- inner_join(model_data_var1, model_data_var2,
+                                    by = joinvars,
+                                    suffix = c("_var1", "_var2")) %>%
+      mutate(variable = mapping$newvar[i], unit = mapping$unit[i])
+    # If the necessary data to derive the new variable are not available, generate an empty value column
+    if (nrow(derived_data[[i]]) == 0) {
+      derived_data[[i]]$value <- as.numeric(character(0))
+    } else {
+      print(paste0("Deriving new variable: ", mapping$newvar[i]))
+      derived_data[[i]] <-
+        subset(derived_data[[i]],!is.na(value_var1) & !is.na(value_var2))
+      if (mapping$operation[i] == "+") {
+        if (is.na(mapping$unit_conversion[i])) {
+          derived_data[[i]] <-
+            derived_data[[i]] %>% mutate(value = value_var1 + value_var2)
+        } else {
+          derived_data[[i]] <-
+            derived_data[[i]] %>% mutate(value = value_var1 + value_var2 * mapping$unit_conversion[i])
+        }
+      } else if (mapping$operation[i] == "*") {
+        derived_data[[i]] <-
+          derived_data[[i]] %>% mutate(value = value_var1 * value_var2 * mapping$unit_conversion[i])
+      } else if (mapping$operation[i] == "/") {
+        derived_data[[i]] <-
+          derived_data[[i]] %>% mutate(value = value_var1 / value_var2 * mapping$unit_conversion[i])
+      }
+    } # end if (nrow(derived_data[[i]]) == 0) else
+    derived_data[[i]] <- derived_data[[i]][output_data_cols]
+  } # end for i in 1:nrow(mapping)
+  output_data <- do.call(bind_rows, derived_data)
+  if(bind_data){
+    output_data <- bind_rows(model_data_df, output_data)
+  }
+  return(output_data)
+}
+
 # export_data()
 

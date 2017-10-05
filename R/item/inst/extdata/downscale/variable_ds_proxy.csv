@@ -14,7 +14,9 @@ Population,quantity,POPULATION
 PPP-GDP,quantity,GDP
 Radiative Forcing,indicator,
 sales,quantity,TRANSPORTENERGY
+sales_weighted_intensity_new,quantity,TRANSPORTENERGY
 stock,quantity,TRANSPORTENERGY
+stock_weighted_intensity_new,quantity,TRANSPORTENERGY
 tkm,quantity,TRANSPORTENERGY
 ttw_bc,quantity,TRANSPORTENERGY
 ttw_ch4,quantity,TRANSPORTENERGY

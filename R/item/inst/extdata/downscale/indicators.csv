@@ -1,13 +1,27 @@
-var1,var2,var1_Unit,unit_conversion,Unit
-energy,Population,PJ/yr,1,GJ/person/yr
-pkm,Population,bn pkm/yr,1,thousand pkm/person/yr
-tkm,Population,bn tkm/yr,1,thousand tkm/person/yr
-vkt,Population,bn vkm/yr,1,thousand vkm/person/yr
-stock,Population,million vehicles,1000,Vehicles per thousand persons
-ttw_co2,Population,Mt CO2/yr,1,t CO2/person/yr
-energy,PPP-GDP,PJ/yr,1,MJ/US$2005
-pkm,PPP-GDP,bn pkm/yr,1,pkm/US$2005
-tkm,PPP-GDP,bn tkm/yr,1,tkm/US$2005
-vkt,PPP-GDP,bn vkm/yr,1,vkm/US$2005
-stock,PPP-GDP,million vehicles,1000,vehicles/million US$2005
-ttw_co2,PPP-GDP,Mt CO2/yr,1,kg CO2/US$2005
+newvar,var1,var2,operation,unit_conversion,unit
+intensity,energy,vkt,/,1,MJ per vkm
+intensity_pass,energy,pkm,/,1,MJ per pkm
+intensity_frt,energy,tkm,/,1,MJ per tkm
+intensity_new,sales_weighted_intensity_new,sales,/,1,MJ per vkm
+intensity_new_stock_weight,stock_weighted_intensity_new,stock,/,1,MJ per vkm
+ttw_co2e,ttw_co2,ttw_ch4,+,25,Mt CO2-equiv/yr
+wtw_co2e,ttw_co2e,wwt_co2e,+,NA,Mt CO2-equiv/yr
+load_factor_pass,pkm,vkt,/,1,passengers per vehicle
+load_factor_frt,tkm,vkt,/,1,tonnes per vehicle
+ef_bc,ttw_bc,vkt,/,1,g BC per vkm
+ef_co2,ttw_co2,vkt,/,1,g CO2 per vkm
+ef_co2_pass,ttw_co2,pkm,/,1,g CO2 per pkm
+ef_co2_frt,ttw_co2,tkm,/,1,g CO2 per tkm
+ef_co2_fuel,ttw_co2,energy,/,1000,g CO2 per MJ
+energy_percapita,energy,Population,/,1,GJ/person/yr
+pkm_percapita,pkm,Population,/,1,thousand pkm/person/yr
+tkm_percapita,tkm,Population,/,1,thousand tkm/person/yr
+vkt_percapita,vkt,Population,/,1,thousand vkm/person/yr
+stock_percapita,stock,Population,/,1000,Vehicles per thousand persons
+ttw_co2_percapita,ttw_co2,Population,/,1,t CO2/person/yr
+energy_perGDP,energy,PPP-GDP,/,1,MJ/US$2005
+pkm_perGDP,pkm,PPP-GDP,/,1,pkm/US$2005
+tkm_perGDP,tkm,PPP-GDP,/,1,tkm/US$2005
+vkt_perGDP,vkt,PPP-GDP,/,1,vkm/US$2005
+stock_perGDP,stock,PPP-GDP,/,1000,vehicles/million US$2005
+ttw_co2_perGDP,ttw_co2,PPP-GDP,/,1,kg CO2/US$2005
