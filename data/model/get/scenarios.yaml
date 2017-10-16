@@ -3,19 +3,19 @@
     category: reference
 
   400ppm_withCCS:
-    category: policy
+    category: policy-extra
 
   400ppm_withoutCCS:
-    category: policy
+    category: policy-extra
 
   450ppm_withCCS:
     category: policy
 
   450ppm_withoutCCS:
-    category: policy
+    category: policy-extra
 
   550ppm_withCCS:
-    category: policy
+    category: policy-extra
 
   550ppm_withoutCCS:
-    category: policy
+    category: policy-extra
