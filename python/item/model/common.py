@@ -170,7 +170,9 @@ def tidy(df):
 
 
 def select(data, *args, **kwargs):
-    """Select from *data*."""
+    """Select from *data*.
+
+    """
     # Process arguments
     if len(args) > 1:
         raise ValueError(("can't determine dimensions for >1 positional "
@@ -180,7 +182,12 @@ def select(data, *args, **kwargs):
 
     for d, v in kwargs.items():
         d = 'technology' if d == 'tech' else d
-        dims[d] = set([v]) if isinstance(v, (int, str)) else set(v)
+        if isinstance(v, (int, str)):
+            dims[d] = set([v])
+        elif v is None:
+            dims[d] = v
+        else:
+            dims[d] = set(v)
 
     if len(args) and dims['variable'] is None:
         dims['variable'] = set(args)
