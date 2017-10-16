@@ -1,18 +1,19 @@
+from copy import deepcopy
 from functools import reduce
 from itertools import chain
 import operator
 from os.path import join
+from textwrap import indent
 
-from plotnine import ggplot, aes, labs, scale_linetype
+import plotnine
 
 from item.common import paths
-from item.model import select
-from item.model.common import INDEX
+from item.model.common import INDEX, select
 from item.model.dimensions import INFO
 
 
-scale_linetype_scenario = scale_linetype(limits=['reference',
-                                                 'policy'])
+scale_linetype_scenario = plotnine.scale_linetype(limits=['reference',
+                                                          'policy'])
 
 
 def min_max(data, dims):
@@ -58,52 +59,101 @@ class Plot:
     Subclass Plot, overriding the variables below and optionally
     the filter() method, to create plots.
     """
-    # Variable to select
-    variable = ''
+    # Selectors to subset the data
+    select = {}
 
-    # Other selectors to subset the data
-    selectors = {}
+    # Aesthetic mapping for plotnine.aes
+    aes = {}
 
-    # Sequence of plotnine.ggplot terms
+    # Sequence of plotnine terms
     terms = []
 
+    def filter(self, data):
+        """Override this method to filter or transform the selected data."""
+        return data
+
+    @classmethod
+    def from_dict(cls, name, attrs={}):
+        """Create a Plot subclass with given *name* and *attrs*."""
+        import pandas
+
+        # Environments for parsing
+        term_globals = {
+            'scale_linetype_scenario': scale_linetype_scenario,
+            }
+        term_globals.update(plotnine.__dict__)
+        filter_globals = {
+            'pd': pandas,
+            'min_max': min_max,
+            }
+
+        # Attrs for the new class
+        new_attrs = {
+            'aes': cls.aes.copy(),
+            'select': cls.select.copy(),
+            'terms': cls.terms.copy(),
+            'filter': cls.filter,
+            }
+
+        # Preprocess the info
+        for key, value in attrs.items():
+            if key in ('aes', 'select'):
+                new_attrs[key].update(value)
+            elif key == 'terms':
+                # Evaluate the terms as if "from plotnine import *"
+                new_attrs['terms'] = list(
+                    map(lambda s: eval(s, term_globals), value))
+            elif key == 'filter':
+                # Construct a function
+                source = 'def filter(self, data):\n' + indent(value, '    ')
+                tmp = {}
+                exec(source, filter_globals, tmp)
+                new_attrs.update(tmp)
+
+        # Define and return the new class
+        return type(name, (cls,), new_attrs)
+
     def __init__(self, data, *fn_extra):
-        # Select the data
-        data = select(data, self.variable, **self.select)
+        # Subset the data
 
-        # Filter the data
-        self.data = self.filter(data)
+        # Query
+        selectors = self.select.copy()
+        query = selectors.pop('query', None)
+        if query:
+            data = data.query(query)
 
-        print(data.describe())
+        # Select
+        data = select(data, **selectors)
 
-        pre_terms = [ggplot(self.data), aes(**self.map)]
+        # Filter
+        data = self.filter(data)
 
-        # Produce both the aesthetic mapping and the labels from
-        # the same class variable
+        # Produce labels from the aesthetic mapping
         labels = {}
-        for k, v in self.map.items():
+        for k, v in self.aes.items():
+            # Dimensions like 'fuel' → title case
             if v in INDEX:
                 labels[k] = v.title()
 
+            # Label the value using the variable information
             if v == 'value':
-                var = self.data['variable'].unique()
+                var = data['variable'].unique()
                 assert len(var) == 1
                 var_info = INFO['variable'][var[0]]
                 labels[k] = '{} [{}]'.format(var[0], var_info['unit'])
 
         # Chain together the terms to produce the figure
-        terms = chain(pre_terms, self.terms, [labs(**labels)])
-        fig = reduce(operator.add, terms)
+        figure = reduce(operator.add, chain([
+            plotnine.ggplot(data),
+            plotnine.aes(**self.aes),
+            # Use the generated labels first, to allow the terms to override
+            plotnine.labs(**labels),
+            ], self.terms))
 
         # Compose the filename
-        clsname = [self.__class__.__name__]
         fn_extra = map(str, fn_extra)
-        name = '_'.join(chain(clsname, fn_extra))
-        self.filename = join(paths['plot'], '%s.%s' % (name, 'pdf'))
+        name = '_'.join(chain([self.__class__.__name__], fn_extra))
+        filename = join(paths['plot'], '%s.%s' % (name, 'pdf'))
 
         # Save
-        fig.save(self.filename, width=128, height=96, units='mm')
-
-    def filter(self, data):
-        """Override this method to filter or transform the selected data."""
-        return data
+        figure.save(filename, width=128, height=96, units='mm')
