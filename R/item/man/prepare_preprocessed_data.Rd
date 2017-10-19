@@ -17,7 +17,9 @@ prepare_preprocessed_data(model_data_list, derive_weighted_indicators = TRUE,
 \item{remove_redundant_alls}{logical (default = TRUE) indicating whether to remove observations with "All" that could
 be calculated instead by adding provided components. These "All" values should not be downscaled.}
 
-\item{interpolate_years}{logical (default = TRUE) indicating whether to interpolate years.}
+\item{interpolate_years}{logical (default = TRUE) indicating whether to interpolate years. If FALSE, no interpolation
+will be performed. If TRUE, iTEM analysis years that fall within the model's range of reported years will be
+linearly interpolated, as necessary.}
 
 \item{drop_na_values}{logical (default = TRUE) indicating whether to drop observations with no value in model-
 submitted data. If FALSE, missing values are set to zero.}

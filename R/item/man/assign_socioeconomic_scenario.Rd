@@ -16,7 +16,8 @@ assign_socioeconomic_scenario(model_data_list, country_region_map_list,
 ratios of variable indicated, by year and model region. exogenous: use exogenously provided assignments between
 model+scenario and nation-level socioeconomic realization for downscaling model output.}
 
-\item{variable}{variable to use in determining the socioeconomic assignment; can be population or gdp}
+\item{SSE_variable}{variable to use in determining the socioeconomic assignment using the SSE method; can be
+Population or PPP-GDP}
 }
 \description{
 Takes in list of model output data from \code{\link{prepare_preprocessed_data}} and returns a list of model-

@@ -56,7 +56,9 @@ load_preprocessed_data <- function(model_data_folder){
 #' @param subset_quantity_flows logical (default = TRUE) indicating whether to subset only quantity flow variables
 #' @param remove_redundant_alls logical (default = TRUE) indicating whether to remove observations with "All" that could
 #'   be calculated instead by adding provided components. These "All" values should not be downscaled.
-#' @param interpolate_years logical (default = TRUE) indicating whether to interpolate years.
+#' @param interpolate_years logical (default = TRUE) indicating whether to interpolate years. If FALSE, no interpolation
+#'   will be performed. If TRUE, iTEM analysis years that fall within the model's range of reported years will be
+#'   linearly interpolated, as necessary.
 #' @param drop_na_values logical (default = TRUE) indicating whether to drop observations with no value in model-
 #'   submitted data. If FALSE, missing values are set to zero.
 #' @param aggregate_redundant_categories logical (default = TRUE) indicating whether to add up categories that are
@@ -127,12 +129,21 @@ prepare_preprocessed_data <- function(model_data_list,
     }
     # Interpolate the years provided, if indicated
     if(interpolate_years){
-      print( paste0( "Interpolating years from model: ", model ))
-      model_data_list[[model]] <- model_data_list[[model]] %>%
-        group_by(scenario, region, variable, mode, technology, fuel) %>%
-        mutate(value = approx_fun(year, value)) %>%
-        ungroup()
-    }
+      # Only interpolate up to the final model year (no need to have a bunch of missing values everywhere)
+      final_model_year <- max( model_data_list[[model]]$year)
+      initial_model_year <- min( model_data_list[[model]]$year)
+      model_item_years <- ITEM_YEARS[ ITEM_YEARS <= final_model_year & ITEM_YEARS >= initial_model_year]
+      years_to_interpolate <- model_item_years[!model_item_years %in% unique(model_data_list[[model]]$year) ]
+      # Don't do this if no data would be added
+      if(length(years_to_interpolate) > 0){
+        print( paste0( "Interpolating years ", paste(years_to_interpolate, collapse = ', '), " from model: ", model ))
+        model_data_list[[model]] <- model_data_list[[model]] %>%
+          group_by_(.dots = ITEM_ID_COLUMNS[ ITEM_ID_COLUMNS != "year"]) %>%
+          complete(year = model_item_years) %>%
+          mutate(value = approx_fun(year, value)) %>%
+          ungroup()
+        }
+      }
     # Either drop NA values or or set them to zero
     if(drop_na_values){
       model_data_list[[model]] <- model_data_list[[model]] %>%
@@ -334,7 +345,8 @@ compute_country_shares <- function(model_data_list,
 #' @param method method used for assigning scenarios. SSE: default behavior; minimize sum of squared errors in future
 #'   ratios of variable indicated, by year and model region. exogenous: use exogenously provided assignments between
 #'   model+scenario and nation-level socioeconomic realization for downscaling model output.
-#' @param variable variable to use in determining the socioeconomic assignment; can be population or gdp
+#' @param SSE_variable variable to use in determining the socioeconomic assignment using the SSE method; can be
+#'   Population or PPP-GDP
 #' @details Returns a list of dataframes where each model is an element. Data frames assign model's scenarios
 #' to a country-level socioeconomics file.
 #' @importFrom assertthat assert_that
