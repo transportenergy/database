@@ -36,7 +36,6 @@ Collate:
     'correct_bp.R'
     'correct_eia.R'
     'correct_get.R'
-    'correct_itf.R'
     'correct_momo.R'
     'correct_roadmap.R'
 RoxygenNote: 6.0.1
