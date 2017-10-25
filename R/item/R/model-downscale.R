@@ -116,7 +116,7 @@ prepare_preprocessed_data <- function(model_data_list,
     if(derive_weighted_indicators){
       model_data_list[[model]] <- derive_variables(model_data_list[[model]],
                                                    mapping = weighted_indicator_mapping,
-                                                   bind_data = TRUE)
+                                                   bind_derived_data = TRUE)
     }
     # Subset quantity flows, if indicated
     if(subset_quantity_flows){
@@ -277,7 +277,7 @@ compute_country_shares <- function(model_data_list,
                                    country_region_map_list,
                                    ds_proxy_data = generate_ds_proxy_data(),
                                    save_output = TRUE, create_dir = TRUE,
-                                   output_dir = DS_OUTPUT_DIR){
+                                   output_dir = DS_OUTPUT_DIR, ...){
   assert_that(is.list(model_data_list))
   assert_that(is.list(country_region_map_list))
   assert_that(is.list(ds_proxy_data))
@@ -306,9 +306,8 @@ compute_country_shares <- function(model_data_list,
       # The group_by columns may include mode; need to keep this flexible to column names
       group_columns <- names(ds_proxy_region)[!names(ds_proxy_region) %in% c("value", "iso")]
       # Convert character vector to list of symbols
-      dots <- lapply(group_columns, as.symbol)
       ds_proxy_region <- ds_proxy_region %>%
-        group_by_(.dots = dots) %>%
+        group_by_(.dots = lapply(group_columns, as.symbol)) %>%
         summarise(reg_total = sum(value)) %>%
         ungroup()
       output_list[[model_name]][[ds_proxy_name]] <- ds_proxy_data[[ds_proxy]] %>%
@@ -342,11 +341,15 @@ compute_country_shares <- function(model_data_list,
 #'
 #' @param model_data_list list of data tables of model-specific pre-processed, prepared data
 #' @param country_region_map_list list of data tables of model-specific country-to-region mappings
-#' @param method method used for assigning scenarios. SSE: default behavior; minimize sum of squared errors in future
+#' @param socio_assign_method method used for assigning scenarios. SSE: default behavior; minimize sum of squared errors in future
 #'   ratios of variable indicated, by year and model region. exogenous: use exogenously provided assignments between
-#'   model+scenario and nation-level socioeconomic realization for downscaling model output.
+#'   model+scenario and nation-level socioeconomic realization for downscaling model output. If this method is
+#'   selected and no model data folder is provided, a single default realization will be used for all models and scenarios.
 #' @param SSE_variable variable to use in determining the socioeconomic assignment using the SSE method; can be
 #'   Population or PPP-GDP
+#' @param socio_assignment_folder character string indicating the folder where the model data are located, in which to find
+#'   exogenously specified assignments from model+scenario to socioeonomic realization. They are stored as
+#'   scenario_folder/model/scenarios.yaml
 #' @details Returns a list of dataframes where each model is an element. Data frames assign model's scenarios
 #' to a country-level socioeconomics file.
 #' @importFrom assertthat assert_that
@@ -357,24 +360,45 @@ compute_country_shares <- function(model_data_list,
 #' @export
 assign_socioeconomic_scenario <- function( model_data_list,
                                            country_region_map_list,
-                                           method = "SSE",
-                                           SSE_variable = "PPP-GDP"){
+                                           socio_assign_method = "SSE",
+                                           SSE_variable = "PPP-GDP",
+                                           socio_assignment_folder = NA, ...){
   assert_that(is.list(model_data_list))
   assert_that(is.list(country_region_map_list))
-  assert_that(method %in% c("exogenous", "SSE"))
+  assert_that(socio_assign_method %in% c("exogenous", "SSE"))
   assert_that(SSE_variable %in% c("PPP-GDP", "Population"))
 
   output_list <- list()
   if(SSE_variable == "PPP-GDP") country_data <- generate_ds_proxy_data()$ds_proxy_gdp
   if(SSE_variable == "Population") country_data <- generate_ds_proxy_data()$ds_proxy_population
-  if(method == "exogenous") print("Using exogenous assignments from model/scenario to country-level socio scenario")
+  if(socio_assign_method == "exogenous" & !is.na(socio_assignment_folder)){
+    print("Using exogenous assignments from model/scenario to country-level socio scenario")
+  }
+  if(socio_assign_method == "exogenous" & is.na(socio_assignment_folder)){
+    print("Using a single country-level socio scenario for all models and scenarios")
+  }
   for(model_name in names(model_data_list)){
-    if(method == "exogenous"){
-      scenario_assignment <- load_data_file(paste0("model/",model_name,"/scenarios.yaml"), quiet = TRUE) %>%
-        rbindlist(idcol = "scenario") %>%
-        select(scenario, socio)
-    } # end if(method == "exogenous")
-    if(method == "SSE"){
+    if(socio_assign_method == "exogenous"){
+      if(is.na(socio_assignment_folder)){
+        scenario_assignment <- data.frame(scenario = unique(model_data_list[[model_name]]$scenario),
+                                          socio = DS_DEFAULT_SCENARIO,
+                                          stringsAsFactors = FALSE)
+      } # end if(is.na(socio_assignment_folder))
+      if(!is.na(socio_assignment_folder)){
+        assert_that(is.character(socio_assignment_folder))
+        domain <- paths[[socio_assignment_folder]]
+        if(is.null(domain)){
+          print(paste('unrecognized path:', socio_assignment_folder))
+          return()
+        }
+        fqfn <- paste0(domain, "/", model_name, "/scenarios.yaml")
+        assert_that(file.exists(fqfn))
+        scenario_assignment <- yaml.load_file(fqfn) %>%
+          rbindlist(idcol = "scenario") %>%
+          select(scenario, socio)
+      } # end if(!is.na(socio_assignment_folder))
+    } # end if(socio_assign_method == "exogenous")
+    if(socio_assign_method == "SSE"){
       print(paste0("Determining country-level socioeconomic scenarios for model: ", model_name))
       # Get the country-to-region assignments for the given model
       region_assignment <- country_region_map_list[[model_name]]
@@ -432,7 +456,7 @@ assign_socioeconomic_scenario <- function( model_data_list,
                                           socio = SSE_data$scenario_socio,
                                           stringsAsFactors = FALSE)
       } #end else; if(!SSE_variable %in% unique( model_data_list[[model_name]]$variable))
-    } # end if(method == "SSE")
+    } # end if(socio_assign_method == "SSE")
     output_list[[model_name]] <- scenario_assignment
   } # end for(model_name in names(model_data_list))
   return(output_list)
@@ -558,8 +582,8 @@ generate_ds_proxy_data <- function(pop_data_fn = "downscale/SSP_Population.csv",
 #' Returns a list of data frames, each named according to the data source/model, each of which has two columns:
 #' iso and region.
 #'
-#' @param model_data_folder folder where the pre-processed model output data is located. If NA, this will default
-#' to an internal (included with the package) country-to-region mapping list for iTEM project regions.
+#' @param model_data_folder folder where the pre-processed model output data is located. If NA, this will return a
+#' list with a single internal (included with the package) country-to-region mapping table for iTEM project regions.
 #' @param item_map_name the name of the dataframe with the iTEM project country-to-region mapping
 #' @details This function is designed to return country-to-region mapping assignments as required by other functions in
 #'   the package. If a model data folder is provided, the function requires that the mapping lists be within this folder
@@ -571,7 +595,7 @@ generate_ds_proxy_data <- function(pop_data_fn = "downscale/SSP_Population.csv",
 #' @importFrom magrittr "%>%"
 #' @importFrom data.table rbindlist
 #' @export
-load_country_region_mappings <- function(model_data_folder = NA, item_map_name = "item"){
+load_country_region_mappings <- function(model_data_folder = NA, item_map_name = "item", ...){
 
   assert_that(is.character(item_map_name))
   country_region_maps <- list()
@@ -665,7 +689,8 @@ prepare_transportenergy_t0_data <- function( country_data,
 #' Returns the intial data frame with permutations appended.
 #'
 #' @param input_data data table with quantity (flow) variables
-#' @param variables character string indicating the variables to loop over
+#' @param collapse_vars character string indicating the variables (columns) whose values will be collapsed (aggregated)
+#'   to "All"
 #' @details The method implemented here assumes that all itemized elements of each variable to add to the total. Any
 #'   excluded elements will not be part of the reported total, and redundant categories (e.g., gasoline,
 #'   total liquid fuels) will be double counted.
@@ -673,29 +698,35 @@ prepare_transportenergy_t0_data <- function( country_data,
 #' @importFrom dplyr group_by_ summarise ungroup bind_rows
 #' @importFrom magrittr "%>%"
 #' @export
-aggregate_all_permutations <- function(input_data, variables = ITEM_IDVARS_WITH_ALLS){
+aggregate_all_permutations <- function(input_data, collapse_vars = DS_IDVARS_WITH_ALLS, ...){
   assert_that(is.data.frame(input_data))
-  assert_that(is.character(variables))
+  assert_that(is.character(collapse_vars))
 
   output_data <- input_data
   group_columns <- names(output_data)[ names(output_data) != "value"]
-  dots <- lapply(group_columns, as.symbol)
 
-  for(var in variables){
+  for(var in collapse_vars){
     print(paste0("Collapsing ", var, " to All and appending"))
     # Where this variable is already "All", exclude from the aggregation (would result in double counting)
+    assert_that(!is.null(output_data[[var]]))
     # Exclude missing values
     output_thisvar <- output_data[ output_data[[var]] != "All" & !is.na(output_data[[var]]),]
     if(nrow(output_thisvar) > 0){
       output_thisvar[[var]] <- "All"
       output_thisvar <- output_thisvar %>%
-        group_by_(.dots = dots) %>%
+        group_by_(.dots = lapply(group_columns, as.symbol)) %>%
         summarise(value = sum(value)) %>%
         ungroup()
       output_data <- bind_rows(output_data, output_thisvar)
-    }
-    # the output of each loop is passed to the input of the next loop, generating all permutations
-  }
+    } # end if(nrow(output_thisvar) > 0)
+    # the output of each loop is passed to the input of the next loop, generating all permutations.
+  } # end for(var in collapse_vars)
+  # because of heterogeneous reporting, there may be duplicate rows. For example, if a model reported fuel for
+  # aviation as "liquids" whereas LDV is reported as "All", the latter would be excluded from the fuel aggregation
+  # (and kept as it was in the input data). For this reason, aggregate one more time.
+  output_data <- group_by_(output_data, .dots = lapply(group_columns, as.symbol)) %>%
+    summarise(value = sum(value)) %>%
+    ungroup()
   return(output_data)
 }
 
@@ -705,7 +736,7 @@ aggregate_all_permutations <- function(input_data, variables = ITEM_IDVARS_WITH_
 #' @details Takes in a csv table with variables and associated categories. Defaults to the one provided with the item
 #' package, but can be set to a different one.
 #' @importFrom assertthat assert_that
-get_variable_mapping <- function(mapping_fn = "downscale/variable_ds_proxy.csv"){
+get_variable_mapping <- function(mapping_fn = "downscale/variable_ds_proxy.csv", ...){
   assert_that(is.character(mapping_fn))
   variable_mapping <- load_data_file(mapping_fn, quiet = TRUE)
   return(variable_mapping)
@@ -730,7 +761,7 @@ get_variable_mapping <- function(mapping_fn = "downscale/variable_ds_proxy.csv")
 #' @importFrom assertthat assert_that
 #' @importFrom magrittr "%>%"
 #' @importFrom dplyr anti_join
-remove_redundant_alls <- function(data, variables = ITEM_IDVARS_WITH_ALLS){
+remove_redundant_alls <- function(data, variables = ITEM_IDVARS_WITH_ALLS, ...){
   assert_that(is.data.frame(data))
   assert_that(is.character(variables))
 
@@ -760,7 +791,8 @@ remove_redundant_alls <- function(data, variables = ITEM_IDVARS_WITH_ALLS){
 #' @importFrom assertthat assert_that
 #' @importFrom dplyr bind_rows
 #' @export
-extract_global_data_to_df <- function(model_data, input_region_col = "region", output_region_col = "region"){
+extract_global_data_to_df <- function(model_data, input_region_col = "region",
+                                      output_region_col = "region", ...){
   assert_that(is.list(model_data))
   assert_that(is.character(input_region_col))
   assert_that(is.character(output_region_col))
@@ -794,25 +826,23 @@ extract_global_data_to_df <- function(model_data, input_region_col = "region", o
 #' @export
 aggregate_item_regions <- function(downscaled_data,
                                    item_region_map = load_country_region_mappings()[['item']],
-                                   compute_global_totals = FALSE){
+                                   compute_global_totals = FALSE, ...){
   assert_that(is.data.frame(downscaled_data))
   assert_that(is.data.frame(item_region_map))
   assert_that(is.logical(compute_global_totals))
 
-  dots <- lapply(ITEM_ID_COLUMNS, as.symbol)
   global_data <- downscaled_data %>%
     filter(iso == "All") %>%
     rename(region = iso)
   region_data <- downscaled_data %>%
     filter(iso != "All") %>%
     left_join(item_region_map, by = "iso") %>%
-    group_by_(.dots = dots) %>%
+    group_by_(.dots = lapply(ITEM_ID_COLUMNS, as.symbol)) %>%
     summarise(value = sum(value)) %>%
     ungroup() %>%
     bind_rows(global_data)
   if(compute_global_totals){
-    region_data <- region_data %>%
-      aggregate_all_permutations(variables = "region")
+    region_data <- aggregate_all_permutations(region_data, collapse_vars = "region")
   }
   return(region_data)
 }
@@ -826,8 +856,9 @@ aggregate_item_regions <- function(downscaled_data,
 #' @param model_data_df data frame with pre-processed/corrected iTEM data in the appropriate format
 #' @param mapping dataframe specifying the variables to be created, along with instructions
 #' for creating them and the units of the new variable
-#' @param bind_data logical (default = FALSE) indicating whether to return a data frame with the original model
+#' @param bind_derived_data logical (default = TRUE) indicating whether to return a data frame with the original model
 #'   data bound to the output of this function (TRUE), or to only return the variables calculated by this function
+#'   (FALSE)
 #' @details This function derives new variables from existing variables in the data frame. Each new variable is derived
 #'   from two and only two existing variables. The operations allowed are +, *, and /. Unit conversions are applied
 #'   multiplicatively. If the operation is addition and there is a unit conversion provided, the conversion is applied
@@ -838,10 +869,10 @@ aggregate_item_regions <- function(downscaled_data,
 #' @export
 derive_variables <- function(model_data_df,
                              mapping = get_variable_mapping("downscale/indicators.csv"),
-                             bind_data = FALSE){
+                             bind_derived_data = TRUE, ...){
   assert_that(is.data.frame(model_data_df))
   assert_that(is.data.frame(mapping))
-  assert_that(is.logical(bind_data))
+  assert_that(is.logical(bind_derived_data))
 
   output_data_cols <- names(model_data_df)
   derived_data <- list()
@@ -882,11 +913,81 @@ derive_variables <- function(model_data_df,
     derived_data[[i]] <- derived_data[[i]][output_data_cols]
   } # end for i in 1:nrow(mapping)
   output_data <- do.call(bind_rows, derived_data)
-  if(bind_data){
+  if(bind_derived_data){
     output_data <- bind_rows(model_data_df, output_data)
   }
   return(output_data)
 }
 
-# export_data()
+#' Perform iTEM data processing, producing region- and/or country-level database(s) from raw model output
+#'
+#' This is a wrapper that performs all steps for inter-model harmonization in iTEM: data loading, pre-processing,
+#' determination of nation-level socioeconomic scenarios for downscaling, downscaling, computation of "All" subtotals,
+#' re-aggregation (if requested), deriving new variables from the existing set, and saving the output.
+#'
+#' @param model_data_folder folder where the pre-processed model output data is located
+#' @param output_folder folder where the harmonized output dataset will be saved
+#' @param write_item_region_data logical (default = TRUE) indicating whether to write out a dataset aggregated to item
+#'   reporting regions. If FALSE, no iTEM region level data will be returned.
+#' @param write_item_country_data logical (default = FALSE) indicating whether to write out a dataset with all variables
+#'   reported at the country level. Warning: the dataset may be quite large.
+#' @param return_output logical (default = FALSE) indicating whether to return an object in the R environment
+#' @param spread_by_years logical (default = TRUE) indicating whether to "spread" the output so that the reporting years
+#'   are columns and values are listed within the year columns
+#' @details This function applies nearly all other item downscaling functions. While it only requires a few arguments,
+#'   any additional arguments provided will be passed to other functions. The list of functions called is provided here:
+#'   \code{\link{load_preprocessed_data}}, \code{\link{prepare_preprocessed_data}},
+#'   \code{\link{load_country_region_mappings}}, \code{\link{compute_country_shares}},
+#'   \code{\link{assign_socioeconomic_scenario}}, \code{\link{downscale_flow_variables}},
+#'   \code{\link{extract_global_data_to_df}}, \code{\link{aggregate_all_permutations}},
+#'   \code{\link{aggregate_item_regions}}, \code{\link{derive_variables}}, \code{\link{save_output}}
+#' @importFrom assertthat assert_that
+#' @importFrom magrittr %>%
+#' @importFrom dplyr bind_rows
+#' @importFrom tidyr spread
+#' @export
+perform_item_data_processing <- function(model_data_folder,
+                                         output_folder,
+                                         write_item_region_data = TRUE,
+                                         write_item_country_data = FALSE,
+                                         return_output = FALSE,
+                                         spread_by_years = TRUE, ...){
+  assert_that(is.character(model_data_folder))
+  assert_that(is.character(output_folder))
+  assert_that(is.logical(write_item_region_data))
+  assert_that(is.logical(write_item_country_data))
+  assert_that(is.logical(return_output))
+  assert_that(is.logical(spread_by_years))
 
+  model_data <- load_preprocessed_data(model_data_folder) %>%
+    prepare_preprocessed_data(...)
+  country_region_maps <- load_country_region_mappings(model_data_folder, ...)
+  country_share <- compute_country_shares(model_data, country_region_maps, ...)
+  model_socio <- assign_socioeconomic_scenario(model_data, country_region_maps, ...)
+  downscaled_data <- downscale_flow_variables(model_data, model_socio, country_share, ...) %>%
+    bind_rows(extract_global_data_to_df(model_data, output_region_col = "iso", ...)) %>%
+    aggregate_all_permutations(...)
+  output_list <- list()
+  if(write_item_region_data){
+    item_region_data <- aggregate_item_regions(downscaled_data) %>%
+      derive_variables(...) %>%
+      mutate(region = if_else(region == "All", "Global", region))
+
+    if(spread_by_years) item_region_data <- spread(item_region_data, key = year, value = value)
+    print("Generating database at the level of iTEM regions")
+    if(return_output) output_list[['item_region_data']] <- item_region_data
+    save_output(item_region_data, output_folder = 'model database', ...)
+  }
+  if(write_item_country_data){
+    item_country_data <- derive_variables(downscaled_data) %>%
+      rename(region = iso) %>%
+      mutate(region = if_else(region == "All", "Global", region))
+
+    print(paste0("Generating database at the level of ",
+                 length(unique(item_country_data$region)), " countries"))
+    if(spread_by_years) item_country_data <- spread(item_country_data, key = year, value = value)
+    if(return_output) output_list[['item_country_data']] <- item_country_data
+    save_output(item_country_data, output_folder = 'model database', ...)
+    }
+  if(return_output) return(output_list)
+  }

@@ -151,25 +151,25 @@ approx_fun <- function(year, value, rule = 1) {
 #'
 #' @param data the data object being saved. Can be a data frame or a list of data frames.
 #' @param output_folder folder where to save the output
-#' @param filename the name of the file being saved. Defaults to the name of the data frame, or the named
+#' @param output_filename the name of the file being saved. Defaults to the name of the data frame, or the named
 #' elements of a list of data frames
 #' @details The folder should be one of the folders specified in init_paths()
 #' @importFrom readr write_csv
 #' @export
-save_output <- function(data, output_folder, filename = NA){
+save_output <- function(data, output_folder, output_filename = NA, ...){
   # Figure out the directory where the output will be saved
   domain <- paths[[output_folder]]
   if( is.data.frame(data)){
-    if(is.na(filename)){
-      # If no filename is specified, default it to the name of the object plus ".csv"
-      filename <- sprintf('%s.csv', deparse(substitute(data)))
+    if(is.na(output_filename)){
+      # If no output_filename is specified, default it to the name of the object plus ".csv"
+      output_filename <- sprintf('%s.csv', deparse(substitute(data)))
     }
-    fqfn <- paste0(domain, "/", filename)
-    if(!endsWith(filename, ".csv")) fqfn <- paste0( fqfn, ".csv")
+    fqfn <- paste0(domain, "/", output_filename)
+    if(!endsWith(output_filename, ".csv")) fqfn <- paste0( fqfn, ".csv")
     write_csv(data, fqfn, col_names = TRUE)
   } else {
     if(is.list(data)){
-      if(!is.na(filename)) print("Note: filename ignored as data object is a list")
+      if(!is.na(output_filename)) print("Note: output_filename ignored as data object is a list")
       for(dataframe in names(data)){
         # Fully qualified file name is the domain + the named dataframe in the list
         fqfn <- paste0(domain, "/", dataframe, ".csv")

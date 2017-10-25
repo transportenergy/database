@@ -6,7 +6,7 @@
 \usage{
 derive_variables(model_data_df,
   mapping = get_variable_mapping("downscale/indicators.csv"),
-  bind_data = FALSE)
+  bind_derived_data = TRUE, ...)
 }
 \arguments{
 \item{model_data_df}{data frame with pre-processed/corrected iTEM data in the appropriate format}
@@ -14,8 +14,9 @@ derive_variables(model_data_df,
 \item{mapping}{dataframe specifying the variables to be created, along with instructions
 for creating them and the units of the new variable}
 
-\item{bind_data}{logical (default = FALSE) indicating whether to return a data frame with the original model
-data bound to the output of this function (TRUE), or to only return the variables calculated by this function}
+\item{bind_derived_data}{logical (default = TRUE) indicating whether to return a data frame with the original model
+data bound to the output of this function (TRUE), or to only return the variables calculated by this function
+(FALSE)}
 }
 \description{
 This function takes in a dataframe with model data, and a variable derivation CSV table with

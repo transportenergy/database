@@ -6,7 +6,7 @@
 \usage{
 compute_country_shares(model_data_list, country_region_map_list,
   ds_proxy_data = generate_ds_proxy_data(), save_output = TRUE,
-  create_dir = TRUE, output_dir = DS_OUTPUT_DIR)
+  create_dir = TRUE, output_dir = DS_OUTPUT_DIR, ...)
 }
 \arguments{
 \item{model_data_list}{list of model output data that has been cleaned, pre-processed, and prepared (i.e., corrected)}

@@ -4,7 +4,7 @@
 \alias{get_variable_mapping}
 \title{Get internal variable mapping assignments (with option to pull an external file instead)}
 \usage{
-get_variable_mapping(mapping_fn = "downscale/variable_ds_proxy.csv")
+get_variable_mapping(mapping_fn = "downscale/variable_ds_proxy.csv", ...)
 }
 \arguments{
 \item{mapping_fn}{file path and name of variable mapping}

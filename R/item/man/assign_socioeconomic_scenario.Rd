@@ -5,19 +5,25 @@
 \title{Assign country-level socioeconomic realization to each model+scenario}
 \usage{
 assign_socioeconomic_scenario(model_data_list, country_region_map_list,
-  method = "SSE", SSE_variable = "PPP-GDP")
+  socio_assign_method = "SSE", SSE_variable = "PPP-GDP",
+  socio_assignment_folder = NA, ...)
 }
 \arguments{
 \item{model_data_list}{list of data tables of model-specific pre-processed, prepared data}
 
 \item{country_region_map_list}{list of data tables of model-specific country-to-region mappings}
 
-\item{method}{method used for assigning scenarios. SSE: default behavior; minimize sum of squared errors in future
+\item{socio_assign_method}{method used for assigning scenarios. SSE: default behavior; minimize sum of squared errors in future
 ratios of variable indicated, by year and model region. exogenous: use exogenously provided assignments between
-model+scenario and nation-level socioeconomic realization for downscaling model output.}
+model+scenario and nation-level socioeconomic realization for downscaling model output. If this method is
+selected and no model data folder is provided, a single default realization will be used for all models and scenarios.}
 
 \item{SSE_variable}{variable to use in determining the socioeconomic assignment using the SSE method; can be
 Population or PPP-GDP}
+
+\item{socio_assignment_folder}{character string indicating the folder where the model data are located, in which to find
+exogenously specified assignments from model+scenario to socioeonomic realization. They are stored as
+scenario_folder/model/scenarios.yaml}
 }
 \description{
 Takes in list of model output data from \code{\link{prepare_preprocessed_data}} and returns a list of model-

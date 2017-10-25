@@ -4,7 +4,7 @@
 \alias{remove_redundant_alls}
 \title{Remove redundant "All" values from selected variables (columns)}
 \usage{
-remove_redundant_alls(data, variables = ITEM_IDVARS_WITH_ALLS)
+remove_redundant_alls(data, variables = ITEM_IDVARS_WITH_ALLS, ...)
 }
 \arguments{
 \item{data}{data frame with model-reported quantity variables}

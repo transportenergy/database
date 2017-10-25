@@ -4,14 +4,14 @@
 \alias{save_output}
 \title{Save data to a specified folder}
 \usage{
-save_output(data, output_folder, filename = NA)
+save_output(data, output_folder, output_filename = NA, ...)
 }
 \arguments{
 \item{data}{the data object being saved. Can be a data frame or a list of data frames.}
 
 \item{output_folder}{folder where to save the output}
 
-\item{filename}{the name of the file being saved. Defaults to the name of the data frame, or the named
+\item{output_filename}{the name of the file being saved. Defaults to the name of the data frame, or the named
 elements of a list of data frames}
 }
 \description{
