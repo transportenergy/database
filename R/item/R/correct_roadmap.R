@@ -26,7 +26,7 @@ correct_roadmap <- function( x ){
     left_join( y = tech_mapping, by = "roadmap_technology") %>%
     select(-roadmap_technology) %>%
     # Sales and stock are reported in individual units; we want millions
-    mutate(value = if_else(variable %in% c("sales", "stock"), value / CONV_ONES_MIL, value)) %>%
+    mutate(value = if_else(variable %in% c("sales", "stock"), value * CONV_ONES_MIL, value)) %>%
     # Aviation service is indicated in rpkm; convert to pkm for consistency
     mutate(variable = if_else(variable == "rpkm", "pkm", variable)) %>%
     # Join in the units from the variable-unit mapping table
