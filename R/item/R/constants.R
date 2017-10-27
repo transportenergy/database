@@ -17,7 +17,7 @@ DS_IDVARS_WITH_ALLS <- sub( "region", "iso", ITEM_IDVARS_WITH_ALLS)
 GLOBAL_IDVARS_WITH_ALLS <- ITEM_IDVARS_WITH_ALLS[ ITEM_IDVARS_WITH_ALLS != "region"]
 
 # Unit conversions
-CONV_ZJ_PJ <- 1e-6    #convert from zetajoules to petajoules
+CONV_ZJ_PJ <- 1e6    #convert from zetajoules to petajoules
 CONV_BIL_MIL <- 1000 # convert from billions to millions
 CONV_TRIL_BIL <- 1000 # convert from trillions to billions
 CONV_ONES_MIL <- 1e-6 # convert from ones to millions
