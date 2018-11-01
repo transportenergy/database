@@ -748,7 +748,7 @@ get_variable_mapping <- function(mapping_fn = "downscale/variable_ds_proxy.csv",
 #' components. Except for diagnostic purposes, "All" and its sub-components should never be downscaled independently due
 #' to potentially different proxies. Instead, where component-level data are available, "All" should be computed
 #' post-hoc as the sum of the components. This function drops redundant "All" values (i.e., values that could be
-#' computed from provided components.
+#' computed from provided components).
 #'
 #' Note that the method assumes that if any components are provided for a given variable that has "All" reported, then
 #' all necessary components to re-calcualate the reported "All" value are provided. However this condition is not
@@ -971,7 +971,8 @@ perform_item_data_processing <- function(model_data_folder,
   if(write_item_region_data){
     item_region_data <- aggregate_item_regions(downscaled_data) %>%
       derive_variables(...) %>%
-      mutate(region = if_else(region == "All", "Global", region))
+      mutate(region = if_else(region == "All", "Global", region),
+             value = signif(value, SIGNIFICANT_FIGURES))
 
     if(spread_by_years) item_region_data <- spread(item_region_data, key = year, value = value)
     print("Generating database at the level of iTEM regions")
@@ -981,7 +982,8 @@ perform_item_data_processing <- function(model_data_folder,
   if(write_item_country_data){
     item_country_data <- derive_variables(downscaled_data) %>%
       rename(region = iso) %>%
-      mutate(region = if_else(region == "All", "Global", region))
+      mutate(region = if_else(region == "All", "Global", region),
+             value = signif(value, SIGNIFICANT_FIGURES))
 
     print(paste0("Generating database at the level of ",
                  length(unique(item_country_data$region)), " countries"))

@@ -3,6 +3,7 @@ COMMENT_CHAR <- "#"
 YEAR_PATTERN <- "^(1|2)[0-9]{3}$"   # a 1 or 2 followed by three digits, and nothing else
 ITEM_YEARS <- c(seq(2005, 2040, 5), seq( 2050, 2100, 10))
 BASEYEAR <- 2010 # base year assumed for country-level datasets with a single base year
+SIGNIFICANT_FIGURES <- 8 # number of significant figures to print output (default is writing all vars to 15 decimal places)
 
 # iTEM columns
 ITEM_ID_COLUMNS <- c("model", "scenario", "region", "variable", "mode", "technology", "fuel", "unit", "year")
