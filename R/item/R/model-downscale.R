@@ -102,8 +102,8 @@ prepare_preprocessed_data <- function(model_data_list,
 
   for(model in names(model_data_list)){
     # Standardize on a region name for the global/world region. Setting to "All" allows removal of redundant reporting
-    model_data_list[[model]] <- model_data_list[[model]] %>%
-      mutate(region = if_else(region %in% c("World", "Wor", "Global"), "All", region))
+    model_data_list[[model]] <- mutate(model_data_list[[model]],
+                                       region = if_else(region %in% c("World", "Wor", "Global"), "All", region))
     # Apply any model-specific correction functions, as necessary
     if( exists(paste0("correct_", model), mode = "function")){
       print( paste0( "Applying model-specific corrections to data from model: ", model ))
@@ -721,11 +721,12 @@ aggregate_all_permutations <- function(input_data, collapse_vars = DS_IDVARS_WIT
     } # end if(nrow(output_thisvar) > 0)
     # the output of each loop is passed to the input of the next loop, generating all permutations.
   } # end for(var in collapse_vars)
-  # because of heterogeneous reporting, there may be duplicate rows. For example, if a model reported fuel for
-  # aviation as "liquids" whereas LDV is reported as "All", the latter would be excluded from the fuel aggregation
-  # (and kept as it was in the input data). For this reason, aggregate one more time.
-  output_data <- group_by_(output_data, .dots = lapply(group_columns, as.symbol)) %>%
-    summarise(value = sum(value)) %>%
+  # Where models reported incomplete cuts through a database, rows may be generated with duplicate ID information and
+  # potentially different data values. Differences may be due to aggregated rounding errors, or data that is simply
+  # unreported for selected variables at a given level of aggregation. This step drops redundant rows, and assumes that
+  # where all ID information is identical, the higher value is the correct one to report.
+    output_data <- group_by_(output_data, .dots = lapply(group_columns, as.symbol)) %>%
+    summarise(value = max(value)) %>%
     ungroup()
   return(output_data)
 }

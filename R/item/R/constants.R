@@ -11,6 +11,7 @@ ITEM_DATA_COLUMNS <- c(ITEM_ID_COLUMNS, "value") # ID columns plus the value col
 ITEM_IDVARS_WITH_ALLS <- c("region", "mode", "technology", "fuel") # ID columns that collapse to "All" for reporting
 
 # Downscaling-related columns - same as above but the region column is re-named to iso
+DS_ID_COLUMNS <- sub( "region", "iso", ITEM_ID_COLUMNS)
 DS_DATA_COLUMNS <- sub( "region", "iso", ITEM_DATA_COLUMNS)
 DS_IDVARS_WITH_ALLS <- sub( "region", "iso", ITEM_IDVARS_WITH_ALLS)
 

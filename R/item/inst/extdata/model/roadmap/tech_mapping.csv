@@ -12,5 +12,5 @@ Gasoline PHEV liquid,PHEV,Total Liquids
 Gasoline PHEV electric,PHEV,Electricity
 Diesel PHEV liquid,PHEV,Total Liquids
 Diesel PHEV electric,PHEV,Electricity
-Gasoline PHEV,PHEV,All
-Diesel PHEV,PHEV,All
+Gasoline PHEV,PHEV,Electricity/Liquids
+Diesel PHEV,PHEV,Electricity/Liquids

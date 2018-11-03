@@ -4,10 +4,10 @@
 \alias{prepare_preprocessed_data}
 \title{Apply corrections to pre-processed data}
 \usage{
-prepare_preprocessed_data(model_data_list, derive_weighted_indicators = TRUE,
-  subset_quantity_flows = TRUE, remove_redundant_alls = TRUE,
-  interpolate_years = TRUE, drop_na_values = TRUE,
-  aggregate_redundant_categories = TRUE, ...)
+prepare_preprocessed_data(model_data_list,
+  derive_weighted_indicators = TRUE, subset_quantity_flows = TRUE,
+  remove_redundant_alls = TRUE, interpolate_years = TRUE,
+  drop_na_values = TRUE, aggregate_redundant_categories = TRUE, ...)
 }
 \arguments{
 \item{model_data_list}{list of data frames with model-specific data}

@@ -4,8 +4,8 @@
 \alias{load_country_region_mappings}
 \title{Get the country-to-region mappings for the project and optionally for a set of models}
 \usage{
-load_country_region_mappings(model_data_folder = NA, item_map_name = "item",
-  ...)
+load_country_region_mappings(model_data_folder = NA,
+  item_map_name = "item", ...)
 }
 \arguments{
 \item{model_data_folder}{folder where the pre-processed model output data is located. If NA, this will return a

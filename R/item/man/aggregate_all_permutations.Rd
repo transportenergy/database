@@ -4,8 +4,8 @@
 \alias{aggregate_all_permutations}
 \title{Aggregate across selected categories of quantity flow data, looping through all permutations}
 \usage{
-aggregate_all_permutations(input_data, collapse_vars = DS_IDVARS_WITH_ALLS,
-  ...)
+aggregate_all_permutations(input_data,
+  collapse_vars = DS_IDVARS_WITH_ALLS, ...)
 }
 \arguments{
 \item{input_data}{data table with quantity (flow) variables}

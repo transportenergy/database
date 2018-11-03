@@ -36,6 +36,8 @@ Collate:
     'correct_bp.R'
     'correct_eia.R'
     'correct_get.R'
+    'correct_message.R'
     'correct_momo.R'
     'correct_roadmap.R'
-RoxygenNote: 6.0.1
+    'correct_statoil.R'
+RoxygenNote: 6.1.0
