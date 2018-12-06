@@ -1,0 +1,16 @@
+roadmap_technology,technology,fuel
+Jet Fuel,Liquids,Total Liquids
+Diesel,Liquids,Total Liquids
+Electric,Electric,Electricity
+Gasoline ICE,Liquids,Total Liquids
+Diesel ICE,Liquids,Total Liquids
+CNG,NG,Natural Gas
+LPG,Liquids,Total Liquids
+BEV,Electric,Electricity
+FCEV,Hydrogen,Hydrogen
+Gasoline PHEV liquid,PHEV,Total Liquids
+Gasoline PHEV electric,PHEV,Electricity
+Diesel PHEV liquid,PHEV,Total Liquids
+Diesel PHEV electric,PHEV,Electricity
+Gasoline PHEV,PHEV,All
+Diesel PHEV,PHEV,All
