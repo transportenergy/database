@@ -522,42 +522,64 @@ generate_ds_proxy_data <- function(pop_data_fn = "downscale/SSP_Population.csv",
     mutate(iso = toupper(REGION)) %>%
     mutate(ds_proxy = "GDP") %>%
     select(ds_proxy, scenario, iso, year, value)
-  # For co2 and transportenergy, use GDP growth ratios to expand available (base year) data
-  # to all iTEM years
-  gdp_baseyear_data <- subset( ds_proxy_gdp, year == BASEYEAR) %>%
+  # For co2 and transportenergy, use population growth ratios multiplied by per-capita GDP growth ratios to expand
+  # available (base year) data to all iTEM years. This is the same as using total GDP, but is partitioned in order
+  # to allow the per-capita GDP growth to be assigned mode-specific elasticities.
+  # Calculate the population growth ratios from the base year
+  pop_baseyear_data <- subset( ds_proxy_population, year == BASEYEAR) %>%
     select(-year) %>%
-    rename(base_gdp = value)
-  gdp_growth_ratios <- ds_proxy_gdp %>%
-    rename(gdp = value) %>%
-    left_join(gdp_baseyear_data, by = c("ds_proxy", "scenario", "iso")) %>%
-    mutate(growth_ratio = gdp/base_gdp) %>%
-    select(scenario, iso, year, growth_ratio)
+    rename(base_pop = value)
+  pop_growth_ratios <- ds_proxy_population %>%
+    rename(pop = value) %>%
+    left_join(pop_baseyear_data, by = c("ds_proxy", "scenario", "iso")) %>%
+    mutate(pop_growth_ratio = pop/base_pop) %>%
+    select(scenario, iso, year, pop_growth_ratio)
+
+  # Calculate the per-capita GDP growth ratios from the base year
+  pcgdp_data <- left_join(ds_proxy_gdp, ds_proxy_population,
+                          by = c("scenario", "iso", "year"),
+                          suffix = c("_gdp", "_pop")) %>%
+    mutate(pcgdp = value_gdp / value_pop) %>%
+    select(scenario, iso, year, pcgdp)
+  pcgdp_baseyear_data <- subset( pcgdp_data, year == BASEYEAR) %>%
+    select(-year) %>%
+    rename(base_pcgdp = pcgdp)
+  pcgdp_growth_ratios <- pcgdp_data %>%
+    left_join(pcgdp_baseyear_data, by = c("scenario", "iso")) %>%
+    mutate(pcgdp_growth_ratio = pcgdp/base_pcgdp) %>%
+    select(scenario, iso, year, pcgdp_growth_ratio)
+
+  # Calculate the CO2 proxy data, from the base-year CO2, population ratio, and per-capita GDP ratio
   co2_baseyear_data <- load_data_file(co2_data_t0_fn, quiet = TRUE) %>%
     rename(base_value = value) %>%
     mutate(iso = toupper(iso)) %>%
     select(iso, base_value) %>%
-    filter(iso %in% gdp_growth_ratios$iso)
-  ds_proxy_co2 <- gdp_growth_ratios %>%
+    filter(iso %in% pop_growth_ratios$iso)
+  ds_proxy_co2 <- pop_growth_ratios %>%
+    left_join(pcgdp_growth_ratios, by = c("scenario", "iso", "year")) %>%
     left_join(co2_baseyear_data, by = "iso") %>%
     # Set any countries in the GDP but not CO2 data to zero
     mutate(base_value = if_else(is.na(base_value), 0, base_value)) %>%
     mutate(ds_proxy = "CO2") %>%
-    mutate(value = base_value * (growth_ratio ^ DS_GDP_ELAST_CO2)) %>%
+    mutate(value = base_value * pop_growth_ratio * (pcgdp_growth_ratio ^ DS_GDP_ELAST_CO2)) %>%
     select(ds_proxy, scenario, iso, year, value)
+
+  # Calculate the transportation proxy data
   transportenergy_data_t0 <- load_data_file(transportenergy_data_t0_fn, quiet = TRUE) %>%
     prepare_transportenergy_t0_data(use_modal_detail = use_modal_detail) %>%
-    filter( iso %in% gdp_growth_ratios$iso)
-  ds_proxy_transportenergy <- gdp_growth_ratios %>%
+    filter( iso %in% pop_growth_ratios$iso)
+  ds_proxy_transportenergy <- pop_growth_ratios %>%
+    left_join(pcgdp_growth_ratios, by = c("scenario", "iso", "year")) %>%
     filter( iso %in% transportenergy_data_t0$iso) %>%
     full_join(transportenergy_data_t0, by = "iso") %>%
     mutate(base_value = if_else(is.na(base_value), 0, base_value)) %>%
     mutate(ds_proxy = "TRANSPORTENERGY") %>%
-    mutate(value = base_value * growth_ratio)  # default assumption is elasticity of 1
+    mutate(value = base_value * pop_growth_ratio * pcgdp_growth_ratio)  # default assumption is elasticity of 1
     if( apply_modal_elasticities){
       mode_GDP_elasticity <- load_data_file( "downscale/mode_GDP_elasticity.csv", quiet = TRUE)
       ds_proxy_transportenergy <- ds_proxy_transportenergy %>%
         left_join( mode_GDP_elasticity, by = "mode") %>%
-        mutate( value = base_value * growth_ratio ^ elasticity )
+        mutate( value = base_value * pop_growth_ratio * pcgdp_growth_ratio ^ elasticity )
     }
   ds_proxy_transportenergy <- ds_proxy_transportenergy %>%
     select(ds_proxy, scenario, iso, mode, year, value)
@@ -867,6 +889,7 @@ aggregate_item_regions <- function(downscaled_data,
 #' @importFrom assertthat assert_that
 #' @importFrom magrittr %>%
 #' @importFrom dplyr inner_join bind_rows mutate
+#' @importFrom tidyr replace_na
 #' @export
 derive_variables <- function(model_data_df,
                              mapping = get_variable_mapping("downscale/indicators.csv"),
@@ -877,15 +900,21 @@ derive_variables <- function(model_data_df,
 
   output_data_cols <- names(model_data_df)
   derived_data <- list()
-  joinvars <- output_data_cols[-which(output_data_cols %in% c("variable", "unit", "value"))]
   for(i in 1:nrow(mapping)){
-    model_data_var1 <- subset( model_data_df, variable == mapping$var1[i])
-    model_data_var2 <- subset(model_data_df, variable == mapping$var2[i])
+    # For variable derivations, replace any NAs for mode, fuel, technology with "All".
+    # Select only ID columns from the "var2" data frame that are relevant for the join
+    join_byvars <- unlist(strsplit(mapping$join_byvars[i], ","))
+    model_data_var1 <- subset( model_data_df, variable == mapping$var1[i]) %>%
+      replace_na(list(mode = "All", technology = "All", fuel = "All"))
+    model_data_var2 <- subset(model_data_df, variable == mapping$var2[i]) %>%
+      replace_na(list(mode = "All", technology = "All", fuel = "All")) %>%
+      select_(.dots = c(join_byvars, "value"))
+
     # The operations allowed are +, *, and /
     assert_that(mapping$operation[i] %in% c("+", "*", "/"))
-    # Join the common data between var1 and var2. The rest of the operations are all conditional
+    # Join the var1 and var2 data. The rest of the operations are all conditional
     derived_data[[i]] <- inner_join(model_data_var1, model_data_var2,
-                                    by = joinvars,
+                                    by = join_byvars,
                                     suffix = c("_var1", "_var2")) %>%
       mutate(variable = mapping$newvar[i], unit = mapping$unit[i])
     # If the necessary data to derive the new variable are not available, generate an empty value column

@@ -33,6 +33,7 @@ Collate:
     'item.R'
     'model-.R'
     'model-downscale.R'
+    'compute_elasticities.R'
     'correct_bp.R'
     'correct_eia.R'
     'correct_get.R'

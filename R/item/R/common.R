@@ -181,3 +181,28 @@ save_output <- function(data, output_folder, output_filename = NA, ...){
     } #end if(is.list(data))
   } # end else
 } #end function
+
+#' repeat_add_columns
+#'
+#' Repeat a data frame for each entry in a second, binding the columns together.
+#'
+#' @param x Data frame to repeat
+#' @param y A copy of \code{x} is created for each row of this data frame
+#' @return A repeated \code{x} with columns from \code{y} added.
+#' @details This function is used to repeat a table by specified values of a variable, written to a new column as
+#'   necessary.
+#' @importFrom assertthat assert_that
+#' @examples
+#' x <- tibble::tibble(x = 1:3)
+#' y <- tibble::tibble(y = c(4, 5), z = c(6, 7))
+#' repeat_add_columns(x, y)
+repeat_add_columns <- function(x, y) {
+  UNIQUE_JOIN_FIELD <- NULL           # silence package checks.
+  assert_that(is.data.frame(x))
+  assert_that(is.data.frame(y))
+
+  x %>%
+    mutate(UNIQUE_JOIN_FIELD = 1) %>%
+    full_join(mutate(y, UNIQUE_JOIN_FIELD = 1), by = "UNIQUE_JOIN_FIELD") %>%
+    select(-UNIQUE_JOIN_FIELD)
+}

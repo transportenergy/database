@@ -1,14 +1,14 @@
 mode,elasticity
-2W and 3W,0.1
-Aviation,0.8
+2W and 3W,0.3
+Aviation,1.1
 Bus,0.3
 Domestic Shipping,0.5
-Freight Rail,0.7
-Freight Rail and Air and Ship,0.7
-HDT,0.65
-International Shipping,0.4
-LDV,0.3
-Passenger Rail,0.4
+Freight Rail,0.5
+Freight Rail and Air and Ship,0.3
+HDT,0.8
+International Shipping,0.2
+LDV,0.5
+Passenger Rail,0.5
 Road,0.4
-Rail,0.6
+Rail,0.5
 All,0.5
