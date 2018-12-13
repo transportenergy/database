@@ -29,6 +29,7 @@ class OpenKAPSARC:
 
     The constructor takes the address of the server.
     """
+    ALL = sys.maxsize
 
     def __init__(self, server):
         self.server = server

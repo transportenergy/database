@@ -15,12 +15,10 @@ CLASSIFIERS = [
     'Operating System :: OS Independent',
     'Intended Audience :: Science/Research',
     'Programming Language :: Python',
-    'Programming Language :: Python :: 2',
-    'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.4',
     'Programming Language :: Python :: 3.5',
     'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
     'Topic :: Scientific/Engineering',
     ]
 
@@ -35,6 +33,9 @@ INSTALL_REQUIRES = [
     'xarray >= 0.9',
     ]
 TESTS_REQUIRE = ['pytest >= 2.7']
+EXTRAS_REQUIRE = {
+    'stats': ['requests', 'requests-cache'],
+    }
 
 DESCRIPTION = "Transportation energy projections database"
 LONG_DESCRIPTION = """
@@ -57,6 +58,7 @@ setup(name=DISTNAME,
       description=DESCRIPTION,
       long_description=LONG_DESCRIPTION,
       install_requires=INSTALL_REQUIRES,
+      extras_require=EXTRAS_REQUIRE,
       tests_require=TESTS_REQUIRE,
       url=URL,
       packages=find_packages(),
