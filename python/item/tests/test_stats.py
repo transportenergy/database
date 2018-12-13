@@ -3,14 +3,10 @@ import pytest
 
 from item.stats import OpenKAPSARC
 
-# Replace this with the string address of the server
-# FIXME use a command-line argument via pytest
-server = 'http://0.0.0.0:8080'
 
-
-@pytest.fixture
+@pytest.fixture(scope='module')
 def ok():
-    return OpenKAPSARC(server)
+    return OpenKAPSARC(pytest.config.getoption('--stats-server'))
 
 
 def test_datarepo(ok):
