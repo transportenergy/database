@@ -1,3 +1,4 @@
 item_config.yaml
 *.egg-info
 .Rproj.user
+doc/_build

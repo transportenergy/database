@@ -21,13 +21,18 @@ except ImportError:
 
 
 class APIError(Exception):
+    """Error message returned by OpenKAPSARC."""
     pass
 
 
 class OpenKAPSARC:
     """Wrapper for the OpenKAPSARC APIs.
 
-    The constructor takes the address of the server.
+    Parameters
+    ----------
+    server : str
+        Address of the server, e.g. `http://example.com:8888`.
+
     """
     ALL = sys.maxsize
 
@@ -51,7 +56,7 @@ class OpenKAPSARC:
             raise
 
     def datarepo(self, name=None):
-        """Information about one or all data repositories.
+        """Return information about one or all data repositories.
 
         If *name* is None (the default), information on all repos is returned.
         """
@@ -59,9 +64,22 @@ class OpenKAPSARC:
                              *filter(None, [name]))
 
     def table(self, repo, name, rows=None, offset=None):
-        """Return data from table *name* in *repo* as a pd.DataFrame.
+        """Return data from table *name* in *repo*.
 
         Currently only the latest data on the master branch is returned.
+
+        Parameters
+        ----------
+        rows : int, optional
+            Number of rows to return. OpenKAPSARC returns 20 rows if this
+            parameter is unspecified.
+        offset : int, optional
+            Number of rows to skip from the beginning of the table.
+
+        Returns
+        -------
+        :class:`pandas.DataFrame`
+
         """
         params = {}
         if rows:
@@ -98,21 +116,3 @@ class OpenKAPSARC:
         assert len(response) == 0
 
         return(data)
-
-
-def demo(server):
-    """Access the KAPSARC APIs at the given SERVER."""
-    ok = OpenKAPSARC(server)
-
-    print('List of all repositories:')
-    for repo in ok.datarepo():
-        print(repo['name'], ':', repo['id'])
-
-    # commented: very verbose
-    # print('\n\nInformation on one repository:')
-    # print(ok.datarepo('ik2_open_data'))
-
-    print('\n\nData from one table in a branch in a repository:')
-    print(ok.table('ik2_open_data', 'modal_split_of_freight_transport'))
-    print(ok.table('ik2_open_data', 'modal_split_of_freight_transport', 10))
-    print(ok.table('ik2_open_data', 'modal_split_of_freight_transport', 30))

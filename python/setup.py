@@ -34,6 +34,7 @@ INSTALL_REQUIRES = [
     ]
 TESTS_REQUIRE = ['pytest >= 2.7']
 EXTRAS_REQUIRE = {
+    'docs': ['sphinx', 'sphinx-rtd-theme', 'numpydoc'],
     'stats': ['requests', 'requests-cache'],
     }
 
