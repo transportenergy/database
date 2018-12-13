@@ -1,3 +1,4 @@
+from json import JSONDecodeError
 import logging
 import sys
 
@@ -11,6 +12,16 @@ log.setLevel(logging.INFO)
 log.addHandler(logging.StreamHandler(sys.stdout))
 
 requests_cache.install_cache('item')
+
+try:
+    import simplejson
+    JSONDecodeErrors = (JSONDecodeError, simplejson.JSONDecodeError)
+except ImportError:
+    JSONDecodeErrors = (JSONDecodeError,)
+
+
+class APIError(Exception):
+    pass
 
 
 class OpenKAPSARC:
@@ -29,8 +40,14 @@ class OpenKAPSARC:
                          params=params)
         log.info(r.url)
 
+        r.raise_for_status()
+
         # All responses are in JSON
-        return r.json()
+        try:
+            return r.json()
+        except JSONDecodeErrors:
+            log.error(r.content)
+            raise
 
     def datarepo(self, name=None):
         """Information about one or all data repositories.

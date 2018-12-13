@@ -1,5 +1,6 @@
 import pandas as pd
 import pytest
+from requests import HTTPError
 
 from item.stats import OpenKAPSARC
 
@@ -31,3 +32,15 @@ def test_dataset(ok):
 
     # Large number of rows returns all the rows in the table
     assert len(ok.table(**args, rows=5000)) == total_rows
+
+
+def test_dataset_invalid_param(ok):
+    args = {
+        'repo': 'ik2_open_data',
+        'name': 'modal_split_of_freight_transport',
+        }
+
+    # Invalid parameter value
+    with pytest.raises(HTTPError,
+                       message="500 Server Error: Internal Server Error"):
+        ok.table(**args, rows=-1)
