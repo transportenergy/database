@@ -18,6 +18,7 @@ def test_dataset(ok):
         'repo': 'ik2_open_data',
         'name': 'modal_split_of_freight_transport',
         }
+    total_rows = 1448
 
     # Default number of rows is 20
     result = ok.table(**args)
@@ -27,3 +28,6 @@ def test_dataset(ok):
     # Other numbers of rows
     assert len(ok.table(**args, rows=10)) == 10
     assert len(ok.table(**args, rows=30)) == 30
+
+    # Large number of rows returns all the rows in the table
+    assert len(ok.table(**args, rows=5000)) == total_rows
