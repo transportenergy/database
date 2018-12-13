@@ -15,11 +15,12 @@ class OpenKAPSARC:
     def __init__(self, server):
         self.server = server
 
-    def endpoint(self, name, *args):
+    def endpoint(self, name, *args, params={}):
         """Call the API endpoint *name* with any additional *args*."""
         # Construct the URL
-        r = requests.get(self.server + '/'.join(['', name] + list(args)))
         print(r.url)
+        r = requests.get(self.server + '/'.join(['', name] + list(args)),
+                         params=params)
 
         # All responses are in JSON
         return r.json()
@@ -32,12 +33,17 @@ class OpenKAPSARC:
         return self.endpoint('datarepo' if name else 'datarepos',
                              *filter(None, [name]))
 
-    def table(self, repo, name):
+    def table(self, repo, name, rows=None):
         """Return data from table *name* in *repo* as a pd.DataFrame.
 
         Currently only the latest data on the master branch is returned.
         """
-        response = self.endpoint('dataset', repo, 'master', name)
+        params = {}
+        if rows:
+            params['_limit'] = rows
+
+        response = self.endpoint('dataset', repo, 'master', name,
+                                 params=params)
 
         # Parse table schema
         schema = response.pop('tschema')
@@ -81,3 +87,5 @@ def demo(server):
 
     print('\n\nData from one table in a branch in a repository:')
     print(ok.table('ik2_open_data', 'modal_split_of_freight_transport'))
+    print(ok.table('ik2_open_data', 'modal_split_of_freight_transport', 10))
+    print(ok.table('ik2_open_data', 'modal_split_of_freight_transport', 30))
