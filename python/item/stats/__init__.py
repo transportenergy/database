@@ -1,7 +1,14 @@
+import logging
+import sys
+
 import pandas as pd
 import requests
 import requests_cache
 
+
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
+log.addHandler(logging.StreamHandler(sys.stdout))
 
 requests_cache.install_cache('item')
 
@@ -18,9 +25,9 @@ class OpenKAPSARC:
     def endpoint(self, name, *args, params={}):
         """Call the API endpoint *name* with any additional *args*."""
         # Construct the URL
-        print(r.url)
         r = requests.get(self.server + '/'.join(['', name] + list(args)),
                          params=params)
+        log.info(r.url)
 
         # All responses are in JSON
         return r.json()
