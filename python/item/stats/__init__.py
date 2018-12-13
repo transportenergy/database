@@ -57,14 +57,16 @@ class OpenKAPSARC:
         return self.endpoint('datarepo' if name else 'datarepos',
                              *filter(None, [name]))
 
-    def table(self, repo, name, rows=None):
+    def table(self, repo, name, rows=None, offset=None):
         """Return data from table *name* in *repo* as a pd.DataFrame.
 
         Currently only the latest data on the master branch is returned.
         """
         params = {}
         if rows:
-            params['_limit'] = rows
+            params['_limit'] = int(rows)
+        if offset:
+            params['_offset'] = int(offset)
 
         response = self.endpoint('dataset', repo, 'master', name,
                                  params=params)

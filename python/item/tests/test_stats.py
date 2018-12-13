@@ -14,13 +14,14 @@ def test_datarepo(ok):
     ok.datarepo()
 
 
-def test_dataset(ok):
-    args = {
-        'repo': 'ik2_open_data',
-        'name': 'modal_split_of_freight_transport',
-        }
-    total_rows = 1448
+args = {
+    'repo': 'ik2_open_data',
+    'name': 'modal_split_of_freight_transport',
+    }
+total_rows = 1448
 
+
+def test_dataset(ok):
     # Default number of rows is 20
     result = ok.table(**args)
     assert isinstance(result, pd.DataFrame)
@@ -34,12 +35,14 @@ def test_dataset(ok):
     assert len(ok.table(**args, rows=5000)) == total_rows
 
 
-def test_dataset_invalid_param(ok):
-    args = {
-        'repo': 'ik2_open_data',
-        'name': 'modal_split_of_freight_transport',
-        }
+def test_dataset_offset(ok):
+    # Using an offset, only the remainder of rows in the table are returned
+    offset = 100
+    assert (len(ok.table(**args, rows=5000, offset=offset)) ==
+            total_rows - offset)
 
+
+def test_dataset_invalid_param(ok):
     # Invalid parameter value
     with pytest.raises(HTTPError,
                        message="500 Server Error: Internal Server Error"):
