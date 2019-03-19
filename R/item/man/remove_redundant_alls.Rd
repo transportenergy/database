@@ -16,7 +16,7 @@ An "All" value for an ID column may be the only data available, or it may be der
 components. Except for diagnostic purposes, "All" and its sub-components should never be downscaled independently due
 to potentially different proxies. Instead, where component-level data are available, "All" should be computed
 post-hoc as the sum of the components. This function drops redundant "All" values (i.e., values that could be
-computed from provided components.
+computed from provided components).
 }
 \details{
 Note that the method assumes that if any components are provided for a given variable that has "All" reported, then
