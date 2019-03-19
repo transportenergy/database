@@ -4,8 +4,8 @@
 \alias{downscale_flow_variables}
 \title{Downscale annual flow variables from model regions to countries}
 \usage{
-downscale_flow_variables(model_data_list, model_socio_list, country_share_list,
-  collapse_list = TRUE, ...)
+downscale_flow_variables(model_data_list, model_socio_list,
+  country_share_list, collapse_list = TRUE, ...)
 }
 \arguments{
 \item{model_data_list}{list of model-specific dataframes with cleaned and pre-processed output}
