@@ -30,6 +30,7 @@ import click
 
 from item.model.__main__ import model
 from item.stats.__main__ import stats
+from item.utils import make_template
 
 
 @click.group(help=__doc__)
@@ -79,9 +80,13 @@ def mkdirs(path, dry_run):
     make_database_dirs(path, dry_run)
 
 
+@main.command()
+def template():
+    make_template()
+
+
 main.add_command(model)
 main.add_command(stats)
 
 
-if __name__ == '__main__':
-    main()  # pragma: no cover
+main()  # pragma: no cover

@@ -1,0 +1,22 @@
+# Specification of the iTEM MIP3 data template
+#
+# Each specification has:
+# - measure: see measures.yaml. A measure may be repeated in multiple specs.
+# - dims: zero or more dimensions. All specifications implicitly have the
+#         dimensions Model, Scenario, Region, and Year.
+# - exclude: Pandas query() syntax for keys to exclude from the specification/
+#            template. More than one may be given. See http://pandas.pydata.org/
+#            pandas-docs/stable/reference/api/pandas.DataFrame.query.html
+
+- measure: gdp
+
+- measure: emissions
+  dims: [ghg, lca_scope]
+  
+- measure: energy
+  dims: [mode, technology, fuel]
+  exclude:
+  - mode == 'rail' and technology not in 'combustion electric'
+  - technology == 'combustion' and fuel == 'electricity'
+  - technology == 'fc' and fuel != 'hydrogen'
+  - technology == 'electric' and fuel != 'electricity'

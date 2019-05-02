@@ -1,0 +1,79 @@
+# Concepts for transport data
+#
+# Each concept has an:
+# - ID: short, machine readable.
+# - Name: short, human readable. If not given, this defaults to the ID,
+#         title-cased.
+# - Description: long, human readable. Optional.
+#
+# Concepts may be hierarchical. The top-level concepts can be used as
+# dimensions when specifying the template.
+
+type:
+  _description: Objects being transported.
+  passenger: ~
+  freight: ~
+
+mode:
+  air:
+    _description: Aviation.
+  road:
+    LDV:
+      _name: Light-duty road vehicle
+      _description: Includes cars, SUVs, and light trucks.
+    bus: ~
+    truck:
+      HDT:
+        _name: Heavy-duty road vehicle
+      MDT:
+        _name: Medium-duty road vehicle
+    2W:
+      _name: Two-wheeled vehicle
+    3W:
+      _name: Three-wheeled vehicle
+  rail: ~
+  water: ~
+
+fuel:
+  liquid:
+    diesel: ~
+    gasoline: ~
+    biofuel: ~
+    synthetic:
+      _description: a.k.a. synfuels, electrofuels.
+  ng:
+    _name: Natural gas
+  hydrogen: ~
+  electricity: ~
+
+technology:
+  _description: Energy conversion technology used to power a motorized vehicle.
+  combustion:
+    _description: >
+      Using only chemical fuels. Inclusive of powertrains that store energy as
+      electricity, i.e. hybrids.
+  electric: ~
+  hybrid:
+    _description: Using both electricity and chemical fuels.
+  fc:
+    _name: Fuel cell
+    _description: Using electrochemical conversion of fuel to electricity.
+
+automation:
+  conventional: ~
+  autonomous: ~
+
+ghg:
+  _name: Greenhouse gases
+  CO2:
+    _description: Carbon dioxide
+  all:
+    _description: All GHGs converted to an equivalent basis.
+
+lca_scope:
+  _name: LCA scope
+  _description: Scope of analysis covered by a lifecycle measure
+  wtw:
+    _name: Well-to-wheels
+  ttw:
+    _name: Tank-to-wheels
