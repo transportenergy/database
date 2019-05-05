@@ -15,27 +15,33 @@ type:
   freight: ~
 
 mode:
+  all:
+    _description: All transport modes.
   air:
     _description: Aviation.
   road:
-    LDV:
-      _name: Light-duty road vehicle
-      _description: Includes cars, SUVs, and light trucks.
-    bus: ~
-    truck:
-      HDT:
-        _name: Heavy-duty road vehicle
-      MDT:
-        _name: Medium-duty road vehicle
-    2W:
-      _name: Two-wheeled vehicle
-    3W:
-      _name: Three-wheeled vehicle
   rail: ~
   water: ~
 
+vehicle:
+  _description: Types of vehicles.
+  all:
+    _description: All vehicle types.
+  LDV:
+    _name: LDV
+    _description: >
+      Light-duty road vehicle, including cars, SUVs, and light trucks.
+  bus: ~
+  truck: ~
+  2W+3W:
+    _name: '2W+3W'
+    _description: Two- and three-wheeled road vehicles.
+
 fuel:
+  all:
+    _description: All fuels.
   liquid:
+    _name: All liquids
     diesel: ~
     gasoline: ~
     biofuel: ~
@@ -48,6 +54,8 @@ fuel:
 
 technology:
   _description: Energy conversion technology used to power a motorized vehicle.
+  all:
+    _description: All technologies.
   combustion:
     _description: >
       Using only chemical fuels. Inclusive of powertrains that store energy as
@@ -66,14 +74,22 @@ automation:
 ghg:
   _name: Greenhouse gases
   CO2:
-    _description: Carbon dioxide
+    _name: CO₂
+    _description: Carbon dioxide.
   all:
     _description: All GHGs converted to an equivalent basis.
 
 lca_scope:
   _name: LCA scope
-  _description: Scope of analysis covered by a lifecycle measure
+  _description: Scope of analysis covered by a lifecycle measure.
   wtw:
     _name: Well-to-wheels
   ttw:
     _name: Tank-to-wheels
+
+fleet:
+  _description: Part or all of a collection of transport vehicles.
+  new:
+    _description: Only newly-sold vehicles in the reporting period.
+  all:
+    _description: All vehicles in use in the reporting period.

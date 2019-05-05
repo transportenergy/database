@@ -3,7 +3,7 @@
 # Each measure is a concept (see concepts.yaml), i.e. has id, name, and
 # description.
 #
-# Measures also have units, specified in one of two ways:
+# Measures also have unit, specified in one of two ways:
 # 1. As a string. All observations of this measure will have this unit.
 # 2. As a collection of "[dimension] == [value]: [unit]" lines. [unit] will be
 #    used when an observation's key for [dimension] is equal to [value].
@@ -11,37 +11,42 @@
 gdp:
   _name: GDP
   _description: Gross domestic product, purchasing power parity method.
-  _units: 10⁹ USD_2005 / year
+  _unit: 10⁹ USD(2005) / year
 
 emissions:
   _description: Mass of pollutant emitted per unit time.
-  _units:
-    'ghg == CO2': 10⁶ t_CO₂ / yr
-    'ghg == all': 10⁶ t_CO₂e / yr
+  _unit:
+    'ghg == CO2': 10⁶ t CO₂ / yr
+    'ghg == all': 10⁶ t CO₂e / yr
 
 energy:
   _description: Energy consumed by transport.
-  _units: PJ / yr
-
+  _unit: PJ / yr
 
 intensity:
-  _description: Energy-intensity of transport activity.
-  _units: MJ / vkm
+  _description: Energy consumed per unit of transport activity.
+  _unit: MJ / vehicle-km
 
 activity:
-  _units:
-    'TODO': 10⁹ pkm / yr
-    'TODO': 10⁹ tkm / yr
-    'TODO': 10⁹ vkm / yr
+  _description: Transport activity.
+  _unit:
+    'type == passenger': 10⁹ passenger-km / yr
+    'type == freight': 10⁹ tonne-km / yr
+
+activity_veh:
+  _name: Activity
+  _description: Distance travelled by transport vehicles.
+  _unit: 10⁹ vehicle-km / yr
 
 sales:
-  _units: 10⁶ vehicle / yr
+  _unit: 10⁶ vehicle / yr
 
 stock:
-  _units: 10⁶ vehicle
+  _unit: 10⁶ vehicle
 
-load factor:
+load_factor:
+  _name: Load factor
   _description: Passengers or freight transported provided per vehicle.
-  _units:
-    'TODO': passenger / vehicle
-    'TODO': tonne / vehicle
+  _unit:
+    'type == passenger': passenger / vehicle
+    'type == freight': tonne / vehicle

@@ -1,3 +1,4 @@
+from functools import lru_cache
 from itertools import product
 from os.path import join
 
@@ -36,6 +37,13 @@ class Concept(Nameable):
         for c in self.children:
             yield from iter(c)
 
+    @lru_cache()
+    def get_child(self, id):
+        for obj in iter(self):
+            if obj.id == id:
+                return obj
+        raise ValueError(id)
+
 
 class ConceptScheme(Concept):
     """A group of concepts."""
@@ -47,7 +55,7 @@ class ConceptScheme(Concept):
 
 class Measure(Concept):
     """Concept with a unit."""
-    units = None
+    unit = None
 
 
 class Key:
@@ -96,26 +104,48 @@ def read_hierarchy(root, klass=Concept):
 def common_dim_dummies():
     """Yield dummy ConceptSchemes for the common dimensions."""
 
-    c_each = Concept(id='each', name='[all model values]')
-    c_total = Concept(id='total', name='[Global total or average]')
+    c_all = Concept(id='[All]', name='[all model values]')
+    c_total = Concept(id='[All + World]', name='[Global total or average]')
 
-    yield ConceptScheme(id='model', name='Model', children=[c_each])
-    yield ConceptScheme(id='scenario', name='Scenario', children=[c_each])
-    yield ConceptScheme(id='region', name='Region', children=[c_each, c_total])
-    yield ConceptScheme(id='year', name='Year', children=[c_each])
+    yield ConceptScheme(id='model', name='Model', children=[c_all])
+    yield ConceptScheme(id='scenario', name='Scenario', children=[c_all])
+    yield ConceptScheme(id='region', name='Region', children=[c_total])
+    yield ConceptScheme(id='year', name='Year', children=[c_all])
 
 
 def add_unit(key, measure):
     """Add units to a key."""
-    if isinstance(measure.units, str):
-        key.values['unit'] = measure.units
+    if isinstance(measure.unit, str):
+        key.values['unit'] = measure.unit
     else:
         # Conditional units
-        for condition, unit in measure.units.items():
+        for condition, unit in measure.unit.items():
             dim, value = condition.split(' == ')
             if key.values[dim] == value:
                 key.values['unit'] = unit
                 return
+
+
+def read_concepts(path):
+    """Read dimensions from file."""
+    with open(path) as f:
+        concepts = read_hierarchy(yaml.load(f), ConceptScheme)
+
+    # Add common dimensions
+    concepts.extend(common_dim_dummies())
+
+    # Reorganize as a dict
+    return {c.id: c for c in concepts}
+
+
+def read_measures(path):
+    """Read measures from file."""
+    measures = ConceptScheme(id='measure')
+
+    with open(path) as f:
+        measures.children = read_hierarchy(yaml.load(f), Measure)
+
+    return measures
 
 
 def make_template(verbose=True):
@@ -123,50 +153,49 @@ def make_template(verbose=True):
 
     Outputs a 'template.csv' containing all keys specified in 'spec.yaml'.
     """
-    # Read dimensions
-    with open(join(paths['data'], 'dimensions.yaml')) as f:
-        dim_cfg = yaml.load(f)
 
-    dims = read_hierarchy(dim_cfg, ConceptScheme)
-    dims.extend(common_dim_dummies())
+    # Concepts (used as dimensions) and possible values
+    dims = read_concepts(join(paths['data'], 'concepts.yaml'))
 
-    # Reorganize as a dict
-    dims = {cs.id: cs for cs in dims}
+    # Measures and units
+    dims['measure'] = read_measures(join(paths['data'], 'measures.yaml'))
 
-    if verbose:
-        print(dims)
-        print(list(dims['mode']))
+    # Common dimensions applied to all keys
+    common_dims = ['model', 'scenario', 'region', 'year']
 
-    # Read measures
-    with open(join(paths['data'], 'measures.yaml')) as f:
-        measure_cfg = yaml.load(f)
-
-    measures = read_hierarchy(measure_cfg, Measure)
-
-    # Reorganize as a dict
-    measures = {m.id: m for m in measures}
+    # List of Key objects representing data to appear in the template
+    keys = []
 
     # Read specification of the template
-
     with open(join(paths['data'], 'spec.yaml')) as f:
-        spec = yaml.load(f)
+        specs = yaml.load(f)
 
-    # Process specifications
-    common_dims = ['model', 'scenario', 'region', 'year']
-    keys = []
+    # Filters to reduce the set of keys; see below at 'Filter keys'
     filters = []
 
-    for spec_item in spec:
-        # List of dimensions for this Key
-        key_dims = common_dims.copy()
-        key_dims.extend(spec_item.pop('dims', []))
+    # Process specifications
+    for spec in specs:
+        try:
+            # Retrieve the measure to add to the key later
+            measure = dims['measure'].get_child(spec.pop('measure'))
 
-        # Retrieve the measure to add to the key later
-        measure = measures[spec_item.pop('measure')]
+            # Store any filters with this spec
+            for exclude in spec.pop('exclude', []):
+                filters.append(f"measure == '{measure.id}' and {exclude}")
+        except KeyError:
+            # Entry without a 'measure:' key = a list of general exclusions
+            filters.extend(spec.pop('exclude'))
+            continue
+
+        # List of dimensions for this Key
+        key_dims = common_dims + spec.pop('dims', [])
+
+        # A list of iterable objects containing the values along each dimension
+        iters = [iter(dims[d]) for d in key_dims]
 
         # Iterate, adding keys by Cartesian product over the dimensions
-        iters = [iter(dims[d]) for d in key_dims]
         for values in product(*iters):
+            # Create a Key with these values and the measure
             kv = dict(zip(key_dims, map(lambda c: c.id, values)))
             kv['measure'] = measure.id
             k = Key(**kv)
@@ -177,45 +206,85 @@ def make_template(verbose=True):
             # Store the key
             keys.append(k)
 
-        # Store any filters with this spec
-        for exclude in spec_item.pop('exclude', []):
-            filters.append(f"measure == '{measure.id}' and {exclude}")
+    # Convert list → DataFrame
+    specs = pd.DataFrame([k.values for k in keys]).fillna('')
 
-    # Intermediate output
-    spec = pd.DataFrame([k.values for k in keys]).fillna('')
-
-    print('{} rows'.format(spec.shape[0]))
+    if verbose:
+        print('{} rows'.format(specs.shape[0]), end='\n\n')
 
     # Filter rows
-    spec = spec.query('not ((' + ') or ('.join(filters) + '))')
+    for filter in filters:
+        if verbose:
+            query_str = '~ ( {} )'.format(filter)
+            print('Filtering: {}'.format(query_str))
 
-    print('{} rows'.format(spec.shape[0]))
+        specs.query(query_str, inplace=True)
+
+        if verbose:
+            print('  … {} rows'.format(specs.shape[0]))
 
     # Convert to an approximation of the traditional iTEM format
 
-    # Helper methods to collapse columns
-    def collapse_lca_scope(row):
+    # Use names instead of IDs for these columns
+    use_name_cols = ['type', 'mode', 'vehicle', 'technology', 'fuel', 'ghg',
+                     'measure']
+
+    # Order of output columns
+    target_cols = common_dims[:-1] + ['measure', 'unit', 'mode', 'technology',
+                                      'fuel', 'year']
+
+    # Columns to sort content
+    sort_cols = ['measure', 'unit', 'type', 'mode', 'vehicle', 'technology',
+                 'fuel', 'lca_scope', 'ghg']
+
+    # Helper methods
+    def use_names(row):
+        """Use names instead of IDs for some columns."""
+        for col in use_name_cols:
+            if len(row[col]):
+                name = dims[col].get_child(row[col]).name
+                if name == 'All' and col in ['technology']:
+                    name = 'Total'
+                row[col] = name
+        return row
+
+    def collapse(row):
+        """Collapse multiple concepts into fewer columns."""
         lca_scope = row.pop('lca_scope')
         if len(lca_scope):
            row['measure'] += ' (' + lca_scope + ')'
-        return row
 
-    def collapse_ghg(row):
         ghg = row.pop('ghg')
         if len(ghg):
            row['measure'] = ghg + ' ' + row['measure']
+
+        type = row.pop('type')
+        if len(type):
+            if row['mode'] in ['Road', 'Rail']:
+                row['mode'] = type + ' ' + row['mode']
+            elif row['mode'] == 'All':
+                row['mode'] = row['mode'] + ' ' + type
+
+        vehicle = row.pop('vehicle')
+        if len(vehicle) and vehicle != 'All':
+            row['mode'] = vehicle
+
         return row
 
-    target_cols = common_dims[:-1] + ['measure', 'unit', 'mode', 'technology',
-                                      'fuel', 'year']
-    rename = {'columns': {'measure': 'variable'}}
+    # Perform several operations efficiently by chaining
+    # - Replace some IDs with names
+    # - Sort
+    specs = specs.apply(use_names, axis=1) \
+                 .sort_values(by=sort_cols) \
+                 .apply(collapse, axis=1) \
+                 .reindex(columns=target_cols) \
+                 .reset_index(drop=True) \
+                 .rename(columns={'measure': 'variable'}) \
+                 .rename(columns=lambda name: name.title())
 
-    spec = spec.apply(collapse_lca_scope, axis=1) \
-               .apply(collapse_ghg, axis=1) \
-               .reindex(columns=target_cols) \
-               .sort_values(by=['measure', 'mode']) \
-               .rename(**rename)
+    if verbose:
+        print('\n', specs.head(10))
 
-    print(spec)
-
-    spec.to_csv('template.csv')
+    # Save in multiple formats
+    specs.to_csv('template.csv', index=False)
+    specs.to_excel('template.xlsx', index=False)
