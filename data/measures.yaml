@@ -8,6 +8,9 @@
 # 2. As a collection of "[dimension] == [value]: [unit]" lines. [unit] will be
 #    used when an observation's key for [dimension] is equal to [value].
 
+population:
+  _unit: 10⁶ persons
+
 gdp:
   _name: GDP
   _description: Gross domestic product, purchasing power parity method.

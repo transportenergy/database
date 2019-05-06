@@ -20,6 +20,8 @@
 
 - measure: gdp
 
+- measure: population
+
 - measure: emissions
   dims: [type, mode, vehicle, technology, fuel, ghg, lca_scope]
   exclude:
