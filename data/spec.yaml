@@ -16,14 +16,14 @@
   # Vehicle types for freight only
   - type == 'passenger' and vehicle == 'truck'
   # Vehicle types for passengers only
-  - type == 'freight' and vehicle in ['LDV', 'bus', '2W+3W']
+  - type == 'freight' and vehicle in ['ldv', 'bus', '2w+3w']
   # Air freight is (largely) provided as a byproduct of passenger service; most
   # models do not include it separately
   - type == 'freight' and mode == 'air'
   # Assume hybrid and fuel cell technologies not used for air, rail, water, or
   # small road vehicles
   - mode in ['air', 'rail', 'water'] and technology in ['hybrid', 'fc']
-  - vehicle == '2W+3W' and technology in ['hybrid', 'fc']
+  - vehicle == '2w+3w' and technology in ['hybrid', 'fc']
   # Combustion powertrains do not take electricity as an input
   - technology == 'combustion' and fuel == 'electricity'
   # Fuel cell powertrains take only hydrogen as an input
@@ -39,7 +39,7 @@
   dims: [type, mode, vehicle, technology, fuel]
 
 - measure: emissions
-  dims: [type, mode, vehicle, technology, fuel, ghg, lca_scope]
+  dims: [type, mode, vehicle, technology, fuel, pollutant, lca_scope]
   exclude:
   # No use-phase emissions from electricity
   - lca_scope == 'ttw' and fuel == 'electricity'
@@ -49,6 +49,10 @@
   - lca_scope == 'wtw'
   # Same fuels are used by individual upstream technologies
   - lca_scope == 'wtt' and technology != 'all'
+  # No totals across AQ species
+  - pollutant == 'aq'
+  # Only use-phase emissions of air quality pollutants
+  - pollutant in ['bc', 'pm25'] and lca_scope != 'ttw'
 
 - measure: activity
   dims: [type, mode, vehicle, technology]

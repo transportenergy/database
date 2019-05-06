@@ -129,7 +129,7 @@ def add_unit(key, measure):
         # Conditional units
         for condition, unit in measure.unit.items():
             dim, value = condition.split(' == ')
-            if key.values[dim] == value:
+            if dim in key.values and key.values[dim] == value:
                 key.values['unit'] = unit
                 return
 
@@ -180,7 +180,7 @@ def make_template(verbose=True):
         specs = yaml.load(f)
 
     # Filters to reduce the set of Keys; see below at 'Filter Keys'
-    exlcude_global = []
+    exclude_global = []
 
     # Processed dataframes
     dfs = []
@@ -195,7 +195,7 @@ def make_template(verbose=True):
             measure = dims['measure'].get_child(spec.pop('measure'))
         except KeyError:
             # Entry without a 'measure:' key is a list of global filters
-            exlcude_global = spec.pop('exclude')
+            exclude_global = spec.pop('exclude')
             continue
 
         # List of dimensions for these Keys
@@ -249,8 +249,8 @@ def make_template(verbose=True):
     # Convert to an approximation of the traditional iTEM format
 
     # Use names instead of IDs for these columns
-    use_name_cols = ['type', 'mode', 'vehicle', 'technology', 'fuel', 'ghg',
-                     'measure']
+    use_name_cols = ['type', 'mode', 'vehicle', 'technology', 'fuel',
+                     'pollutant', 'measure']
 
     # Order of output columns
     target_cols = common_dims[:-1] + ['measure', 'unit', 'mode', 'technology',
@@ -258,7 +258,7 @@ def make_template(verbose=True):
 
     # Columns to sort content
     sort_cols = ['sort_order', 'measure', 'unit', 'type', 'mode', 'vehicle',
-                 'technology', 'fuel', 'lca_scope', 'ghg']
+                 'technology', 'fuel', 'lca_scope', 'pollutant']
 
     # Helper methods
     def use_names(row):
@@ -281,9 +281,9 @@ def make_template(verbose=True):
         if len(lca_scope):
            row['measure'] += ' (' + lca_scope + ')'
 
-        ghg = row.pop('ghg')
-        if len(ghg):
-           row['measure'] = ghg + ' ' + row['measure']
+        pollutant = row.pop('pollutant')
+        if len(pollutant):
+           row['measure'] = pollutant + ' ' + row['measure']
 
         fleet = row.pop('fleet')
         if len(fleet):

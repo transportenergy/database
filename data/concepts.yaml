@@ -27,13 +27,13 @@ vehicle:
   _description: Types of vehicles.
   all:
     _description: All vehicle types.
-  LDV:
+  ldv:
     _name: LDV
     _description: >
       Light-duty road vehicle, including cars, SUVs, and light trucks.
   bus: ~
   truck: ~
-  2W+3W:
+  2w+3w:
     _name: '2W+3W'
     _description: Two- and three-wheeled road vehicles.
 
@@ -71,13 +71,23 @@ automation:
   conventional: ~
   autonomous: ~
 
-ghg:
-  _name: Greenhouse gases
-  CO2:
-    _name: CO₂
-    _description: Carbon dioxide.
-  all:
-    _description: All GHGs converted to an equivalent basis.
+pollutant:
+  ghg:
+    _name: GHG
+    _description: >
+      Greenhouse gases.
+      Where used for totals, all GHGs are conveted to an equivalence basis.
+    co2:
+      _name: CO₂
+      _description: Carbon dioxide.
+  aq:
+    _description: Air quality-related pollutant species.
+    bc:
+      _name: BC
+      _description: Black carbon.
+    pm25:
+      _name: PM2.5
+      _description: Particulate matter smaller than 2.5 μm.
 
 lca_scope:
   _name: LCA scope

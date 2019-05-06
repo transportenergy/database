@@ -19,14 +19,17 @@ gdp:
 emissions:
   _description: Mass of pollutant emitted per unit time.
   _unit:
-    'ghg == CO2': 10⁶ t CO₂ / yr
-    'ghg == all': 10⁶ t CO₂e / yr
+    'pollutant == co2': 10⁶ t CO₂ / yr
+    'pollutant == ghg': 10⁶ t CO₂e / yr
+    'pollutant == bc': 1O³ t BC / yr
+    'pollutant == pm25': 1O³ t PM2.5 / yr
 
 energy:
   _description: Energy consumed by transport.
   _unit: PJ / yr
 
 intensity:
+  _name: Energy intensity
   _description: Energy consumed per unit of transport activity.
   _unit: MJ / vehicle-km
 
