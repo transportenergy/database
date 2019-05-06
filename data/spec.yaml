@@ -9,7 +9,7 @@
 #            pandas-docs/stable/reference/api/pandas.DataFrame.query.html
 
 
-# General exclusions
+# General exclusions that apply to any measure including these dimensions
 - exclude:
   # Vehicle types are only relevant for road modes
   - mode != 'road' and vehicle != 'all'
@@ -24,14 +24,6 @@
   # small road vehicles
   - mode in ['air', 'rail', 'water'] and technology in ['hybrid', 'fc']
   - vehicle == '2W+3W' and technology in ['hybrid', 'fc']
-
-- measure: gdp
-
-- measure: population
-
-- measure: energy
-  dims: [type, mode, vehicle, technology, fuel]
-  exclude: &excl-e
   # Combustion powertrains do not take electricity as an input
   - technology == 'combustion' and fuel == 'electricity'
   # Fuel cell powertrains take only hydrogen as an input
@@ -39,13 +31,16 @@
   # Electric powertrains take only electricity as an input
   - technology == 'electric' and fuel != 'electricity'
 
+- measure: gdp
+
+- measure: population
+
+- measure: energy
+  dims: [type, mode, vehicle, technology, fuel]
+
 - measure: emissions
   dims: [type, mode, vehicle, technology, fuel, ghg, lca_scope]
   exclude:
-  # See comment under energy, above
-  - technology == 'combustion' and fuel == 'electricity'
-  - technology == 'fc' and fuel != 'hydrogen'
-  - technology == 'electric' and fuel != 'electricity'
   # No use-phase emissions from electricity
   - lca_scope == 'ttw' and fuel == 'electricity'
   # Not concerned with e.g. HFC emissions from refrigerants, or CH₄ emissions
@@ -67,7 +62,6 @@
 
 - measure: intensity
   dims: [type, mode, vehicle, technology, fleet]
-  exclude: *excl-e
 
 - measure: sales
   dims: [type, mode, vehicle, technology]

@@ -4,10 +4,14 @@ from os.path import join
 
 from item.common import paths
 import pandas as pd
+from pandas.core.computation.ops import UndefinedVariableError
 import yaml
 
 
 # Class definitions
+#
+# These are based on the SDMX information model; SDMX is not used directly,
+# because there is currently no mature Python package for it.
 
 class Nameable:
     """Base class."""
@@ -54,7 +58,7 @@ class ConceptScheme(Concept):
 
 
 class Measure(Concept):
-    """Concept with a unit."""
+    """A Concept with a unit."""
     unit = None
 
 
@@ -102,7 +106,11 @@ def read_hierarchy(root, klass=Concept):
 
 
 def common_dim_dummies():
-    """Yield dummy ConceptSchemes for the common dimensions."""
+    """Yield dummy ConceptSchemes for the common dimensions.
+
+    Each of these has only 1 item. Submitted datasets will have multiple values
+    along each of these dimensions.
+    """
 
     c_all = Concept(id='[All]', name='[all model values]')
     c_total = Concept(id='[All + World]', name='[Global total or average]')
@@ -151,7 +159,11 @@ def read_measures(path):
 def make_template(verbose=True):
     """Generate a data template.
 
-    Outputs a 'template.csv' containing all keys specified in 'spec.yaml'.
+    Outputs files containing all keys specified in 'spec.yaml'. The file is
+    produced in two formats:
+
+    - template.csv
+    - template.xlsx
     """
 
     # Concepts (used as dimensions) and possible values
@@ -163,31 +175,30 @@ def make_template(verbose=True):
     # Common dimensions applied to all keys
     common_dims = ['model', 'scenario', 'region', 'year']
 
-    # List of Key objects representing data to appear in the template
-    keys = []
-
     # Read specification of the template
     with open(join(paths['data'], 'spec.yaml')) as f:
         specs = yaml.load(f)
 
-    # Filters to reduce the set of keys; see below at 'Filter keys'
-    filters = []
+    # Filters to reduce the set of Keys; see below at 'Filter Keys'
+    exlcude_global = []
 
-    # Process specifications
-    for spec in specs:
+    # Processed dataframes
+    dfs = []
+
+    # Process each entry in the spec file
+    for n_spec, spec in enumerate(specs):
+        # List of Key objects representing data
+        keys = []
+
         try:
             # Retrieve the measure to add to the key later
             measure = dims['measure'].get_child(spec.pop('measure'))
-
-            # Store any filters with this spec
-            for exclude in spec.pop('exclude', []):
-                filters.append(f"measure == '{measure.id}' and {exclude}")
         except KeyError:
-            # Entry without a 'measure:' key = a list of general exclusions
-            filters.extend(spec.pop('exclude'))
+            # Entry without a 'measure:' key is a list of global filters
+            exlcude_global = spec.pop('exclude')
             continue
 
-        # List of dimensions for this Key
+        # List of dimensions for these Keys
         key_dims = common_dims + spec.pop('dims', [])
 
         # A list of iterable objects containing the values along each dimension
@@ -195,33 +206,45 @@ def make_template(verbose=True):
 
         # Iterate, adding keys by Cartesian product over the dimensions
         for values in product(*iters):
-            # Create a Key with these values and the measure
-            kv = dict(zip(key_dims, map(lambda c: c.id, values)))
-            kv['measure'] = measure.id
+            # Create a Key with these values, the sort order, and the measure
+            kv = dict(zip(key_dims, map(lambda c: c.id, values)),
+                      sort_order=n_spec, measure=measure.id)
             k = Key(**kv)
 
-            # Add the units
+            # Add appropriate units
             add_unit(k, measure)
 
-            # Store the key
+            # Store the Key
             keys.append(k)
 
-    # Convert list → DataFrame
-    specs = pd.DataFrame([k.values for k in keys]).fillna('')
-
-    if verbose:
-        print('{} rows'.format(specs.shape[0]), end='\n\n')
-
-    # Filter rows
-    for filter in filters:
         if verbose:
-            query_str = '~ ( {} )'.format(filter)
-            print('Filtering: {}'.format(query_str))
+            print("\nSpec for '{}': {} keys".format(measure.id, len(keys)))
 
-        specs.query(query_str, inplace=True)
+        # Convert list → DataFrame for filtering
+        df = pd.DataFrame([k.values for k in keys]).fillna('')
 
-        if verbose:
-            print('  … {} rows'.format(specs.shape[0]))
+        # Filter Keys by both global and spec-specific filters
+        for filter in exclude_global + spec.pop('exclude', []):
+            # 'not' operator (~) to exclude the matching rows
+            query_str = '~({})'.format(filter)
+
+            try:
+                df.query(query_str, inplace=True)
+            except UndefinedVariableError:
+                # Filter references a dimension that's not in this dataframe;
+                # the filter isn't relevant
+                continue
+
+            if verbose:
+                print('  {} keys after filtering {}'.format(df.shape[0],
+                                                            query_str))
+
+        # Store the filtered keys as a dataframe
+        dfs.append(df)
+
+    # Combine all dataframes
+    specs = pd.concat(dfs, axis=0, sort=False) \
+              .fillna('')
 
     # Convert to an approximation of the traditional iTEM format
 
@@ -234,8 +257,8 @@ def make_template(verbose=True):
                                       'fuel', 'year']
 
     # Columns to sort content
-    sort_cols = ['measure', 'unit', 'type', 'mode', 'vehicle', 'technology',
-                 'fuel', 'lca_scope', 'ghg']
+    sort_cols = ['sort_order', 'measure', 'unit', 'type', 'mode', 'vehicle',
+                 'technology', 'fuel', 'lca_scope', 'ghg']
 
     # Helper methods
     def use_names(row):
@@ -243,6 +266,9 @@ def make_template(verbose=True):
         for col in use_name_cols:
             if len(row[col]):
                 name = dims[col].get_child(row[col]).name
+
+                # Where 'All' appears in the technology column, the template
+                # requests totals.
                 if name == 'All' and col in ['technology']:
                     name = 'Total'
                 row[col] = name
@@ -250,6 +276,7 @@ def make_template(verbose=True):
 
     def collapse(row):
         """Collapse multiple concepts into fewer columns."""
+        # Combine 3 concepts with 'measure' ("Variable")
         lca_scope = row.pop('lca_scope')
         if len(lca_scope):
            row['measure'] += ' (' + lca_scope + ')'
@@ -262,6 +289,7 @@ def make_template(verbose=True):
         if len(fleet):
             row['measure'] += ' (' + fleet + ' vehicles)'
 
+        # Combine 2 concepts with 'mode'
         type = row.pop('type')
         if len(type):
             if row['mode'] in ['Road', 'Rail']:
@@ -275,9 +303,13 @@ def make_template(verbose=True):
 
         return row
 
-    # Perform several operations efficiently by chaining
+    # Chain several operations for better performance
     # - Replace some IDs with names
     # - Sort
+    # - Collapse multiple columns into fewer
+    # - Set preferred column order
+    # - Drop the integer index
+    # - Rename columns to Title Case
     specs = specs.apply(use_names, axis=1) \
                  .sort_values(by=sort_cols) \
                  .apply(collapse, axis=1) \
@@ -287,7 +319,8 @@ def make_template(verbose=True):
                  .rename(columns=lambda name: name.title())
 
     if verbose:
-        print('\n', specs.head(10))
+        print('', 'Total keys: {0[0]}'.format(specs.shape), specs.head(10),
+              sep='\n\n')
 
     # Save in multiple formats
     specs.to_csv('template.csv', index=False)
