@@ -258,6 +258,10 @@ def make_template(verbose=True):
         if len(ghg):
            row['measure'] = ghg + ' ' + row['measure']
 
+        fleet = row.pop('fleet')
+        if len(fleet):
+            row['measure'] += ' (' + fleet + ' vehicles)'
+
         type = row.pop('type')
         if len(type):
             if row['mode'] in ['Road', 'Rail']:
