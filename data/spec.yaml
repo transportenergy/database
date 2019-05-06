@@ -11,10 +11,17 @@
 
 # General exclusions
 - exclude:
+  # Vehicle types are only relevant for road modes
   - mode != 'road' and vehicle != 'all'
+  # Vehicle types for freight only
   - type == 'passenger' and vehicle == 'truck'
-  - type == 'freight' and mode == 'air'
+  # Vehicle types for passengers only
   - type == 'freight' and vehicle in ['LDV', 'bus', '2W+3W']
+  # Air freight is (largely) provided as a byproduct of passenger service; most
+  # models do not include it separately
+  - type == 'freight' and mode == 'air'
+  # Assume hybrid and fuel cell technologies not used for air, rail, water, or
+  # small road vehicles
   - mode in ['air', 'rail', 'water'] and technology in ['hybrid', 'fc']
   - vehicle == '2W+3W' and technology in ['hybrid', 'fc']
 
@@ -22,20 +29,31 @@
 
 - measure: population
 
+- measure: energy
+  dims: [type, mode, vehicle, technology, fuel]
+  exclude: &excl-e
+  # Combustion powertrains do not take electricity as an input
+  - technology == 'combustion' and fuel == 'electricity'
+  # Fuel cell powertrains take only hydrogen as an input
+  - technology == 'fc' and fuel != 'hydrogen'
+  # Electric powertrains take only electricity as an input
+  - technology == 'electric' and fuel != 'electricity'
+
 - measure: emissions
   dims: [type, mode, vehicle, technology, fuel, ghg, lca_scope]
   exclude:
+  # See comment under energy, above
   - technology == 'combustion' and fuel == 'electricity'
   - technology == 'fc' and fuel != 'hydrogen'
   - technology == 'electric' and fuel != 'electricity'
-  - fuel == 'electricity' and lca_scope == 'ttw'
-
-- measure: energy
-  dims: [type, mode, vehicle, technology, fuel]
-  exclude:
-  - technology == 'combustion' and fuel == 'electricity'
-  - technology == 'fc' and fuel != 'hydrogen'
-  - technology == 'electric' and fuel != 'electricity'
+  # No use-phase emissions from electricity
+  - lca_scope == 'ttw' and fuel == 'electricity'
+  # Not concerned with e.g. HFC emissions from refrigerants, or CH₄ emissions
+  # at service stations; typically assigned to non-transport sectors even in
+  # models that include them.
+  - lca_scope == 'wtw'
+  # Same fuels are used by individual upstream technologies
+  - lca_scope == 'wtt' and technology != 'all'
 
 - measure: activity
   dims: [type, mode, vehicle, technology]
@@ -47,9 +65,14 @@
   dims: [type, mode, vehicle, technology]
   exclude: *excl-act
 
+- measure: intensity
+  dims: [type, mode, vehicle, technology, fleet]
+  exclude: *excl-e
+
 - measure: sales
   dims: [type, mode, vehicle, technology]
   exclude: &excl2
+  # Omit sales of non-road vehicles
   - mode != 'road'
 
 - measure: stock
@@ -59,7 +82,5 @@
 - measure: load_factor
   dims: [type, mode, vehicle, technology]
   exclude:
+  # Omit load factors by individual technologies
   - technology != 'all'
-
-- measure: intensity
-  dims: [type, mode, vehicle, technology, fleet]

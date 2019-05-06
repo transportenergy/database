@@ -81,11 +81,13 @@ ghg:
 
 lca_scope:
   _name: LCA scope
-  _description: Scope of analysis covered by a lifecycle measure.
-  wtw:
-    _name: Well-to-wheels
+  _description: Scope of analysis covered by a transport life-cycle measure.
   ttw:
     _name: Tank-to-wheels
+  wtw:
+    _name: Well-to-wheels
+  wtt:
+    _name: Well-to-tank
 
 fleet:
   _description: Part or all of a collection of transport vehicles.
