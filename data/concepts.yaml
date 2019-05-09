@@ -85,9 +85,15 @@ pollutant:
     bc:
       _name: BC
       _description: Black carbon.
+    nox:
+      _name: NOx
+      _description: Air quality-related nitrogen oxides, i.e. NO, NO₂, and N₂O.
     pm25:
       _name: PM2.5
       _description: Particulate matter smaller than 2.5 μm.
+    so2:
+      _name: SO₂
+      _description: Sulfur dioxide.
 
 lca_scope:
   _name: LCA scope

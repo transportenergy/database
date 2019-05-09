@@ -52,7 +52,7 @@
   # No totals across AQ species
   - pollutant == 'aq'
   # Only use-phase emissions of air quality pollutants
-  - pollutant in ['bc', 'pm25'] and lca_scope != 'ttw'
+  - pollutant in ['bc', 'nox', 'pm25', 'so2'] and lca_scope != 'ttw'
 
 - measure: activity
   dims: [type, mode, vehicle, technology]

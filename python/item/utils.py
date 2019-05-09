@@ -164,6 +164,8 @@ def make_template(verbose=True):
 
     - template.csv
     - template.xlsx
+
+    .. todo:: Allow filtering on concepts that are parents of other concepts.
     """
 
     # Concepts (used as dimensions) and possible values
