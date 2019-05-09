@@ -71,9 +71,8 @@
   # Not concerned with e.g. HFC emissions from refrigerants, or CH₄ emissions
   # at service stations; typically assigned to non-transport sectors even in
   # models that include them.
-  - lca_scope == 'wtw'
-  # Same fuels are used by individual upstream technologies
-  - lca_scope == 'wtt' and technology != 'all'
+  - lca_scope == 'wtt'
+  - lca_scope == 'wtw' and technology != 'all'
   # No totals across AQ species
   - pollutant == 'aq'
   # Only use-phase emissions of air quality pollutants
