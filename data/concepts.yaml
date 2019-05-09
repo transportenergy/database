@@ -109,5 +109,8 @@ fleet:
   _description: Part or all of a collection of transport vehicles.
   new:
     _description: Only newly-sold vehicles in the reporting period.
+  used:
+    _description: >
+      Only used vehicles that were not manufactured in the reporting period.
   all:
     _description: All vehicles in use in the reporting period.

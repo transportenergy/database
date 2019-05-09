@@ -66,16 +66,21 @@
 
 - measure: intensity
   dims: [type, mode, vehicle, technology, fleet]
+  exclude:
+  - fleet == 'used'
 
 - measure: sales
-  dims: [type, mode, vehicle, technology]
+  dims: [type, mode, vehicle, technology, fleet]
   exclude: &excl2
   # Omit sales of non-road vehicles
   - mode != 'road'
+  - fleet == 'all'
 
 - measure: stock
   dims: [type, mode, vehicle, technology]
-  exclude: *excl2
+  exclude:
+  - mode != 'road'
+  - fleet != 'all'
 
 - measure: load_factor
   dims: [type, mode, vehicle, technology]
