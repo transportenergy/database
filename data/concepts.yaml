@@ -1,10 +1,10 @@
 # Concepts for transport data
 #
 # Each concept has an:
-# - ID: short, machine readable.
-# - Name: short, human readable. If not given, this defaults to the ID,
-#         title-cased.
-# - Description: long, human readable. Optional.
+# - _id: short, machine readable.
+# - _name: short, human readable. If not given, this defaults to the ID,
+#    title-cased.
+# - _description: long, human readable. Optional.
 #
 # Concepts may be hierarchical. The top-level concepts can be used as
 # dimensions when specifying the template.
@@ -68,8 +68,25 @@ technology:
     _description: Using electrochemical conversion of fuel to electricity.
 
 automation:
-  conventional: ~
-  autonomous: ~
+  _description: Degree of automation in operation of transport vehicles.
+  human:
+    _name: Human
+    _description: Vehicle operated by a human driver.
+  av:
+    _name: Automated
+    _description: Fully-automated (self-driving) vehicle.
+
+operator:
+  own:
+    _name: Own-supplied
+    _description: >
+      Transport by a vehicle owned and operated for private use by a household
+      or individual.
+  hire:
+    _name: Hired
+    _description: >
+      Transport by a vehicle (and driver) hired through a firm or commercial
+      service.
 
 pollutant:
   ghg:

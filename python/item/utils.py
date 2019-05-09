@@ -252,7 +252,7 @@ def make_template(verbose=True):
 
     # Use names instead of IDs for these columns
     use_name_cols = ['type', 'mode', 'vehicle', 'technology', 'fuel',
-                     'pollutant', 'measure']
+                     'pollutant', 'automation', 'operator', 'measure']
 
     # Order of output columns
     target_cols = common_dims[:-1] + ['measure', 'unit', 'mode', 'technology',
@@ -291,7 +291,7 @@ def make_template(verbose=True):
         if len(fleet):
             row['measure'] += ' (' + fleet + ' vehicles)'
 
-        # Combine 2 concepts with 'mode'
+        # Combine 3 concepts with 'mode'
         type = row.pop('type')
         if len(type):
             if row['mode'] in ['Road', 'Rail']:
@@ -302,6 +302,12 @@ def make_template(verbose=True):
         vehicle = row.pop('vehicle')
         if len(vehicle) and vehicle != 'All':
             row['mode'] = vehicle
+
+        operator = row.pop('operator')
+        automation = row.pop('automation')
+        if len(operator) and len(automation) and row['mode'] == 'LDV':
+            automation = '' if automation == 'Human' else ' AV'
+            row['mode'] += ' ({}{})'.format(operator.lower(), automation)
 
         return row
 

@@ -30,6 +30,11 @@
   - technology == 'fc' and fuel != 'hydrogen'
   # Electric powertrains take only electricity as an input
   - technology == 'electric' and fuel != 'electricity'
+  # Shared and automated vehicles only relevant for LDVs
+  - vehicle != ['ldv'] and automation == 'av'
+  - vehicle == '2w+3w' and operator == 'hire'
+  - vehicle not in ['ldv', '2w+3w'] and operator == 'own'
+
 
 - measure: gdp
 
@@ -55,13 +60,13 @@
   - pollutant in ['bc', 'nox', 'pm25', 'so2'] and lca_scope != 'ttw'
 
 - measure: activity
-  dims: [type, mode, vehicle, technology]
+  dims: [type, mode, vehicle, technology, automation, operator]
   exclude: &excl-act
   # Omit sums by technology across modes
   - mode == 'all' and technology != 'all'
 
 - measure: activity_veh
-  dims: [type, mode, vehicle, technology]
+  dims: [type, mode, vehicle, technology, automation, operator]
   exclude: *excl-act
 
 - measure: intensity
