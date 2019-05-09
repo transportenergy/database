@@ -41,10 +41,11 @@ fuel:
   all:
     _description: All fuels.
   liquid:
-    _name: All liquids
+    _name: All liquid
     diesel: ~
     gasoline: ~
-    biofuel: ~
+    biofuel:
+      _name: Liquid biofuel
     synthetic:
       _description: a.k.a. synfuels, electrofuels.
   ng:

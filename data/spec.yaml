@@ -40,6 +40,26 @@
 
 - measure: population
 
+- measure: price
+  dims: [pollutant]
+  exclude:
+  - pollutant != 'ghg'
+
+- measure: price
+  dims: [fuel]
+  exclude:
+  - fuel not in ['gasoline', 'diesel', 'electricity']
+
+- measure: activity_veh
+  dims: [type, mode, vehicle, technology, automation, operator]
+  exclude: &excl-act
+  # Omit sums by technology across modes
+  - mode == 'all' and technology != 'all'
+
+- measure: activity
+  dims: [type, mode, vehicle, technology, automation, operator]
+  exclude: *excl-act
+
 - measure: energy
   dims: [type, mode, vehicle, technology, fuel]
 
@@ -58,16 +78,6 @@
   - pollutant == 'aq'
   # Only use-phase emissions of air quality pollutants
   - pollutant in ['bc', 'nox', 'pm25', 'so2'] and lca_scope != 'ttw'
-
-- measure: activity
-  dims: [type, mode, vehicle, technology, automation, operator]
-  exclude: &excl-act
-  # Omit sums by technology across modes
-  - mode == 'all' and technology != 'all'
-
-- measure: activity_veh
-  dims: [type, mode, vehicle, technology, automation, operator]
-  exclude: *excl-act
 
 - measure: intensity
   dims: [type, mode, vehicle, technology, fleet]
