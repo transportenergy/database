@@ -289,9 +289,13 @@ def make_template(verbose=True):
 
         fleet = row.pop('fleet')
         if len(fleet):
-            row['measure'] += ' (' + fleet + ' vehicles)'
+            if row['measure'] == 'Energy intensity' and fleet == 'all':
+                fleet = ''
+            else:
+                fleet = ' (' + fleet + ' vehicles)'
+            row['measure'] += fleet
 
-        # Combine 3 concepts with 'mode'
+        # Combine 4 concepts with 'mode'
         type = row.pop('type')
         if len(type):
             if row['mode'] in ['Road', 'Rail']:
