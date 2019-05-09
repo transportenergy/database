@@ -1,4 +1,6 @@
 *.log
+*.csv
+*.xlsx
 *.py,cover
 *.pdf
 .cache

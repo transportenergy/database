@@ -318,17 +318,18 @@ def make_template(verbose=True):
     # Chain several operations for better performance
     # - Replace some IDs with names
     # - Sort
+    # - Save the full-resolution version as *specs_full*
     # - Collapse multiple columns into fewer
     # - Set preferred column order
     # - Drop the integer index
     # - Rename columns to Title Case
-    specs = specs.apply(use_names, axis=1) \
-                 .sort_values(by=sort_cols) \
-                 .apply(collapse, axis=1) \
-                 .reindex(columns=target_cols) \
-                 .reset_index(drop=True) \
-                 .rename(columns={'measure': 'variable'}) \
-                 .rename(columns=lambda name: name.title())
+    specs_full = specs.apply(use_names, axis=1) \
+                      .sort_values(by=sort_cols) \
+                      .reset_index(drop=True)
+    specs = specs_full.apply(collapse, axis=1) \
+                      .reindex(columns=target_cols) \
+                      .rename(columns={'measure': 'variable'}) \
+                      .rename(columns=lambda name: name.title())
 
     if verbose:
         print('', 'Total keys: {0[0]}'.format(specs.shape), specs.head(10),
@@ -337,3 +338,12 @@ def make_template(verbose=True):
     # Save in multiple formats
     specs.to_csv('template.csv', index=False)
     specs.to_excel('template.xlsx', index=False)
+
+    # Save the index
+    index = {'Full dimensionality': specs_full, 'Template (reduced)': specs}
+    index = pd.concat(index, axis=1) \
+              .drop(columns=common_dims + list(map(str.title, common_dims)),
+                    axis=1, level=1) \
+              .replace('', '---')
+    index.to_csv('index.csv')
+    index.to_excel('index.xlsx')
