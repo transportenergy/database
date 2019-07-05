@@ -4,7 +4,8 @@
 # standard version towards the iTEM3 template.
 #
 # Dictionary 1:
-#    Raw_columns_mapping is used to convert the raw data set's columns into the #    standard one and specify the missing columns:
+#    Raw_columns_mapping is used to convert the raw data set's columns into the
+#    standard one and specify the missing columns:
 #       ["Model", "Scenario", "Region", "Variable", "Unit", "Mode",
 #        "Technology", "Fuel", "Year", "Value"]
 # Dictionary 2:
@@ -13,7 +14,8 @@
 # Dictionary 3:
 #   Other_columns_var_mapping is used to convert raw columns values to the
 #   template ones, e.g., Electrical energy->Electricity
-#   Other_columns_var_mapping contains basic mapping rules only to keep most #   the raw data set's taxonomy
+#   Other_columns_var_mapping contains basic mapping rules only to keep most
+#   the raw data set's taxonomy
 # Dictionary 4:
 #   note is used to describe the raw data set to provide more information for
 #   further processing
@@ -44,6 +46,7 @@ electricity-consumption-by-industry-transport-activities-and-householdsservices-
     Value: Value
   note:
     Energy: Final energy consumption
+
 final-energy-consumption-by-product.csv:
   Added_columns_var_mapping:
     Model: '[ALL]'
@@ -107,6 +110,7 @@ freight-transport.csv:
       (P-km) and road injury accidents. Additional information is also gathered on
       containers transported by rail and sea (Tons and TEU) as well as short sea shipping
       data (T-km).
+
 goods-road-vehicle-fleet-by-vehicle-category-and-permissible-maximum-gross-weigh.csv:
   Added_columns_var_mapping:
     Fuel: '-'
@@ -154,6 +158,7 @@ goods-transport-by-rail.csv:
     Value: Value
   note:
     Activity: Goods Transport by Rail
+
 modal-split-of-freight-transport.csv:
   Added_columns_var_mapping:
     Fuel: '-'
@@ -197,6 +202,7 @@ modal-split-of-passenger-transport.csv:
     Vehicle: Mode
   note:
     Activity: Passenger Transport Mode split based on passenger-km / yr.
+
 new-goods-road-vehicles-registered-by-vehicle-category-and-permissible-maximum-g.csv:
   Added_columns_var_mapping:
     Fuel: '-'
@@ -305,6 +311,7 @@ passenger-road-vehicle-fleet-and-rate-per-thousand-inhabitants-by-vehicle-catego
     Vehicle Category: Mode
   note:
     Stock: Passenger vehicles.
+
 passenger-transport.csv:
   Added_columns_var_mapping:
     Fuel: '-'
@@ -335,6 +342,7 @@ passenger-transport.csv:
     Variable: Mode
   note:
     Activity: Passenger road.
+
 rail-transport-of-passengers.csv:
   Added_columns_var_mapping:
     Fuel: '-'
@@ -357,6 +365,7 @@ rail-transport-of-passengers.csv:
     Value: Value
   note:
     Activity: Passenger Rail in total.
+
 road-vehicle-fleet-by-vehicle-category-and-fuel-type.csv:
   Added_columns_var_mapping:
     Model: '[ALL]'
@@ -385,6 +394,7 @@ road-vehicle-fleet-by-vehicle-category-and-fuel-type.csv:
     Value: Value
   note:
     Activity: Road vehicle fleet at 31 December by vehicle category and fuel type.
+
 volume-of-passenger-transport-relative-to-gdp.csv:
   Added_columns_var_mapping:
     Fuel: '-'
