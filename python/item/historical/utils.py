@@ -79,21 +79,22 @@ def conversion_layer1(df, top_dict):
     return df
 
 
-if __name__ == '__main__':
-    datapath = "IK2_Open_Data/"
-    dataList = os.listdir(datapath)
+def main(input_dir, output_file):
+    dataList = os.listdir(input_dir)
     dataList = [x for x in dataList if x[-4:] == ".csv"]
     top_most_dict_yaml = yaml.safe_load(open('mapping_conv_phase1.yaml'))
     list_of_df = []
 
     for file in top_most_dict_yaml:
-        df = pd.read_csv(datapath + file, sep=";")
+        df = pd.read_csv(input_dir + file, sep=";")
         top_dict = top_most_dict_yaml[file]  # Mapping rules for dataset
         df = conversion_layer1(df, top_dict)
         df["Source"] = file
         list_of_df.append(df)
+
     df_output = pd.concat(list_of_df, sort=False, ignore_index=True)
     df_output = df_output[["Model", "Scenario", "Region", "Variable", "Unit",
                            "Mode", "Technology", "Fuel", "Year", "Value",
                            "Source"]]
-    df_output.to_csv("IK2_Open_Data_conv_phase1.csv", index=False)
+
+    df_output.to_csv(output_file, index=False)
