@@ -36,11 +36,6 @@ electricity-consumption-by-industry-transport-activities-and-householdsservices-
       MAPPING:
         Gigawatt-hour: PJ / yr
   Raw_columns_mapping:
-    ADD:
-    - Model
-    - Scenario
-    - Variable
-    - Technology
     Date: Year
     Geo: Region
     Indic_nrg: Mode
@@ -63,11 +58,6 @@ final-energy-consumption-by-product.csv:
       MAPPING:
         Thousand TOE (tonnes of oil equivalent): PJ / yr
   Raw_columns_mapping:
-    ADD:
-    - Model
-    - Scenario
-    - Variable
-    - Technology
     Date: Year
     Geo: Region
     Indic nrg: Mode
@@ -108,13 +98,6 @@ freight-transport.csv:
         "10\u2076 tonne-km / yr": "10\u2079 tonne-km / yr"
         TEU: TEU
   Raw_columns_mapping:
-    ADD:
-    - Model
-    - Scenario
-    - Variable
-    - Unit
-    - Technology
-    - Fuel
     Country: Region
     Date: Year
     Value: Value
@@ -140,13 +123,6 @@ goods-road-vehicle-fleet-by-vehicle-category-and-permissible-maximum-gross-weigh
       MAPPING:
         Number: "10\u2076 vehicle"
   Raw_columns_mapping:
-    ADD:
-    - Model
-    - Scenario
-    - Variable
-    - Unit
-    - Technology
-    - Fuel
     Country: Region
     Date: Year
     Value: Value
@@ -171,12 +147,6 @@ goods-transport-by-rail.csv:
         Million TKM (tonne-kilometre): "10\u2079 tonne-km / yr"
         Thousand tonnes: "10\u2079 tonne / yr"
   Raw_columns_mapping:
-    ADD:
-    - Model
-    - Scenario
-    - Variable
-    - Technology
-    - Fuel
     Date: Year
     Geo: Region
     Measure: Unit
@@ -199,12 +169,6 @@ modal-split-of-freight-transport.csv:
         - sum of available data
       Roads: Freight Road
   Raw_columns_mapping:
-    ADD:
-    - Model
-    - Scenario
-    - Variable
-    - Technology
-    - Fuel
     Date: Year
     Geo: Region
     Measure: Unit
@@ -226,12 +190,6 @@ modal-split-of-passenger-transport.csv:
       Passenger cars: Passenger cars
       Trains: Trains
   Raw_columns_mapping:
-    ADD:
-    - Model
-    - Scenario
-    - Variable
-    - Technology
-    - Fuel
     Date: Year
     Geo: Region
     Measure: Unit
@@ -255,13 +213,6 @@ new-goods-road-vehicles-registered-by-vehicle-category-and-permissible-maximum-g
       MAPPING:
         Number: "10\u2076 vehicle / yr"
   Raw_columns_mapping:
-    ADD:
-    - Model
-    - Scenario
-    - Variable
-    - Unit
-    - Technology
-    - Fuel
     Country: Region
     Date: Year
     Value: Value
@@ -297,13 +248,6 @@ new-passenger-car-registrations-by-fuel-type.csv:
       MAPPING:
         Number: "10\u2076 vehicle / yr"
   Raw_columns_mapping:
-    ADD:
-    - Model
-    - Scenario
-    - Variable
-    - Unit
-    - Mode
-    - Technology
     Country: Region
     Date: Year
     Fuel type: Fuel
@@ -326,12 +270,6 @@ new-road-vehicle-registrations-by-vehicle-category-and-fuel-type.csv:
       MAPPING:
         Number: "10\u2076 vehicle / yr"
   Raw_columns_mapping:
-    ADD:
-    - Model
-    - Scenario
-    - Variable
-    - Unit
-    - Fuel
     Country: Region
     Date: Year
     Fuel type: Technology
@@ -360,12 +298,6 @@ passenger-road-vehicle-fleet-and-rate-per-thousand-inhabitants-by-vehicle-catego
         absolute value: "10\u2076 vehicle"
         per 1000 inhabitants: "10\u2076 vehicle / k inhabitants"
   Raw_columns_mapping:
-    ADD:
-    - Model
-    - Scenario
-    - Variable
-    - Technology
-    - Fuel
     Country: Region
     Date: Year
     Measurement: Unit
@@ -397,13 +329,6 @@ passenger-transport.csv:
       MAPPING:
         "10\u2076 passenger-km / yr": "10\u2079 passenger-km / yr"
   Raw_columns_mapping:
-    ADD:
-    - Model
-    - Scenario
-    - Variable
-    - Unit
-    - Technology
-    - Fuel
     Country: Region
     Date: Year
     Value: Value
@@ -425,12 +350,6 @@ rail-transport-of-passengers.csv:
       MAPPING:
         Millions of passenger-kilometres: "10\u2079 passenger-km / yr"
   Raw_columns_mapping:
-    ADD:
-    - Model
-    - Scenario
-    - Variable
-    - Technology
-    - Fuel
     Date: Year
     Geo: Region
     Measure: Unit
@@ -459,12 +378,6 @@ road-vehicle-fleet-by-vehicle-category-and-fuel-type.csv:
       MAPPING:
         Number: "10\u2076 vehicle"
   Raw_columns_mapping:
-    ADD:
-    - Model
-    - Scenario
-    - Variable
-    - Unit
-    - Technology
     Country: Region
     Date: Year
     Fuel type: Fuel
@@ -482,13 +395,6 @@ volume-of-passenger-transport-relative-to-gdp.csv:
     Variable: All Passenger / GDP
   Other_columns_var_mapping: {}
   Raw_columns_mapping:
-    ADD:
-    - Model
-    - Scenario
-    - Variable
-    - Mode
-    - Technology
-    - Fuel
     Date: Year
     Geo: Region
     Measure: Unit

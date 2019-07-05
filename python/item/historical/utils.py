@@ -51,17 +51,16 @@ def conversion_layer1(df, top_dict):
     #  from mapping_conv_phase1.yaml
 
     # Rename existing columns that to match the template
-    df = df.loc[:, [x for x in top_dict['Raw_columns_mapping'] if x != "ADD"]]
     col_dict = top_dict['Raw_columns_mapping']
-    map(col_dict.pop, ['ADD'])
+    df = df.loc[:, [x for x in col_dict]]
     df.rename(columns=col_dict, inplace=True)
 
     # Add columns that are not included and mapping with pre-defined rules
-    for x in top_dict['Raw_columns_mapping']["ADD"]:
-        if x != "Unit":
-            df[x] = [top_dict["Added_columns_var_mapping"][x]] * len(df)
+    for col, value in top_dict['Added_columns_var_mapping'].items():
+        if col == 'Unit':
+            df[col] = df.apply(lambda row: add_unit_conversion(row), axis=1)
         else:
-            df[x] = df.apply(lambda row: add_unit_conversion(row), axis=1)
+            df[col] = value
 
     # Unit conversion if necessary
     if "Unit" in top_dict["Other_columns_var_mapping"]:
