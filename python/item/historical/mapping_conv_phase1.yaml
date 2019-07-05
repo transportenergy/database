@@ -1,15 +1,22 @@
 # Structure of mapping rules in the conversion layer 1
-# How to use: Load this file as a dictionary to convert raw data sets into the standard version towards the iTEM3 template
-# Dictionary 1: 
-#    Raw_columns_mapping is used to convert the raw data set's columns into the standard one and specify the missing columns: 
-#       ["Model", "Scenario", "Region", "Variable", "Unit", "Mode", "Technology", "Fuel", "Year", "Value"]
-# Dictionary 2: 
-#   Added_columns_var_mapping is used to add the missing columns with assigned values based on the data set's content
-# Dictionary 3: 
-#   Other_columns_var_mapping is used to convert raw columns values to the template ones, e.g., Electrical energy->Electricity
-#   Other_columns_var_mapping contains basic mapping rules only to keep most the raw data set's taxonomy
-# Dictionary 4: 
-#   note is used to describe the raw data set to provide more information for further processing
+#
+# How to use: Load this file as a dictionary to convert raw data sets into the
+# standard version towards the iTEM3 template.
+#
+# Dictionary 1:
+#    Raw_columns_mapping is used to convert the raw data set's columns into the #    standard one and specify the missing columns:
+#       ["Model", "Scenario", "Region", "Variable", "Unit", "Mode",
+#        "Technology", "Fuel", "Year", "Value"]
+# Dictionary 2:
+#   Added_columns_var_mapping is used to add the missing columns with assigned
+#   values based on the data set's content
+# Dictionary 3:
+#   Other_columns_var_mapping is used to convert raw columns values to the
+#   template ones, e.g., Electrical energy->Electricity
+#   Other_columns_var_mapping contains basic mapping rules only to keep most #   the raw data set's taxonomy
+# Dictionary 4:
+#   note is used to describe the raw data set to provide more information for
+#   further processing
 
 electricity-consumption-by-industry-transport-activities-and-householdsservices-.csv:
   Added_columns_var_mapping:
