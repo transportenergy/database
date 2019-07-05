@@ -25,21 +25,21 @@ def unit_conversion(unitA, unitB):
 
 
 # For adding Unit column with defined one by the raw data set
-def addUnit_conversion(row):
-    if top_dict["Added_columns_var_mapping"]["Unit"]["DEPEND"] == "None":
-        value = top_dict["Added_columns_var_mapping"]["Unit"]["MAPPING"]
+def add_unit_conversion(row):
+    info = top_dict["Added_columns_var_mapping"]["Unit"]
+    if info["DEPEND"] == "None":
+        value = info["MAPPING"]
     else:
-        depended_field = top_dict["Added_columns_var_mapping"]["Unit"]["DEPEND"]
+        depended_field = info["DEPEND"]
         v = row[depended_field]
-        value = top_dict["Added_columns_var_mapping"]["Unit"]["MAPPING"][v]
+        value = info["MAPPING"][v]
     return value
 
 
 # For converting Unit from raw to standard
 def value_conversion(row):
-    func = unit_conversion(
-        row["Unit"],
-        top_dict["Other_columns_var_mapping"]["Unit"]["MAPPING"][row["Unit"]])
+    info = top_dict["Other_columns_var_mapping"]["Unit"]
+    func = unit_conversion(row["Unit"], info["MAPPING"][row["Unit"]])
     return func(row["Value"])
 
 
@@ -61,7 +61,7 @@ def conversion_layer1(df, top_dict):
         if x != "Unit":
             df[x] = [top_dict["Added_columns_var_mapping"][x]] * len(df)
         else:
-            df[x] = df.apply(lambda row: addUnit_conversion(row), axis=1)
+            df[x] = df.apply(lambda row: add_unit_conversion(row), axis=1)
 
     # Unit conversion if necessary
     if "Unit" in top_dict["Other_columns_var_mapping"]:
@@ -86,6 +86,7 @@ if __name__ == '__main__':
     dataList = [x for x in dataList if x[-4:] == ".csv"]
     top_most_dict_yaml = yaml.safe_load(open('mapping_conv_phase1.yaml'))
     list_of_df = []
+
     for file in top_most_dict_yaml:
         df = pd.read_csv(datapath + file, sep=";")
         top_dict = top_most_dict_yaml[file]  # Mapping rules for dataset
