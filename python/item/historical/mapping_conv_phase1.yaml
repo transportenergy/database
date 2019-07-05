@@ -22,8 +22,6 @@
 
 electricity-consumption-by-industry-transport-activities-and-householdsservices-.csv:
   Added_columns_var_mapping:
-    Model: '[ALL]'
-    Scenario: '[ALL]'
     Technology: Total
     Variable: Energy
   Other_columns_var_mapping:
@@ -49,8 +47,6 @@ electricity-consumption-by-industry-transport-activities-and-householdsservices-
 
 final-energy-consumption-by-product.csv:
   Added_columns_var_mapping:
-    Model: '[ALL]'
-    Scenario: '[ALL]'
     Technology: Total
     Variable: Energy
   Other_columns_var_mapping:
@@ -73,8 +69,6 @@ final-energy-consumption-by-product.csv:
 freight-transport.csv:
   Added_columns_var_mapping:
     Fuel: '-'
-    Model: '[ALL]'
-    Scenario: '[ALL]'
     Technology: Total
     Unit:
       DEPEND: Mode
@@ -114,8 +108,6 @@ freight-transport.csv:
 goods-road-vehicle-fleet-by-vehicle-category-and-permissible-maximum-gross-weigh.csv:
   Added_columns_var_mapping:
     Fuel: '-'
-    Model: '[ALL]'
-    Scenario: '[ALL]'
     Technology: Total
     Unit:
       DEPEND: None
@@ -138,8 +130,6 @@ goods-road-vehicle-fleet-by-vehicle-category-and-permissible-maximum-gross-weigh
 goods-transport-by-rail.csv:
   Added_columns_var_mapping:
     Fuel: '-'
-    Model: '[ALL]'
-    Scenario: '[ALL]'
     Technology: Total
     Variable: Activity
   Other_columns_var_mapping:
@@ -162,8 +152,6 @@ goods-transport-by-rail.csv:
 modal-split-of-freight-transport.csv:
   Added_columns_var_mapping:
     Fuel: '-'
-    Model: '[ALL]'
-    Scenario: '[ALL]'
     Technology: Total
     Variable: Activity
   Other_columns_var_mapping:
@@ -185,8 +173,6 @@ modal-split-of-freight-transport.csv:
 modal-split-of-passenger-transport.csv:
   Added_columns_var_mapping:
     Fuel: '-'
-    Model: '[ALL]'
-    Scenario: '[ALL]'
     Technology: Total
     Variable: Activity
   Other_columns_var_mapping:
@@ -206,8 +192,6 @@ modal-split-of-passenger-transport.csv:
 new-goods-road-vehicles-registered-by-vehicle-category-and-permissible-maximum-g.csv:
   Added_columns_var_mapping:
     Fuel: '-'
-    Model: '[ALL]'
-    Scenario: '[ALL]'
     Technology: Total
     Unit:
       DEPEND: None
@@ -229,8 +213,6 @@ new-goods-road-vehicles-registered-by-vehicle-category-and-permissible-maximum-g
 new-passenger-car-registrations-by-fuel-type.csv:
   Added_columns_var_mapping:
     Mode: Passenger Road
-    Model: '[ALL]'
-    Scenario: '[ALL]'
     Technology: Total
     Unit:
       DEPEND: None
@@ -264,8 +246,6 @@ new-passenger-car-registrations-by-fuel-type.csv:
 new-road-vehicle-registrations-by-vehicle-category-and-fuel-type.csv:
   Added_columns_var_mapping:
     Fuel: '-'
-    Model: '[ALL]'
-    Scenario: '[ALL]'
     Unit:
       DEPEND: None
       MAPPING: Number
@@ -287,8 +267,6 @@ new-road-vehicle-registrations-by-vehicle-category-and-fuel-type.csv:
 passenger-road-vehicle-fleet-and-rate-per-thousand-inhabitants-by-vehicle-catego.csv:
   Added_columns_var_mapping:
     Fuel: '-'
-    Model: '[ALL]'
-    Scenario: '[ALL]'
     Technology: Total
     Variable: Stock
   Other_columns_var_mapping:
@@ -315,8 +293,6 @@ passenger-road-vehicle-fleet-and-rate-per-thousand-inhabitants-by-vehicle-catego
 passenger-transport.csv:
   Added_columns_var_mapping:
     Fuel: '-'
-    Model: '[ALL]'
-    Scenario: '[ALL]'
     Technology: Total
     Unit:
       DEPEND: None
@@ -346,8 +322,6 @@ passenger-transport.csv:
 rail-transport-of-passengers.csv:
   Added_columns_var_mapping:
     Fuel: '-'
-    Model: '[ALL]'
-    Scenario: '[ALL]'
     Technology: Total
     Variable: Activity
   Other_columns_var_mapping:
@@ -368,8 +342,6 @@ rail-transport-of-passengers.csv:
 
 road-vehicle-fleet-by-vehicle-category-and-fuel-type.csv:
   Added_columns_var_mapping:
-    Model: '[ALL]'
-    Scenario: '[ALL]'
     Technology: Total
     Unit:
       DEPEND: None
@@ -399,8 +371,6 @@ volume-of-passenger-transport-relative-to-gdp.csv:
   Added_columns_var_mapping:
     Fuel: '-'
     Mode: All Passenger
-    Model: '[ALL]'
-    Scenario: '[ALL]'
     Technology: Total
     Variable: All Passenger / GDP
   Other_columns_var_mapping: {}

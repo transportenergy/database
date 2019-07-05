@@ -93,8 +93,7 @@ def main(input_dir, output_file):
         list_of_df.append(df)
 
     df_output = pd.concat(list_of_df, sort=False, ignore_index=True)
-    df_output = df_output[["Model", "Scenario", "Region", "Variable", "Unit",
-                           "Mode", "Technology", "Fuel", "Year", "Value",
-                           "Source"]]
+    df_output = df_output[["Region", "Variable", "Unit", "Mode", "Technology",
+                           "Fuel", "Year", "Value", "Source"]]
 
     df_output.to_csv(output_file, index=False)
