@@ -58,13 +58,13 @@ def conversion_layer1(df, top_dict):
     # Add columns that are not included and mapping with pre-defined rules
     for col, value in top_dict['Added_columns_var_mapping'].items():
         if col == 'Unit':
-            df[col] = df.apply(lambda row: add_unit_conversion(row), axis=1)
+            df[col] = df.apply(add_unit_conversion, axis=1)
         else:
             df[col] = value
 
     # Unit conversion if necessary
     if "Unit" in top_dict["Other_columns_var_mapping"]:
-        df["Value"] = df.apply(lambda row: value_conversion(row), axis=1)
+        df["Value"] = df.apply(value_conversion, axis=1)
     # Name conversion for some columns to keep as consistent as possible while
     # keeping the raw data set's taxonomy
     if "Other_columns_var_mapping" in top_dict:
