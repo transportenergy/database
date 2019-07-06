@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import pandas as pd
 import yaml
@@ -25,8 +26,7 @@ def unit_conversion(unitA, unitB):
 
 
 # For adding Unit column with defined one by the raw data set
-def add_unit_conversion(row):
-    info = top_dict["Added_columns_var_mapping"]["Unit"]
+def add_unit_conversion(row, info):
     if info["DEPEND"] == "None":
         value = info["MAPPING"]
     else:
@@ -37,8 +37,7 @@ def add_unit_conversion(row):
 
 
 # For converting Unit from raw to standard
-def value_conversion(row):
-    info = top_dict["Other_columns_var_mapping"]["Unit"]
+def value_conversion(row, info):
     func = unit_conversion(row["Unit"], info["MAPPING"][row["Unit"]])
     return func(row["Value"])
 
@@ -58,35 +57,35 @@ def conversion_layer1(df, top_dict):
     # Add columns that are not included and mapping with pre-defined rules
     for col, value in top_dict['Added_columns_var_mapping'].items():
         if col == 'Unit':
-            df[col] = df.apply(add_unit_conversion, axis=1)
+            df[col] = df.apply(add_unit_conversion, axis=1, args=(value,))
         else:
             df[col] = value
 
-    # Unit conversion if necessary
-    if "Unit" in top_dict["Other_columns_var_mapping"]:
-        df["Value"] = df.apply(value_conversion, axis=1)
-    # Name conversion for some columns to keep as consistent as possible while
-    # keeping the raw data set's taxonomy
-    if "Other_columns_var_mapping" in top_dict:
-        for field in top_dict["Other_columns_var_mapping"]:
-            if field != "Unit":
-                df[field] = df[field].apply(
-                    lambda x: top_dict["Other_columns_var_mapping"][field][x])
-            else:
-                df[field] = df[field].apply(
-                    lambda x:
-                    top_dict["Other_columns_var_mapping"][field]["MAPPING"][x])
+    for field, info in top_dict.get('Other_columns_var_mapping', {}).items():
+        # Name conversion for some columns to keep as consistent as possible
+        # while keeping the raw data set's taxonomy
+        if field == 'Unit':
+            # Unit conversion if necessary
+            df['Value'] = df.apply(value_conversion, axis=1, args=(info,))
+
+            df[field] = df[field].apply(lambda x: info["MAPPING"][x])
+        else:
+            df[field] = df[field].apply(lambda x: info[x])
+
     return df
 
 
 def main(input_dir, output_file):
     dataList = os.listdir(input_dir)
     dataList = [x for x in dataList if x[-4:] == ".csv"]
-    top_most_dict_yaml = yaml.safe_load(open('mapping_conv_phase1.yaml'))
+
+    config_path = Path(__file__).parent / 'mapping_conv_phase1.yaml'
+
+    top_most_dict_yaml = yaml.safe_load(open(config_path))
     list_of_df = []
 
     for file in top_most_dict_yaml:
-        df = pd.read_csv(input_dir + file, sep=";")
+        df = pd.read_csv(Path(input_dir) / file, sep=";")
         top_dict = top_most_dict_yaml[file]  # Mapping rules for dataset
         df = conversion_layer1(df, top_dict)
         df["Source"] = file
