@@ -25,10 +25,11 @@ r_binary_packages:
 - devtools
 
 env:
-- CACHE=$HOME/.cache/item
-- CONDAFNAME=Miniconda3-latest-Linux-x86_64.sh
-- CONDAURL=https://repo.anaconda.com/miniconda/$CONDAFNAME
-- PATH=$HOME/miniconda/bin:$PATH
+  global:
+  - CACHE=$HOME/.cache/item
+  - CONDAFNAME=Miniconda3-latest-Linux-x86_64.sh
+  - CONDAURL=https://repo.anaconda.com/miniconda/$CONDAFNAME
+  - PATH=$HOME/miniconda/bin:$PATH
 
 before_install: source ci/before_install.sh
 
