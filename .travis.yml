@@ -21,6 +21,7 @@ cache:
 
 r: release
 
+# NB see ci/install.sh; this is a no-op
 r_binary_packages:
 - devtools
 
