@@ -3,3 +3,4 @@ item_config.yaml
 .pytest_cache
 .Rproj.user
 doc/_build
+R/*.Rcheck
