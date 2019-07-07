@@ -23,15 +23,18 @@ python:
 
 r: release
 
+before_install:
+  - > Rscript -e "install.packages(c('devtools', 'IRkernel'),
+                                   lib='$R_LIBS_USER')"
+
 install:
-  - Rscript -e 'withr::with_libpaths(Sys.getenv("R_LIBS_USER"), devtools::install_deps("R/item"))'
-  - Rscript -e 'devtools::session_info(installed.packages()[, "Package"])'
+  - pip install python/
   - pip install -r ci/requirements.txt
-  - pip install codecov pytest-cov
+  - Rscript -e 'devtools::install("R/itemrixmp", dep = T)'
 
 script:
-   - R CMD check R/item
    - py.test python/item --cov=item --cov-report term-missing
+   - R CMD check R/item
 
 after_success:
   - coverage combine

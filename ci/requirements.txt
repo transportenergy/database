@@ -1,4 +1,6 @@
 click >= 0.6
+codecov
+coverage
 pandas >= 0.20
 pint >= 0.8
 plotnine >= 0.1
