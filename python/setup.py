@@ -16,7 +16,6 @@ CLASSIFIERS = [
     'Intended Audience :: Science/Research',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.5',
     'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
     'Topic :: Scientific/Engineering',
@@ -33,8 +32,9 @@ INSTALL_REQUIRES = [
     ]
 TESTS_REQUIRE = ['pytest >= 2.7']
 EXTRAS_REQUIRE = {
-    'docs': ['sphinx', 'sphinx-rtd-theme', 'numpydoc'],
-    'stats': ['requests', 'requests-cache'],
+    'doc': ['sphinx', 'sphinx-rtd-theme', 'numpydoc'],
+    'hist': ['requests', 'requests-cache'],
+    'tests': ['pytest'],
     'eppa': ['gdx >= 3'],
     }
 

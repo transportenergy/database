@@ -36,7 +36,7 @@ before_install:
 
 install:
 - source ci/install.sh
-- pip install python/
+- pip install python/.[doc,eppa,hist,tests]
 - Rscript -e "devtools::install('R/item', dep = T)"
 
 script:
