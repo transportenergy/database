@@ -6,7 +6,7 @@ import pytest
 
 # From xarray
 @pytest.fixture(scope='session')
-def item_tmp_dir(tmp_path):
+def item_tmp_dir(tmp_path_factory):
     """Create a temporary iTEM directory with the structure:
 
     <path>
@@ -23,6 +23,7 @@ def item_tmp_dir(tmp_path):
     if local_data is None:
         pytest.skip('needs full database (give --local-data)')
 
+    tmp_path = tmp_path_factory.mktemp('item-user-data')
     try:
         # Create the directories
         make_database_dirs(tmp_path, False)
