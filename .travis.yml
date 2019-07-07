@@ -18,20 +18,26 @@ cache:
     - $HOME/.cache/pip
     - $HOME/R/Library
 
-python:
-  - 3.7
-
 r: release
+
+addons:
+  apt:
+    packages:
+    # Python 3
+    - python3-pip
+    # For git2r
+    - libgit2-dev
 
 before_install:
   - Rscript -e "install.packages('devtools', lib='$R_LIBS_USER')"
 
 install:
-  - pip install python/
-  - pip install -r ci/requirements.txt
+  - pip3 install python/
+  - pip3 install -r ci/requirements.txt
   - Rscript -e "devtools::install('R/item', dep = T)"
 
 script:
+   - which -a py.test
    - py.test python/item --cov=item --cov-report term-missing
    - R CMD check R/item
 
