@@ -41,7 +41,7 @@ install:
 - Rscript -e "devtools::install('R/item', dep = T)"
 
 script:
-- which -a py.test
+- ls -r home/travis/miniconda/lib/python3.7/site-packages/item
 - py.test python/item --cov=item --cov-report term-missing
 - R CMD check R/item
 
