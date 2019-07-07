@@ -5,6 +5,12 @@ from requests import HTTPError
 from item.stats import OpenKAPSARC
 
 
+pytestmark = pytest.mark.skipif(
+    pytest.config.getoption('--stats-server') is None,
+    reason='--stats-server not supplied.'
+    )
+
+
 @pytest.fixture(scope='module')
 def ok():
     return OpenKAPSARC(pytest.config.getoption('--stats-server'))

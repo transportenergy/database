@@ -1,8 +1,10 @@
 import logging
 from os import makedirs
-from os.path import abspath, dirname, expanduser, join
+from os.path import abspath, expanduser, join
+from pathlib import Path
 from warnings import filterwarnings
 
+from pkg_resources import resource_filename
 import yaml
 
 
@@ -14,7 +16,7 @@ filterwarnings('ignore',
 # Various paths to data
 paths = {
     # Package data
-    'data': abspath(join(dirname(__file__), '..', '..', 'data')),
+    'data': Path(resource_filename(__name__, 'data')).resolve(),
     }
 
 
@@ -63,20 +65,21 @@ def init_paths(**kwargs):
     path_config.update(kwargs)
 
     def init_path(name, default, mkdir=False):
-        paths[name] = abspath(expanduser(path_config.get(name, default)))
-        if mkdir:
-            makedirs(paths['cache'], exist_ok=True)
+        full_path = Path(path_config.get(name, default)).resolve().expanduser()
+        paths[name] = full_path
 
     init_path('cache', '.cache')
 
     init_path('log', '.')
 
     init_path('model', '.')
-    init_path('model raw', join(paths['model'], 'raw'))
-    init_path('model processed', join(paths['model'], 'processed'))
-    init_path('model database', join(paths['model'], 'database'))
-    init_path('models-1', join(paths['model database'], '1.csv'))
-    init_path('models-2', join(paths['model database'], '2.csv'))
+    init_path('model raw', paths['model'] / 'raw')
+    init_path('model processed', paths['model'] / 'processed')
+    init_path('model database', paths['model'] / 'database')
+    init_path('models-1', paths['model database'] / '1.csv')
+    init_path('models-2', paths['model database'] / '2.csv')
+
+    init_path('historical', '.')
 
     init_path('plot', join('.', 'plot'))
 
@@ -99,7 +102,7 @@ def make_database_dirs(path, dry_run):
         ('model', 'database'),
         ('model', 'processed'),
         ('model', 'raw'),
-        ('stats',),
+        ('historical',),
         ]
     dirs = [path] + [join(path, *d) for d in dirs]
 

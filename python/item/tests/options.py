@@ -3,5 +3,5 @@ def pytest_addoption(parser):
                      help='run slow tests')
     parser.addoption('--local-data',
                      help='path to local data for testing')
-    parser.addoption('--stats-server', default='https://0.0.0.0:8080',
+    parser.addoption('--stats-server',
                      help='address of statistics server')

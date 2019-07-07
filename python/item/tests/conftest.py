@@ -1,4 +1,4 @@
-from os.path import join
+from pathlib import Path
 import shutil
 
 import pytest
@@ -22,6 +22,8 @@ def item_tmp_dir(tmp_path_factory):
 
     if local_data is None:
         pytest.skip('needs full database (give --local-data)')
+    else:
+        local_data = Path(local_data)
 
     tmp_path = tmp_path_factory.mktemp('item-user-data')
     try:
@@ -29,13 +31,12 @@ def item_tmp_dir(tmp_path_factory):
         make_database_dirs(tmp_path, False)
 
         # Override configuration for the test suite
-        paths = {
+        init_paths(**{
             'log': tmp_path,
             'model': tmp_path,
-            'model raw': join(local_data, 'model', 'raw'),
-            'model database': join(local_data, 'model', 'database'),
-            }
-        init_paths(**paths)
+            'model raw': local_data / 'model' / 'raw',
+            'model database': local_data / 'model' / 'database',
+            })
 
         # For use by test functions
         yield tmp_path
