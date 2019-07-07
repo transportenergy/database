@@ -1,4 +1,5 @@
 item_config.yaml
 *.egg-info
+.pytest_cache
 .Rproj.user
 doc/_build

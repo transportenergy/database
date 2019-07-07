@@ -6,4 +6,6 @@
 .cache
 .coverage
 __pycache__
+build
+dist
 item.sqlite
