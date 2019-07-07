@@ -1,13 +1,12 @@
 from os.path import join
 import shutil
-import tempfile
 
 import pytest
 
 
 # From xarray
 @pytest.fixture(scope='session')
-def item_tmp_dir():
+def item_tmp_dir(tmp_path):
     """Create a temporary iTEM directory with the structure:
 
     <path>
@@ -24,22 +23,21 @@ def item_tmp_dir():
     if local_data is None:
         pytest.skip('needs full database (give --local-data)')
 
-    tmp_dir = tempfile.mkdtemp()
     try:
         # Create the directories
-        make_database_dirs(tmp_dir, False)
+        make_database_dirs(tmp_path, False)
 
         # Override configuration for the test suite
         paths = {
-            'log': tmp_dir,
-            'model': tmp_dir,
+            'log': tmp_path,
+            'model': tmp_path,
             'model raw': join(local_data, 'model', 'raw'),
             'model database': join(local_data, 'model', 'database'),
             }
         init_paths(**paths)
 
         # For use by test functions
-        yield tmp_dir
+        yield tmp_path
     finally:
         # Remove the whole tree
-        shutil.rmtree(tmp_dir)
+        shutil.rmtree(tmp_path)
