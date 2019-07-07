@@ -1,8 +1,6 @@
 # N.B. this file configures Travis to test *both* the Python and R item codes.
-# This line:
-language: python
-# …invokes the Travis setup for Python. The Travis setup for R is patched into
-# the file below, with reference to:
+#
+# References:
 # - The Travis documentation: https://docs.travis-ci.com/
 # - Example .travis.yml for a popular R package:
 #   https://github.com/tidyverse/ggplot2/blob/master/.travis.yml
@@ -11,7 +9,9 @@ language: python
 #     lib/travis/build/script/r.rb
 #   - Example output: https://travis-ci.org/tidyverse/ggplot2/jobs/232365761
 
-dist: trusty
+dist: xenial
+
+language: r
 
 cache:
   directories:
@@ -19,52 +19,9 @@ cache:
     - $HOME/R/Library
 
 python:
-  - 3.5
+  - 3.7
 
-env:
-  global:
-    - TRAVIS_R_VERSION=3.4.0
-    - R_LIBS_USER=~/R/Library
-    - R_LIBS_SITE=/usr/local/lib/R/site-library:/usr/lib/R/site-library
-    - R_PROFILE=~/.Rprofile.site
-
-addons:
-  apt:
-    sources:
-      - sourceline: 'ppa:marutter/rrutter'
-      - sourceline: 'ppa:marutter/c2d4u'
-      - sourceline: 'deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)/'
-        key_url: 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xE084DAB9'
-    packages:
-      # default Travis package set for R
-      - build-essential
-      - gcc
-      - g++
-      - gfortran
-      - libblas-dev
-      - liblapack-dev
-      - libncurses5-dev
-      - libreadline-dev
-      - libjpeg-dev
-      - libpng-dev
-      - zlib1g-dev
-      - libbz2-dev
-      - liblzma-dev
-      - cdbs
-      - qpdf
-      - texinfo
-      - libmagick++-dev
-      - libssh2-1-dev
-      # R development tools
-      - r-cran-devtools
-
-before_install:
-  - curl -fLo /tmp/R-3.4.0-$(lsb_release -cs).xz https://s3.amazonaws.com/rstudio-travis/R-3.4.0-$(lsb_release -cs).xz
-  - tar xJf /tmp/R-3.4.0-$(lsb_release -cs).xz -C ~
-  - export PATH=$HOME/R-bin/bin:$PATH
-  - export LD_LIBRARY_PATH=$HOME/R-bin/lib:$LD_LIBRARY_PATH
-  - rm /tmp/R-3.4.0-$(lsb_release -cs).xz
-  - echo 'options(repos = c(CRAN = "https://cloud.r-project.org"))' > ~/.Rprofile.site
+r: release
 
 install:
   - Rscript -e 'withr::with_libpaths(Sys.getenv("R_LIBS_USER"), devtools::install_deps("R/item"))'
