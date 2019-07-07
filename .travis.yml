@@ -31,7 +31,11 @@ addons:
 
 before_install:
   # - Rscript -e "install.packages('devtools', lib='$R_LIBS_USER')"
-  - pip3 install --upgrade pip
+  - which -a pip
+  - which -a pip3
+  - pip3 install --verbose --upgrade pip
+  - which -a pip
+  - which -a pip3
 
 install:
   - pip3 install python/
