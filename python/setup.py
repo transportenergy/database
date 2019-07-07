@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
 
+
 MAJOR = 0
 MINOR = 1
 MICRO = 0
@@ -63,4 +64,5 @@ setup(name=DISTNAME,
       extras_require=EXTRAS_REQUIRE,
       url=URL,
       packages=find_packages(),
-      package_data={'item': ['../data/*']})
+      include_package_data=True,
+      )
