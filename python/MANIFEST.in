@@ -1,1 +1,1 @@
-graft ../data
+recursive-include item/data *.yaml
