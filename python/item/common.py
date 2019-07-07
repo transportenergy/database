@@ -1,6 +1,6 @@
 import logging
 from os import makedirs
-from os.path import abspath, expanduser, join
+from os.path import abspath, join
 from pathlib import Path
 from warnings import filterwarnings
 
