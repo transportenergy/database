@@ -71,11 +71,19 @@ setup(name=DISTNAME,
       classifiers=CLASSIFIERS,
       description=DESCRIPTION,
       long_description=LONG_DESCRIPTION,
+      url=URL,
+
       install_requires=INSTALL_REQUIRES,
       tests_require=TESTS_REQUIRE,
       extras_require=EXTRAS_REQUIRE,
-      url=URL,
+
       packages=find_packages(),
       # package_data={'item': list_files('item', 'data')},
       include_package_data=True,
+
+      entry_points={
+        'console_scripts': [
+            'item = item.cli:main',
+        ]
+      },
       )
