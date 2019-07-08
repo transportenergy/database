@@ -76,5 +76,6 @@ setup(name=DISTNAME,
       extras_require=EXTRAS_REQUIRE,
       url=URL,
       packages=find_packages(),
-      package_data={'item': list_files('item', 'data')},
+      # package_data={'item': list_files('item', 'data')},
+      include_package_data=True,
       )
