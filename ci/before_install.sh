@@ -9,3 +9,6 @@ maybe_download () {
 }
 
 maybe_download $CONDAURL $CONDAFNAME
+
+# Remove the package if it has been cached
+pip uninstall item
