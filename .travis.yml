@@ -42,8 +42,6 @@ install:
 - Rscript -e "devtools::install('R/item', dep = T)"
 
 script:
-- which -a pytest
-- pytest --help
 - pytest --pyargs item --cov=item --cov-report=term-missing
 - R CMD build R/item
 - R CMD check R/item
