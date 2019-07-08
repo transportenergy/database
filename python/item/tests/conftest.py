@@ -5,17 +5,15 @@ import pytest
 
 
 def pytest_addoption(parser):
-    parser.addoption('--run-slow', action='store_true', default=False,
-                     help='run slow tests')
-    parser.addoption('--local-data',
+    parser.addoption('--local-data', action='store', default=None,
                      help='path to local data for testing')
-    parser.addoption('--stats-server', default=None,
+    parser.addoption('--stats-server', action='store', default=None,
                      help='address of statistics server')
 
 
 # From xarray
 @pytest.fixture(scope='session')
-def item_tmp_dir(tmp_path_factory):
+def item_tmp_dir(tmp_path_factory, pytestconfig):
     """Create a temporary iTEM directory with the structure:
 
     <path>
@@ -27,12 +25,7 @@ def item_tmp_dir(tmp_path_factory):
     """
     from item.common import init_paths, make_database_dirs
 
-    local_data = pytest.config.getoption('--local-data')
-
-    if local_data is None:
-        pytest.skip('needs full database (give --local-data)')
-    else:
-        local_data = Path(local_data)
+    local_data = Path(pytestconfig.getoption('--local-data', skip=True))
 
     tmp_path = tmp_path_factory.mktemp('item-user-data')
     try:
