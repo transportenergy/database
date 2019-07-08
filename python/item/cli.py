@@ -87,6 +87,3 @@ def template():
 
 main.add_command(model)
 main.add_command(stats)
-
-
-main()  # pragma: no cover
