@@ -4,7 +4,8 @@ Title: R tools for accessing & maintaining the iTEM databases
 Description: R tools for accessing & maintaining the iTEM databases.
 License: GPL-3
 Author: c(
-    person("Paul Natsuo", "Kishimoto", email = "mail@paul.kishimoto.name", role = c("aut", "cre")),
+    person("Paul Natsuo", "Kishimoto", email = "mail@paul.kishimoto.name",
+           role = c("aut", "cre")),
     person("Page", "Kyle", email = "pkyle@pnnl.gov", role = "aut")
     )
 Maintainer: Paul Natsuo Kishimoto <mail@paul.kishimoto.name>
@@ -15,6 +16,7 @@ Imports:
     assertthat (>= 0.1),
     data.table (>= 1.10.4),
     dplyr (>= 0.5.0),
+    ggplot2,
     magrittr (>= 1.5),
     optparse,
     R.utils,

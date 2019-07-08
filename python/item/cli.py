@@ -1,29 +1,4 @@
-"""Command-line interface for the iTEM databases.
-
-This tool takes configuration options in one of two ways:
-
-1. From a file named item_config.yaml in the current directory. For
-instance, to override the path to the raw model data, put the
-following in item_config.yaml:
-
-\b
-    path:
-      'model raw': ../custom/data/location
-
-2. From command-line options. For instance, give the following:
-
-       $ ./run --path model_raw ../custom/data/location COMMAND
-
-Underscores are converted to spaces automatically.
-
-In a Python script, the following is equivalent:
-
-\b
-    import item
-    item.init_paths(model_raw='../custom/data/location')
-    …
-
-"""
+"""Command-line interface for the iTEM databases."""
 from textwrap import indent
 
 import click
@@ -45,6 +20,33 @@ def main(paths):
     paths = {k.replace('_', ' '): v for (k, v) in paths}
 
     init_paths(**paths)
+
+
+@main.command()
+def help():
+    """Show extended help for the command-line tool."""
+    print(__doc__, end='\n\n')
+    print("""This tool takes configuration options in one of two ways:
+
+1. From a file named item_config.yaml in the current directory. For
+   instance, to override the path to the raw model data, put the
+   following in item_config.yaml:
+
+   path:
+     'model raw': ../custom/data/location
+
+2. From command-line options. For instance, give the following:
+
+   $ ./run --path model_raw ../custom/data/location COMMAND
+
+Underscores are converted to spaces automatically.
+
+In a Python script, the following is equivalent:
+
+    import item
+    item.init_paths(model_raw='../custom/data/location')
+    …
+""")
 
 
 @main.command()
@@ -82,11 +84,9 @@ def mkdirs(path, dry_run):
 
 @main.command()
 def template():
+    """Generate the MIP3 submission template."""
     make_template()
 
 
 main.add_command(model)
 main.add_command(stats)
-
-
-main()  # pragma: no cover

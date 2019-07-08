@@ -336,8 +336,8 @@ def make_template(verbose=True):
               sep='\n\n')
 
     # Save in multiple formats
-    specs.to_csv('template.csv', index=False)
-    specs.to_excel('template.xlsx', index=False)
+    specs.to_csv(paths['output'] / 'template.csv', index=False)
+    specs.to_excel(paths['output'] / 'template.xlsx', index=False)
 
     # Save the index
     index = {'Full dimensionality': specs_full, 'Template (reduced)': specs}
@@ -345,5 +345,5 @@ def make_template(verbose=True):
               .drop(columns=common_dims + list(map(str.title, common_dims)),
                     axis=1, level=1) \
               .replace('', '---')
-    index.to_csv('index.csv')
-    index.to_excel('index.xlsx')
+    index.to_csv(paths['output'] / 'index.csv')
+    index.to_excel(paths['output'] / 'index.xlsx')

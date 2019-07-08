@@ -1,0 +1,56 @@
+# N.B. this file configures Travis to test *both* the Python and R item codes.
+#
+# References:
+# - The Travis documentation: https://docs.travis-ci.com/
+# - Example .travis.yml for a popular R package:
+#   https://github.com/tidyverse/ggplot2/blob/master/.travis.yml
+# - The community-developed R support for Travis:
+#   - https://github.com/travis-ci/travis-build , in particular the file:
+#     lib/travis/build/script/r.rb
+#   - Example output: https://travis-ci.org/tidyverse/ggplot2/jobs/232365761
+
+dist: xenial
+
+language: r
+
+cache:
+  directories:
+  - $HOME/.cache/item
+  - $HOME/.cache/pip
+  - $HOME/.conda/pkgs
+  - $HOME/R/Library
+
+r: release
+
+# NB see ci/install.sh; this is a no-op
+r_binary_packages:
+- devtools
+
+env:
+  global:
+  - CACHE=$HOME/.cache/item
+  - CONDAFNAME=Miniconda3-latest-Linux-x86_64.sh
+  - CONDAURL=https://repo.anaconda.com/miniconda/$CONDAFNAME
+  - PATH=$HOME/miniconda/bin:$PATH
+
+before_install:
+- source ci/before_install.sh
+
+install:
+- source ci/install.sh
+- pip install python/.[doc,eppa,hist,tests] --progress-bar off
+- Rscript -e "devtools::install('R/item', dep = T)"
+
+script:
+- which -a pytest
+- pytest --help
+- pytest --pyargs item --cov=item --cov-report=term-missing
+- R CMD build R/item
+- R CMD check R/item
+
+after_success:
+- coverage combine
+- codecov
+
+notifications:
+  email: false

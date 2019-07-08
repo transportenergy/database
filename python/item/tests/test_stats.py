@@ -6,8 +6,8 @@ from item.stats import OpenKAPSARC
 
 
 @pytest.fixture(scope='module')
-def ok():
-    return OpenKAPSARC(pytest.config.getoption('--stats-server'))
+def ok(pytestconfig):
+    yield OpenKAPSARC(pytestconfig.getoption('--stats-server', skip=True))
 
 
 def test_datarepo(ok):
