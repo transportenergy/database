@@ -1,8 +1,8 @@
 $CACHE/$CONDAFNAME -b -u -p $HOME/miniconda
 conda info --all
-which -a p
+which -a pip
 
-pip install -r ci/requirements.txt
+pip install --requirement ci/requirements.txt --progress-bar off
 
 # Remove the package if it has been cached
 pip uninstall item
