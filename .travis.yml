@@ -17,6 +17,7 @@ cache:
   directories:
   - $HOME/.cache/item
   - $HOME/.cache/pip
+  - $HOME/.conda/pkgs
   - $HOME/R/Library
 
 r: release
