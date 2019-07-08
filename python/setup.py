@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+from os import walk
+from pathlib import Path
+
 from setuptools import setup, find_packages
 
 
@@ -52,6 +55,14 @@ LONG_DESCRIPTION = """
 
 """
 
+
+def list_files(*parts):
+    paths = []
+    for dirpath, _, filenames in walk(Path(*parts)):
+        paths.extend(dirpath / filename for filename in filenames)
+    return paths
+
+
 setup(name=DISTNAME,
       version=VERSION,
       author=AUTHOR,
@@ -64,5 +75,6 @@ setup(name=DISTNAME,
       extras_require=EXTRAS_REQUIRE,
       url=URL,
       packages=find_packages(),
+      package_data={'item': list_files('item', 'data')},
       include_package_data=True,
       )
