@@ -38,6 +38,7 @@ def item_tmp_dir(tmp_path_factory, pytestconfig):
             'model': tmp_path,
             'model raw': local_data / 'model' / 'raw',
             'model database': local_data / 'model' / 'database',
+            'output': tmp_path / 'output',
             })
 
         # For use by test functions

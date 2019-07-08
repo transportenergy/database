@@ -82,6 +82,7 @@ def mkdirs(path, dry_run):
 
 @main.command()
 def template():
+    """Generate the MIP3 submission template."""
     make_template()
 
 
