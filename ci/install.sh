@@ -7,9 +7,6 @@ pip install --requirement ci/requirements.txt --progress-bar off
 # Remove the package if it has been cached
 pip uninstall item
 
-ls -lR python/item
-python python/setup.py --verbose bdist_wheel
-
 # NB must do this here because Travis does not handle 'r_binary_packages' until
 #    *after* the install: script in .travis.yml
 sudo apt-get install -y r-cran-devtools

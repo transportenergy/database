@@ -57,9 +57,10 @@ LONG_DESCRIPTION = """
 
 
 def list_files(*parts):
+    """Walk the path specified by *parts* for package data files."""
     paths = []
-    for dirpath, _, filenames in walk(Path(*parts)):
-        paths.extend(dirpath / filename for filename in filenames)
+    for dirpath, _, filenames in walk(Path(*parts), followlinks=True):
+        paths.extend(Path(dirpath) / filename for filename in filenames)
     return paths
 
 
@@ -76,5 +77,4 @@ setup(name=DISTNAME,
       url=URL,
       packages=find_packages(),
       package_data={'item': list_files('item', 'data')},
-      include_package_data=True,
       )
