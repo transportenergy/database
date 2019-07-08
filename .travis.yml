@@ -38,8 +38,7 @@ before_install:
 
 install:
 - source ci/install.sh
-- ls -lr /home/travis/miniconda/lib/python3.7/site-packages/item
-- pip install python/.[doc,eppa,hist,tests] --progress-bar off
+- pip install python/.[doc,eppa,hist,tests] --progress-bar off --verbose
 - ls -lr /home/travis/miniconda/lib/python3.7/site-packages/item
 - Rscript -e "devtools::install('R/item', dep = T)"
 
