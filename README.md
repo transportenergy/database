@@ -1,6 +1,7 @@
 Tools for the iTEM databases
 ============================
 [![Build Status](https://travis-ci.org/transportenergy/database.svg?branch=master)](https://travis-ci.org/transportenergy/database)
+![Codecov](https://img.shields.io/codecov/c/gh/transportenergy/database.svg)
 
 [iTEM](https://transportenergy.org) maintains two databases:
 
