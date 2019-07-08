@@ -1,0 +1,1 @@
+recursive-include item/data *.yaml

@@ -1,13 +1,19 @@
-from os.path import join
+from pathlib import Path
 import shutil
-import tempfile
 
 import pytest
 
 
+def pytest_addoption(parser):
+    parser.addoption('--local-data', action='store', default=None,
+                     help='path to local data for testing')
+    parser.addoption('--stats-server', action='store', default=None,
+                     help='address of statistics server')
+
+
 # From xarray
 @pytest.fixture(scope='session')
-def item_tmp_dir():
+def item_tmp_dir(tmp_path_factory, pytestconfig):
     """Create a temporary iTEM directory with the structure:
 
     <path>
@@ -19,27 +25,23 @@ def item_tmp_dir():
     """
     from item.common import init_paths, make_database_dirs
 
-    local_data = pytest.config.getoption('--local-data')
+    local_data = Path(pytestconfig.getoption('--local-data', skip=True))
 
-    if local_data is None:
-        pytest.skip('needs full database (give --local-data)')
-
-    tmp_dir = tempfile.mkdtemp()
+    tmp_path = tmp_path_factory.mktemp('item-user-data')
     try:
         # Create the directories
-        make_database_dirs(tmp_dir, False)
+        make_database_dirs(tmp_path, False)
 
         # Override configuration for the test suite
-        paths = {
-            'log': tmp_dir,
-            'model': tmp_dir,
-            'model raw': join(local_data, 'model', 'raw'),
-            'model database': join(local_data, 'model', 'database'),
-            }
-        init_paths(**paths)
+        init_paths(**{
+            'log': tmp_path,
+            'model': tmp_path,
+            'model raw': local_data / 'model' / 'raw',
+            'model database': local_data / 'model' / 'database',
+            })
 
         # For use by test functions
-        yield tmp_dir
+        yield tmp_path
     finally:
         # Remove the whole tree
-        shutil.rmtree(tmp_dir)
+        shutil.rmtree(tmp_path)

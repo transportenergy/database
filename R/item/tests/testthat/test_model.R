@@ -13,6 +13,7 @@ test_paths <- list(`model database`=test_data)
 
 test_that("iTEM1 database has expected # of rows", {
   skip_on_cran()
+  skip_on_ci()
 
   init_paths(test_paths)
 

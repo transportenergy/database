@@ -1,4 +1,7 @@
 item_config.yaml
 *.egg-info
+.coverage
+.pytest_cache
 .Rproj.user
 doc/_build
+R/*.Rcheck

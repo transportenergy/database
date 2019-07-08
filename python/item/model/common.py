@@ -126,7 +126,7 @@ def load():
     global SCENARIOS
 
     with open(join(paths['data'], 'model', 'models.yaml')) as f:
-        MODELS = yaml.load(f)
+        MODELS = yaml.load(f, Loader=yaml.SafeLoader)
 
     # Load scenario information
     scenarios = []
@@ -134,7 +134,7 @@ def load():
         fn = join(paths['data'], 'model', model, 'scenarios.yaml')
         try:
             with open(fn) as f:
-                m_s = yaml.load(f)
+                m_s = yaml.load(f, Loader=yaml.SafeLoader)
         except FileNotFoundError:
             continue
 

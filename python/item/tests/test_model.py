@@ -11,18 +11,12 @@ from item.model import (
     )
 
 
-slow = pytest.mark.skipif(
-    not pytest.config.getoption('--run-slow'),
-    reason='need --run-slow option to run',
-    )
-
-
 item1_size = 928541
 item2_size = 1994943
 
 
 @pytest.fixture(scope='session')
-def item1_data():
+def item1_data(item_tmp_dir):
     yield load_model_data(1)
 
 
@@ -33,15 +27,15 @@ def test_process_raw(item_tmp_dir, model):
     assert exists(join(paths['model processed'], '2', '%s.csv' % model))
 
 
-@slow
+@pytest.mark.slow
 @pytest.mark.parametrize('model', ['eppa5'])
 def test_process_raw_slow(item_tmp_dir, model):
     process_raw(2, [model])
     assert exists(join(paths['model processed'], '2', '%s.csv' % model))
 
 
-@slow
-def test_item1_dataframe():
+@pytest.mark.slow
+def test_item1_dataframe(item_tmp_dir):
     # As a pd.DataFrame
     data = load_model_data(1, skip_cache=True)
     assert len(data) == item1_size
@@ -56,16 +50,16 @@ def test_item1_dataframe():
     assert data.notnull().sum() == 875589  # Omits intensity_new
 
 
-@slow
-def test_item2():
+@pytest.mark.slow
+def test_item2(item_tmp_dir):
     # As a pd.DataFrame
     data = load_model_data(2, skip_cache=True)
     assert len(data) == item2_size
 
 
-@slow
+@pytest.mark.slow
 @pytest.mark.xfail(reason='causes a MemoryError')
-def test_item2_xr():
+def test_item2_xr(item_tmp_dir):
     # As a dict() of xr.DataArray
     data = load_model_data(2, fmt=xr.DataArray)
     size = sum([d.notnull().sum() for d in data.values()])
