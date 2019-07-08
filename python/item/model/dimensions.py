@@ -59,7 +59,7 @@ def load():
     path = join(paths['data'], 'model', 'dimensions')
     for k in ['variable', 'mode', 'technology', 'fuel', 'match']:
         with open(join(path, '{}.yaml'.format(k))) as f:
-            data[k] = yaml.load(f)
+            data[k] = yaml.load(f, Loader=yaml.SafeLoader)
     variable, mode, tech, fuel, match = data.values()
 
     # Sets of modes, for convenience
