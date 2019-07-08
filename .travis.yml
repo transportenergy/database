@@ -38,12 +38,11 @@ before_install:
 
 install:
 - source ci/install.sh
-- pip install python/.[doc,eppa,hist,tests] --progress-bar off --verbose
-- ls -lr /home/travis/miniconda/lib/python3.7/site-packages/item
+- pip install python/.[doc,eppa,hist,tests] --progress-bar off
 - Rscript -e "devtools::install('R/item', dep = T)"
 
 script:
-- py.test python/item --cov=item --cov-report term-missing
+- py.test --pyargs item --cov=item --cov-report term-missing
 - R CMD build R/item
 - R CMD check R/item
 
