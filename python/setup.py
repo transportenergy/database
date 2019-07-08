@@ -27,6 +27,7 @@ CLASSIFIERS = [
 
 INSTALL_REQUIRES = [
     'click >= 0.6',
+    'openpyxl',
     'pandas >= 0.20',
     'pint >= 0.8',
     'plotnine >= 0.1',
