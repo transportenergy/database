@@ -90,7 +90,7 @@ def read_hierarchy(root, klass=Concept):
         # Store the _name, _description, etc.
         for k, v in contents.items():
             if k.startswith('_'):
-                 setattr(c, k.lstrip('_'), v)
+                setattr(c, k.lstrip('_'), v)
 
         # Default name:
         if c.name is None:
@@ -137,7 +137,8 @@ def add_unit(key, measure):
 def read_concepts(path):
     """Read dimensions from file."""
     with open(path) as f:
-        concepts = read_hierarchy(yaml.load(f), ConceptScheme)
+        concepts = read_hierarchy(yaml.load(f, Loader=yaml.FullLoader),
+                                  ConceptScheme)
 
     # Add common dimensions
     concepts.extend(common_dim_dummies())
@@ -151,7 +152,8 @@ def read_measures(path):
     measures = ConceptScheme(id='measure')
 
     with open(path) as f:
-        measures.children = read_hierarchy(yaml.load(f), Measure)
+        measures.children = read_hierarchy(yaml.load(f, Loader=yaml.FullLoader),
+                                           Measure)
 
     return measures
 
@@ -179,7 +181,7 @@ def make_template(verbose=True):
 
     # Read specification of the template
     with open(join(paths['data'], 'spec.yaml')) as f:
-        specs = yaml.load(f)
+        specs = yaml.load(f, Loader=yaml.FullLoader)
 
     # Filters to reduce the set of Keys; see below at 'Filter Keys'
     exclude_global = []
