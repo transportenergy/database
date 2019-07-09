@@ -5,10 +5,20 @@ path:
   # Location of the model database
   model: ../../data/model
 
+  # Location of the historical database
+  historical: ../../data/historical
+
   # Location for cached data
   cache: ../../data/cache
 
   # Location for the item.log file containing logs from the tools
   # log: .
+
+
+# Key for the OpenKAPSARC API.
+# - Register an account at https://datasource.kapsarc.org/signup/
+# - Create a key at https://datasource.kapsarc.org/account/api-keys/
+api_key: a1b2c3d4e5a1b2c3d4e5a1b2c3d4e5a1b2c3d4e5a1b2c3d4e5a1b2c3
+
 
 # No other configuration options are currently recognized
