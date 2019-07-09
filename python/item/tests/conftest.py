@@ -7,8 +7,8 @@ import pytest
 def pytest_addoption(parser):
     parser.addoption('--local-data', action='store', default=None,
                      help='path to local data for testing')
-    parser.addoption('--stats-server', action='store', default=None,
-                     help='address of statistics server')
+    parser.addoption('--server', action='store', default=None,
+                     help='address of historical data server')
 
 
 # From xarray

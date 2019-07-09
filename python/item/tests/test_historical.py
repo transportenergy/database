@@ -2,12 +2,12 @@ import pandas as pd
 import pytest
 from requests import HTTPError
 
-from item.stats import OpenKAPSARC
+from item.historical import OpenKAPSARC
 
 
 @pytest.fixture(scope='module')
 def ok(pytestconfig):
-    yield OpenKAPSARC(pytestconfig.getoption('--stats-server', skip=True))
+    yield OpenKAPSARC(pytestconfig.getoption('--server', skip=True))
 
 
 def test_datarepo(ok):

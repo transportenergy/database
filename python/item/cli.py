@@ -4,7 +4,7 @@ from textwrap import indent
 import click
 
 from item.model.__main__ import model
-from item.stats.__main__ import stats
+from item.historical.__main__ import historical
 from item.utils import make_template
 
 
@@ -89,4 +89,4 @@ def template():
 
 
 main.add_command(model)
-main.add_command(stats)
+main.add_command(historical)
