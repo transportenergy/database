@@ -63,12 +63,12 @@ class OpenKAPSARC:
     # sets hosted by the software provider used by KAPSARC
     source = 'catalog'
 
-    def __init__(self, server=None):
-        if server:
-            self.server = server
+    def __init__(self, server=None, api_key=None):
+        self.server = server or self.server
+        self.api_key = api_key or config.get('api_key', None)
 
     def _modify_params(self, params):
-        params.setdefault('apikey', config['api_key'])
+        params.setdefault('apikey', self.api_key)
 
     def endpoint(self, name, *args, params={}, **kwargs):
         """Call the API endpoint *name* with any additional *args*."""

@@ -1,3 +1,5 @@
+import os
+
 import pandas as pd
 import pytest
 
@@ -6,7 +8,7 @@ from item.openkapsarc import OpenKAPSARC
 
 @pytest.fixture(scope='module')
 def ok():
-    yield OpenKAPSARC()
+    yield OpenKAPSARC(api_key=os.environ.get('OK_API_KEY', None))
 
 
 def test_datasets(ok):

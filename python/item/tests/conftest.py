@@ -8,20 +8,11 @@ import pytest
 def pytest_addoption(parser):
     parser.addoption('--local-data', action='store', default=None,
                      help='path to local data for testing')
-    parser.addoption('--server', action='store', default=None,
-                     help='address of historical data server')
-
-
-def pytest_sessionstart(session):
-    from item.common import config
-    config['api_key'] = os.environ.get('OK_API_KEY', '')
-    print('pytest_sessionstart', len(config['api_key']))
 
 
 def pytest_report_header(config, startdir):
-    from item.common import config
-    msg = 'OpenKAPSARC API key:'
-    msg += 'present' if len(config['api_key']) else 'MISSING'
+    msg = 'OpenKAPSARC API key: '
+    msg += 'present' if 'OK_API_KEY' in os.environ else 'MISSING'
     return msg
 
 
