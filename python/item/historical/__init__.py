@@ -1,3 +1,4 @@
+from io import StringIO, TextIOWrapper
 from json import JSONDecodeError
 import logging
 import sys
@@ -5,6 +6,9 @@ import sys
 import pandas as pd
 import requests
 import requests_cache
+
+
+from ..common import config, paths
 
 
 log = logging.getLogger(__name__)
@@ -25,94 +29,124 @@ class APIError(Exception):
     pass
 
 
+class Dataset:
+    def __init__(self, data):
+        self.data = data
+
+    @property
+    def id(self):
+        return self.data['dataset']['dataset_id']
+
+    @property
+    def uid(self):
+        return self.data['dataset']['dataset_uid']
+
+    def __str__(self):
+        return f"<Dataset {self.uid}: '{self.id}'>"
+
+
 class OpenKAPSARC:
-    """Wrapper for the OpenKAPSARC APIs.
+    """Wrapper for the OpenKAPSARC data API.
+
+    See https://datasource.kapsarc.org/api/v2/console
 
     Parameters
     ----------
-    server : str
+    server : str, optional
         Address of the server, e.g. `http://example.com:8888`.
 
     """
     ALL = sys.maxsize
+    max = {'rows': 100}
+    server = 'https://datasource.kapsarc.org/api/v2'
 
-    def __init__(self, server):
-        self.server = server
+    # Alternate values include 'opendatasoft', which includes all public data
+    # sets hosted by the software provider used by KAPSARC
+    source = 'catalog'
 
-    def endpoint(self, name, *args, params={}):
+    def __init__(self, server=None):
+        if server:
+            self.server = server
+
+    def _modify_params(self, params):
+        params.setdefault('apikey', config['api_key'])
+
+    def endpoint(self, name, *args, params={}, **kwargs):
         """Call the API endpoint *name* with any additional *args*."""
         # Construct the URL
-        r = requests.get(self.server + '/'.join(['', name] + list(args)),
-                         params=params)
+        self._modify_params(params)
+        args = list(filter(None, args))
+        url_parts = [self.server, self.source, name] + args
+        r = requests.get('/'.join(url_parts), params=params, **kwargs)
         log.info(r.url)
 
         r.raise_for_status()
 
-        # All responses are in JSON
-        try:
-            return r.json()
-        except JSONDecodeErrors:
-            log.error(r.content)
-            raise
+        if 'application/json' in r.headers['content-type']:
+            # Response in JSON
+            try:
+                return r.json()
+            except JSONDecodeErrors:
+                log.error(r.content)
+                raise
+        else:
+            log.debug(r.headers['content-type'])
+            return r
 
-    def datarepo(self, name=None):
-        """Return information about one or all data repositories.
+    # _auto_endpoint = [
+    #     'datasets'
+    # ]
+    #
+    # def __getattr__(self, name):
+    #     if name in self._auto_endpoint:
+    #         return partial(self.endpoint, name)
+    #     else:
+    #         raise AttributeError(name)
 
-        If *name* is None (the default), information on all repos is returned.
-        """
-        return self.endpoint('datarepo' if name else 'datarepos',
-                             *filter(None, [name]))
+    def datasets(self, dataset_id=None, *args, params={}, kw=None, **kwargs):
+        if kw:
+            if 'where' in params:
+                raise ValueError("either give kw= or params={'where': …}")
+            params['where'] = f"keyword LIKE '{kw}'"
 
-    def table(self, repo, name, rows=None, offset=None):
-        """Return data from table *name* in *repo*.
+        params.setdefault('rows', self.max['rows'])
+
+        result = self.endpoint('datasets', dataset_id, *args, params=params,
+                               **kwargs)
+
+        if dataset_id:
+            return Dataset(result)
+        else:
+            total_count = result['total_count']
+            log.info('{} results; retrieved {}'
+                     .format(total_count, len(result['datasets'])))
+
+            return [Dataset(ds_json) for ds_json in result['datasets']]
+
+    def table(self, dataset_id, cache=True, **kwargs):
+        """Return data from dataset *name*.
 
         Currently only the latest data on the master branch is returned.
-
-        Parameters
-        ----------
-        rows : int, optional
-            Number of rows to return. OpenKAPSARC returns 20 rows if this
-            parameter is unspecified.
-        offset : int, optional
-            Number of rows to skip from the beginning of the table.
 
         Returns
         -------
         :class:`pandas.DataFrame`
 
         """
-        params = {}
-        if rows:
-            params['_limit'] = int(rows)
-        if offset:
-            params['_offset'] = int(offset)
+        # Make another request to get dataset information
+        ds = self.datasets(dataset_id)
 
-        response = self.endpoint('dataset', repo, 'master', name,
-                                 params=params)
+        cache_path = (paths['historical'] / ds.uid).with_suffix('.csv')
+        log.info(f'Caching in {cache_path}')
 
-        # Parse table schema
-        schema = response.pop('tschema')
+        # Stream data
+        kwargs['stream'] = True
+        args = ['datasets', dataset_id, 'exports', 'csv']
+        with self.endpoint(*args, **kwargs) as response:
+            # Write content to file
+            with open(cache_path, 'wb') as cache:
+                for chunk in response.iter_content():
+                    cache.write(chunk)
 
-        # Store column information according to the 'colorder' key
-        columns = {}
-        for col_info in schema.pop('columns'):
-
-            if col_info['name'] == 'uhash':
-                # FIXME the tschema includes information about a 'uhash'
-                # column, but the data include only a '_id' column for each
-                # row.
-                col_info['name'] = '_id'
-
-            columns[col_info.pop('colorder')] = col_info
-
-        # Prepare a pd.Index for the data using the 'name' key
-        col_index = pd.Index(col_info['name'] for _, col_info in
-                             sorted(columns.items()))
-
-        # Convert data to a pandas DataFrame
-        data = pd.DataFrame(response.pop('data')) \
-                 .reindex(columns=col_index)
-
-        assert len(response) == 0
-
-        return(data)
+        # Parse and return
+        return pd.read_csv(cache_path, sep=';')

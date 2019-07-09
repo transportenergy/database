@@ -8,23 +8,21 @@ historical = Group('historical', help="Manipulate the historical database.")
 
 
 @historical.command()
-@click.argument('server')
+@click.argument('server', default=None, required=False)
 def demo(server):
     """Access the KAPSARC APIs at the given SERVER."""
     ok = OpenKAPSARC(server)
 
-    print('List of all repositories:')
-    for repo in ok.datarepo():
-        print(repo['name'], ':', repo['id'])
+    print('List of all datasets:')
+    for ds in ok.datasets():
+        print(ds)
 
-    # very verbose
-    print('\n\nInformation on one repository:')
-    print(ok.datarepo('ik2_open_data'))
+    print("\n\nDatasets with the 'iTEM' keyword:")
+    for ds in ok.datasets(kw='item'):
+        print(ds)
 
     print('\n\nData from one table in a branch in a repository:')
-    print(ok.table('ik2_open_data', 'modal_split_of_freight_transport'))
-    print(ok.table('ik2_open_data', 'modal_split_of_freight_transport', 10))
-    print(ok.table('ik2_open_data', 'modal_split_of_freight_transport', 30))
+    print(ok.table('modal-split-of-freight-transport'))
 
 
 @historical.command()
