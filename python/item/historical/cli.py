@@ -28,9 +28,11 @@ def demo(server):
 @historical.command()
 @click.argument('output_file', type=click.Path(dir_okay=False, writable=True),
                 default='IK2_Open_Data_conv_phase1.csv')
-def phase1(output_file):
+@click.option('--use-cache/--no-cache', is_flag=True, default=True,
+              help='Use cached files (no network traffic).')
+def phase1(output_file, use_cache):
     """Convert raw data to have consistent columns and units.
 
     OUTPUT_FILE defaults to 'IK2_Open_Data_conv_phase1.csv'.
     """
-    _phase1(output_file)
+    _phase1(output_file, use_cache)

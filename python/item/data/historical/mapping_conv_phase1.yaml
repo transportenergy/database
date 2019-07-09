@@ -1,24 +1,15 @@
-# Structure of mapping rules in the conversion layer 1
+# Rules for transforming raw/primary/input data from OpenKAPSARC datahub
 #
-# How to use: Load this file as a dictionary to convert raw data sets into the
-# standard version towards the iTEM3 template.
+# See the documentation of item.historical.conversion_layer1 for the meaning
+# of the keys in each entry.
 #
-# Dictionary 1:
-#    Raw_columns_mapping is used to convert the raw data set's columns into the
-#    standard one and specify the missing columns:
-#       ["Model", "Scenario", "Region", "Variable", "Unit", "Mode",
-#        "Technology", "Fuel", "Year", "Value"]
-# Dictionary 2:
-#   add is used to add the missing columns with assigned
-#   values based on the data set's content
-# Dictionary 3:
-#   replace is used to convert raw columns values to the
-#   template ones, e.g., Electrical energy->Electricity
-#   replace contains basic mapping rules only to keep most
-#   the raw data set's taxonomy
-# Dictionary 4:
-#   note is used to describe the raw data set to provide more information for
-#   further processing
+# Additional keys:
+# - 'id': corresponds to the identity string of the data set in the OpenKAPSARC
+#   datahub.
+# - 'uid': corresponds to the unique identifier of the data set in the
+#   OpenKAPSARC datahub.
+# - 'note': additional description of the raw data set as a reference for
+#   further processing.
 
 - id: electricity-consumption-by-industry-transport-activities-and-householdsservices-
   uid: da_lqeg3z
@@ -33,8 +24,9 @@
       Final Energy Consumption - Other Sectors: Other
       Final Energy Consumption - Transport: Transport
     Unit:
-      MAPPING:
-        Gigawatt-hour: PJ / yr
+      Gigawatt-hour: gigawatt hour
+  preferred_units:
+  - PJ
   rename:
     date: Year
     geo_name: Region
@@ -54,8 +46,9 @@
     Mode:
       Final Energy Consumption: Transport
     Unit:
-      MAPPING:
-        Thousand TOE (tonnes of oil equivalent): PJ / yr
+      Thousand TOE (tonnes of oil equivalent): 10³ TOE
+  preferred_units:
+  - PJ / yr
   rename:
     date: Year
     geo_name: Region
@@ -86,20 +79,17 @@
       Road freight transport on own account: "10⁶ tonne-km / yr"
       Total inland freight transport: "10⁶ tonne-km / yr"
     Variable: Activity
-  replace:
-    Unit:
-      _depend: Mode
-      MAPPING:
-        '10³ tonne / yr': '10⁹ tonne / yr'
-        '10⁶ tonne-km / yr': '10⁹ tonne-km / yr'
-        TEU: TEU
+  preferred_units:
+  - 10⁹ tonne / yr
+  - 10⁹ tonne km / yr
+  - TEU
   rename:
     country_name: Region
     date: Year
     value: Value
     variable_name: Mode
   note:
-    Activity: >
+    Activity: >-
       Variables collected are inland transport of goods (T-km), of passengers
       (P-km) and road injury accidents. Additional information is also gathered
       on containers transported by rail and sea (Tons and TEU) as well as short
@@ -110,17 +100,15 @@
   add:
     Fuel: '-'
     Technology: Total
-    Unit: Number
+    Unit: vehicle
     Variable: Stock
-  replace:
-    Unit:
-      MAPPING:
-        Number: "10⁶ vehicle"
+  preferred_units:
+  - 10⁶ vehicle
   rename:
-    country: Region
+    country_name: Region
     date: Year
     value: Value
-    vehicle Category: Mode
+    vehicle_category_name: Mode
   note:
     Stock: Goods road vehicle fleet at 31 December by vehicle category and permissible
       maximum gross weight group
@@ -135,9 +123,11 @@
     Mode:
       Total transport: Freight Rail
     Unit:
-      MAPPING:
-        Million TKM (tonne-kilometre): "10⁹ tonne-km / yr"
-        Thousand tonnes: "10⁹ tonne / yr"
+      Million TKM (tonne-kilometre): 10⁹ tonne km
+      Thousand tonnes: 10³ tonne
+  preferred_units:
+  - 10⁹ tonne km
+  - 10⁹ tonne
   rename:
     date: Year
     geo_name: Region
@@ -157,9 +147,11 @@
     Mode:
       Inland waterways: Freight Inland Water
       Railways: Freight Rail
-      Railways, inland waterways - sum of available data: >
+      Railways, inland waterways - sum of available data: >-
         Railways, inland waterways - sum of available data
       Roads: Freight Road
+    Unit:
+      Percentage: ''
   rename:
     date: Year
     geo_name: Region
@@ -180,6 +172,8 @@
       Motor coaches, buses and trolley buses: Motor coaches, buses and trolley buses
       Passenger cars: Passenger cars
       Trains: Trains
+    Unit:
+      Percentage: ''
   rename:
     date: Year
     geo_name: Region
@@ -194,12 +188,10 @@
   add:
     Fuel: '-'
     Technology: Total
-    Unit: Number
+    Unit: vehicle
     Variable: Sales (new vehicles)
-  replace:
-    Unit:
-      MAPPING:
-        Number: "10⁶ vehicle / yr"
+  preferred_units:
+  - 10⁶ vehicle
   rename:
     country: Region
     date: Year
@@ -213,7 +205,7 @@
   add:
     Mode: Passenger Road
     Technology: Total
-    Unit: Number
+    Unit: vehicle
     Variable: Sales (new vehicles)
   replace:
     Fuel:
@@ -228,9 +220,8 @@
       'Petrol of Which:': Gasoline
       Total: All
       Up to 1399cc: Up to 1399cc
-    Unit:
-      MAPPING:
-        Number: "10⁶ vehicle / yr"
+  preferred_units:
+  - 10⁶ vehicle
   rename:
     country_name: Region
     date: Year
@@ -243,12 +234,10 @@
   uid: da_cr1356
   add:
     Fuel: '-'
-    Unit: Number
+    Unit: vehicle
     Variable: Sales (new vehicles)
-  replace:
-    Unit:
-      MAPPING:
-        Number: "10⁶ vehicle / yr"
+  preferred_units:
+  - 10⁶ vehicle
   rename:
     country_name: Region
     date: Year
@@ -272,9 +261,11 @@
       Passenger cars: Passenger Road
       Trams: Trams
     Unit:
-      MAPPING:
-        absolute value: "10⁶ vehicle"
-        per 1000 inhabitants: "10⁶ vehicle / k inhabitants"
+      absolute value: vehicle
+      per 1000 inhabitants: 0.001 vehicle / person
+  preferred_units:
+  - 10⁶ vehicle
+  - 0.001 vehicle / person
   rename:
     country_name: Region
     date: Year
@@ -289,20 +280,19 @@
   add:
     Fuel: '-'
     Technology: Total
-    Unit: 10⁶ passenger-km / yr
+    Unit: 10⁶ passenger km / yr
     Variable: Activity
   replace:
     Mode:
       Rail passenger transport: Passenger Rail
       Road passenger transport: Road passenger transport
-      Road passenger transport by buses and coaches: >
+      Road passenger transport by buses and coaches: >-
         Road passenger transport by buses and coaches
-      Road passenger transport by passenger cars: >
+      Road passenger transport by passenger cars: >-
         Road passenger transport by passenger cars
       Total inland passenger transport: Total inland passenger transport
-    Unit:
-      MAPPING:
-        "10⁶ passenger-km / yr": "10⁹ passenger-km / yr"
+  preferred_units:
+  - 10⁹ passenger km / yr
   rename:
     country_name: Region
     date: Year
@@ -321,8 +311,9 @@
     Mode:
       Total transport: Passenger Rail
     Unit:
-      MAPPING:
-        Millions of passenger-kilometres: "10⁹ passenger-km / yr"
+      Millions of passenger-kilometres: 10⁶ person km
+  preferred_units:
+  - 10⁹ person km
   rename:
     date: Year
     geo_name: Region
@@ -336,7 +327,7 @@
   uid: da_hc6nbq
   add:
     Technology: Total
-    Unit: Number
+    Unit: vehicle
     Variable: Stock
   replace:
     Fuel:
@@ -345,9 +336,8 @@
       Electricity: Electricity
       Petrol: Gasoline
       Total: Total
-    Unit:
-      MAPPING:
-        Number: "10⁶ vehicle"
+  preferred_units:
+  - 10⁶ vehicle
   rename:
     country_name: Region
     date: Year
@@ -355,7 +345,7 @@
     type_of_vehicle_name: Mode
     value: Value
   note:
-    Activity: >
+    Activity: >-
       Road vehicle fleet at 31 December by vehicle category and fuel type.
 
 - id: volume-of-passenger-transport-relative-to-gdp
@@ -370,8 +360,11 @@
     geo_name: Region
     measure_name: Unit
     value: Value
+  replace:
+    Unit:
+      Index, 2005=100: idx_2005_100
   note:
-    All Passenger: >
+    All Passenger: >-
       This indicator is defined as the ratio between the volume of inland
       passenger transport measured in passenger kilometres and GDP chain linked
       volumes, at 2005 exchange rates. It includes transport on national
