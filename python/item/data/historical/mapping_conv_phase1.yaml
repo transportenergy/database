@@ -36,7 +36,7 @@
       DEPEND: None
       MAPPING:
         Gigawatt-hour: PJ / yr
-  Raw_columns_mapping:
+  rename:
     date: Year
     geo_name: Region
     indic_nrg_name: Mode
@@ -58,7 +58,7 @@
       DEPEND: None
       MAPPING:
         Thousand TOE (tonnes of oil equivalent): PJ / yr
-  Raw_columns_mapping:
+  rename:
     date: Year
     geo_name: Region
     indic_nrg_name: Mode
@@ -97,7 +97,7 @@
         "10\xB3 tonne / yr": "10\u2079 tonne / yr"
         "10\u2076 tonne-km / yr": "10\u2079 tonne-km / yr"
         TEU: TEU
-  Raw_columns_mapping:
+  rename:
     country_name: Region
     date: Year
     value: Value
@@ -122,7 +122,7 @@
       DEPEND: None
       MAPPING:
         Number: "10\u2076 vehicle"
-  Raw_columns_mapping:
+  rename:
     country: Region
     date: Year
     value: Value
@@ -145,7 +145,7 @@
       MAPPING:
         Million TKM (tonne-kilometre): "10\u2079 tonne-km / yr"
         Thousand tonnes: "10\u2079 tonne / yr"
-  Raw_columns_mapping:
+  rename:
     date: Year
     geo_name: Region
     measure_name: Unit
@@ -167,7 +167,7 @@
       Railways, inland waterways - sum of available data: Railways, inland waterways
         - sum of available data
       Roads: Freight Road
-  Raw_columns_mapping:
+  rename:
     date: Year
     geo_name: Region
     measure_name: Unit
@@ -187,7 +187,7 @@
       Motor coaches, buses and trolley buses: Motor coaches, buses and trolley buses
       Passenger cars: Passenger cars
       Trains: Trains
-  Raw_columns_mapping:
+  rename:
     date: Year
     geo_name: Region
     measure_name: Unit
@@ -210,7 +210,7 @@
       DEPEND: None
       MAPPING:
         Number: "10\u2076 vehicle / yr"
-  Raw_columns_mapping:
+  rename:
     country: Region
     date: Year
     value: Value
@@ -244,7 +244,7 @@
       DEPEND: None
       MAPPING:
         Number: "10\u2076 vehicle / yr"
-  Raw_columns_mapping:
+  rename:
     country_name: Region
     date: Year
     fuel_type_name: Fuel
@@ -265,7 +265,7 @@
       DEPEND: None
       MAPPING:
         Number: "10\u2076 vehicle / yr"
-  Raw_columns_mapping:
+  rename:
     country_name: Region
     date: Year
     fuel_type_name: Technology
@@ -292,7 +292,7 @@
       MAPPING:
         absolute value: "10\u2076 vehicle"
         per 1000 inhabitants: "10\u2076 vehicle / k inhabitants"
-  Raw_columns_mapping:
+  rename:
     country_name: Region
     date: Year
     measurement_name: Unit
@@ -323,7 +323,7 @@
       DEPEND: None
       MAPPING:
         "10\u2076 passenger-km / yr": "10\u2079 passenger-km / yr"
-  Raw_columns_mapping:
+  rename:
     country_name: Region
     date: Year
     value: Value
@@ -344,7 +344,7 @@
       DEPEND: None
       MAPPING:
         Millions of passenger-kilometres: "10\u2079 passenger-km / yr"
-  Raw_columns_mapping:
+  rename:
     date: Year
     geo_name: Region
     measure_name: Unit
@@ -372,7 +372,7 @@
       DEPEND: None
       MAPPING:
         Number: "10\u2076 vehicle"
-  Raw_columns_mapping:
+  rename:
     country_name: Region
     date: Year
     fuel_type_name: Fuel
@@ -389,7 +389,7 @@
     Technology: Total
     Variable: All Passenger / GDP
   Other_columns_var_mapping: {}
-  Raw_columns_mapping:
+  rename:
     date: Year
     geo_name: Region
     measure_name: Unit

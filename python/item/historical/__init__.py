@@ -53,7 +53,7 @@ def conversion_layer1(df, top_dict):
     #  from mapping_conv_phase1.yaml
 
     # Rename existing columns that to match the template
-    col_dict = top_dict['Raw_columns_mapping']
+    col_dict = top_dict['rename']
     df = df.loc[:, [x for x in col_dict]]
     df.rename(columns=col_dict, inplace=True)
 
