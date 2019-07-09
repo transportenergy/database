@@ -1,6 +1,3 @@
-import os
-from pathlib import Path
-
 import pandas as pd
 import yaml
 
@@ -29,14 +26,10 @@ def unit_conversion(unitA, unitB):
 
 
 # For adding Unit column with defined one by the raw data set
-def add_unit_conversion(row, info):
-    if info["DEPEND"] == "None":
-        value = info["MAPPING"]
-    else:
-        depended_field = info["DEPEND"]
-        v = row[depended_field]
-        value = info["MAPPING"][v]
-    return value
+def map_units(row, info):
+    depended_field = info['_depend']
+    depended_value = row[depended_field]
+    return info[depended_value]
 
 
 # For converting Unit from raw to standard
@@ -58,9 +51,9 @@ def conversion_layer1(df, top_dict):
     df.rename(columns=col_dict, inplace=True)
 
     # Add columns that are not included and mapping with pre-defined rules
-    for col, value in top_dict['Added_columns_var_mapping'].items():
-        if col == 'Unit':
-            df[col] = df.apply(add_unit_conversion, axis=1, args=(value,))
+    for col, value in top_dict['add'].items():
+        if col == 'Unit' and '_depend' in value:
+            df[col] = df.apply(map_units, axis=1, args=(value,))
         else:
             df[col] = value
 
@@ -78,7 +71,7 @@ def conversion_layer1(df, top_dict):
     return df
 
 
-def main(output_file):
+def main(output_file, use_cache=True):
     # Get the configuration
     config_path = paths['data'] / 'historical' / 'mapping_conv_phase1.yaml'
     top_most_dict_yaml = yaml.safe_load(open(config_path))
@@ -89,7 +82,12 @@ def main(output_file):
     list_of_df = []
 
     for ds_info in top_most_dict_yaml:
-        df = ok.table(ds_info['id'])
+        if use_cache:
+            cache_path = (paths['historical'] /
+                          ds_info['uid']).with_suffix('.csv')
+            df = pd.read_csv(cache_path, sep=';')
+        else:
+            df = ok.table(ds_info['id'])
 
         df = conversion_layer1(df, ds_info)
         df['Source'] = f"OpenKAPSARC/{ds_info['uid']}"
