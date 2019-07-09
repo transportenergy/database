@@ -57,7 +57,7 @@ def conversion_layer1(df, top_dict):
         else:
             df[col] = value
 
-    for field, info in top_dict.get('Other_columns_var_mapping', {}).items():
+    for field, info in top_dict.get('replace', {}).items():
         # Name conversion for some columns to keep as consistent as possible
         # while keeping the raw data set's taxonomy
         if field == 'Unit':

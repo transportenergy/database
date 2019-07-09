@@ -12,9 +12,9 @@
 #   add is used to add the missing columns with assigned
 #   values based on the data set's content
 # Dictionary 3:
-#   Other_columns_var_mapping is used to convert raw columns values to the
+#   replace is used to convert raw columns values to the
 #   template ones, e.g., Electrical energy->Electricity
-#   Other_columns_var_mapping contains basic mapping rules only to keep most
+#   replace contains basic mapping rules only to keep most
 #   the raw data set's taxonomy
 # Dictionary 4:
 #   note is used to describe the raw data set to provide more information for
@@ -25,7 +25,7 @@
   add:
     Technology: Total
     Variable: Energy
-  Other_columns_var_mapping:
+  replace:
     Fuel:
       Electrical energy: Electricity
     Mode:
@@ -50,7 +50,7 @@
   add:
     Technology: Total
     Variable: Energy
-  Other_columns_var_mapping:
+  replace:
     Mode:
       Final Energy Consumption: Transport
     Unit:
@@ -86,7 +86,7 @@
       Road freight transport on own account: "10⁶ tonne-km / yr"
       Total inland freight transport: "10⁶ tonne-km / yr"
     Variable: Activity
-  Other_columns_var_mapping:
+  replace:
     Unit:
       _depend: Mode
       MAPPING:
@@ -112,7 +112,7 @@
     Technology: Total
     Unit: Number
     Variable: Stock
-  Other_columns_var_mapping:
+  replace:
     Unit:
       MAPPING:
         Number: "10⁶ vehicle"
@@ -131,7 +131,7 @@
     Fuel: '-'
     Technology: Total
     Variable: Activity
-  Other_columns_var_mapping:
+  replace:
     Mode:
       Total transport: Freight Rail
     Unit:
@@ -153,7 +153,7 @@
     Fuel: '-'
     Technology: Total
     Variable: Activity
-  Other_columns_var_mapping:
+  replace:
     Mode:
       Inland waterways: Freight Inland Water
       Railways: Freight Rail
@@ -175,7 +175,7 @@
     Fuel: '-'
     Technology: Total
     Variable: Activity
-  Other_columns_var_mapping:
+  replace:
     Mode:
       Motor coaches, buses and trolley buses: Motor coaches, buses and trolley buses
       Passenger cars: Passenger cars
@@ -196,7 +196,7 @@
     Technology: Total
     Unit: Number
     Variable: Sales (new vehicles)
-  Other_columns_var_mapping:
+  replace:
     Unit:
       MAPPING:
         Number: "10⁶ vehicle / yr"
@@ -215,7 +215,7 @@
     Technology: Total
     Unit: Number
     Variable: Sales (new vehicles)
-  Other_columns_var_mapping:
+  replace:
     Fuel:
       1400cc 1999cc: 1400cc 1999cc
       2000cc and more: 2000cc and more
@@ -245,7 +245,7 @@
     Fuel: '-'
     Unit: Number
     Variable: Sales (new vehicles)
-  Other_columns_var_mapping:
+  replace:
     Unit:
       MAPPING:
         Number: "10⁶ vehicle / yr"
@@ -264,7 +264,7 @@
     Fuel: '-'
     Technology: Total
     Variable: Stock
-  Other_columns_var_mapping:
+  replace:
     Mode:
       Mopeds: Mopeds
       Motor coaches, buses and trolley bus: Motor coaches, buses and trolley bus
@@ -291,7 +291,7 @@
     Technology: Total
     Unit: 10⁶ passenger-km / yr
     Variable: Activity
-  Other_columns_var_mapping:
+  replace:
     Mode:
       Rail passenger transport: Passenger Rail
       Road passenger transport: Road passenger transport
@@ -317,7 +317,7 @@
     Fuel: '-'
     Technology: Total
     Variable: Activity
-  Other_columns_var_mapping:
+  replace:
     Mode:
       Total transport: Passenger Rail
     Unit:
@@ -338,7 +338,7 @@
     Technology: Total
     Unit: Number
     Variable: Stock
-  Other_columns_var_mapping:
+  replace:
     Fuel:
       Alternative (total): Alternative (total)
       Diesel: Diesel
