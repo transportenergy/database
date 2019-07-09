@@ -1,152 +1,100 @@
-from io import StringIO, TextIOWrapper
-from json import JSONDecodeError
-import logging
-import sys
+import os
+from pathlib import Path
 
 import pandas as pd
-import requests
-import requests_cache
+import yaml
+
+from ..common import paths
 
 
-from ..common import config, paths
+# Define the function used for converting a unit from raw to standard in iTEM3
+# template
+def unit_conversion(unitA, unitB):
+    # Convert unitA to unitB
+    if (unitA, unitB) == ("Gigawatt-hour", 'PJ / yr'):
+        func = lambda x: x * 0.0036
+    if (unitA, unitB) == ("Thousand TOE (tonnes of oil equivalent)",'PJ / yr'):
+        func = lambda x: x * 0.0419
+    if unitA == unitB:
+        func = lambda x: x
+    if ((unitA, unitB) == ('10⁶ tonne-km / yr', "10⁹ tonne-km / yr")) | ((unitA, unitB) == ('Million TKM (tonne-kilometre)',"10⁹ tonne-km / yr")) \
+        | ((unitA, unitB) == ("10⁶ passenger-km / yr", "10⁹ passenger-km / yr")) | ((unitA, unitB) == ("Millions of passenger-kilometres","10⁹ passenger-km / yr")):
+        func = lambda x: x / 1000
+    if ((unitA, unitB) == ("10³ tonne / yr", "10⁹ tonne / yr")) | ((unitA, unitB) == ("Number", "10⁶ vehicle / yr"))  \
+        | ((unitA, unitB) == ('Thousand tonnes', "10⁹ tonne / yr")) | ((unitA, unitB) == ("Number", "10⁶ vehicle")) \
+        | ((unitA, unitB) == ("absolute value", "10⁶ vehicle")) | ((unitA, unitB) == ("per 1000 inhabitants","10⁶ vehicle / k inhabitants")):
+        func = lambda x: x / 10**6
+    return func
 
 
-log = logging.getLogger(__name__)
-log.setLevel(logging.INFO)
-log.addHandler(logging.StreamHandler(sys.stdout))
-
-requests_cache.install_cache('item')
-
-try:
-    import simplejson
-    JSONDecodeErrors = (JSONDecodeError, simplejson.JSONDecodeError)
-except ImportError:
-    JSONDecodeErrors = (JSONDecodeError,)
+# For adding Unit column with defined one by the raw data set
+def add_unit_conversion(row, info):
+    if info["DEPEND"] == "None":
+        value = info["MAPPING"]
+    else:
+        depended_field = info["DEPEND"]
+        v = row[depended_field]
+        value = info["MAPPING"][v]
+    return value
 
 
-class APIError(Exception):
-    """Error message returned by OpenKAPSARC."""
-    pass
+# For converting Unit from raw to standard
+def value_conversion(row, info):
+    func = unit_conversion(row["Unit"], info["MAPPING"][row["Unit"]])
+    return func(row["Value"])
 
 
-class Dataset:
-    def __init__(self, data):
-        self.data = data
+# Function of conversion phase 1
+def conversion_layer1(df, top_dict):
+    # Input:
+    #  df - raw data set loaded from IK2 Open Data
+    #  top_dict - raw-data-set-dependent dictionary with mapping rules loaded
+    #  from mapping_conv_phase1.yaml
 
-    @property
-    def id(self):
-        return self.data['dataset']['dataset_id']
+    # Rename existing columns that to match the template
+    col_dict = top_dict['Raw_columns_mapping']
+    df = df.loc[:, [x for x in col_dict]]
+    df.rename(columns=col_dict, inplace=True)
 
-    @property
-    def uid(self):
-        return self.data['dataset']['dataset_uid']
-
-    def __str__(self):
-        return f"<Dataset {self.uid}: '{self.id}'>"
-
-
-class OpenKAPSARC:
-    """Wrapper for the OpenKAPSARC data API.
-
-    See https://datasource.kapsarc.org/api/v2/console
-
-    Parameters
-    ----------
-    server : str, optional
-        Address of the server, e.g. `http://example.com:8888`.
-
-    """
-    ALL = sys.maxsize
-    max = {'rows': 100}
-    server = 'https://datasource.kapsarc.org/api/v2'
-
-    # Alternate values include 'opendatasoft', which includes all public data
-    # sets hosted by the software provider used by KAPSARC
-    source = 'catalog'
-
-    def __init__(self, server=None):
-        if server:
-            self.server = server
-
-    def _modify_params(self, params):
-        params.setdefault('apikey', config['api_key'])
-
-    def endpoint(self, name, *args, params={}, **kwargs):
-        """Call the API endpoint *name* with any additional *args*."""
-        # Construct the URL
-        self._modify_params(params)
-        args = list(filter(None, args))
-        url_parts = [self.server, self.source, name] + args
-        r = requests.get('/'.join(url_parts), params=params, **kwargs)
-        log.info(r.url)
-
-        r.raise_for_status()
-
-        if 'application/json' in r.headers['content-type']:
-            # Response in JSON
-            try:
-                return r.json()
-            except JSONDecodeErrors:
-                log.error(r.content)
-                raise
+    # Add columns that are not included and mapping with pre-defined rules
+    for col, value in top_dict['Added_columns_var_mapping'].items():
+        if col == 'Unit':
+            df[col] = df.apply(add_unit_conversion, axis=1, args=(value,))
         else:
-            log.debug(r.headers['content-type'])
-            return r
+            df[col] = value
 
-    # _auto_endpoint = [
-    #     'datasets'
-    # ]
-    #
-    # def __getattr__(self, name):
-    #     if name in self._auto_endpoint:
-    #         return partial(self.endpoint, name)
-    #     else:
-    #         raise AttributeError(name)
+    for field, info in top_dict.get('Other_columns_var_mapping', {}).items():
+        # Name conversion for some columns to keep as consistent as possible
+        # while keeping the raw data set's taxonomy
+        if field == 'Unit':
+            # Unit conversion if necessary
+            df['Value'] = df.apply(value_conversion, axis=1, args=(info,))
 
-    def datasets(self, dataset_id=None, *args, params={}, kw=None, **kwargs):
-        if kw:
-            if 'where' in params:
-                raise ValueError("either give kw= or params={'where': …}")
-            params['where'] = f"keyword LIKE '{kw}'"
-
-        params.setdefault('rows', self.max['rows'])
-
-        result = self.endpoint('datasets', dataset_id, *args, params=params,
-                               **kwargs)
-
-        if dataset_id:
-            return Dataset(result)
+            df[field] = df[field].apply(lambda x: info["MAPPING"][x])
         else:
-            total_count = result['total_count']
-            log.info('{} results; retrieved {}'
-                     .format(total_count, len(result['datasets'])))
+            df[field] = df[field].apply(lambda x: info[x])
 
-            return [Dataset(ds_json) for ds_json in result['datasets']]
+    return df
 
-    def table(self, dataset_id, cache=True, **kwargs):
-        """Return data from dataset *name*.
 
-        Currently only the latest data on the master branch is returned.
+def main(input_dir, output_file):
+    dataList = os.listdir(input_dir)
+    dataList = [x for x in dataList if x[-4:] == ".csv"]
 
-        Returns
-        -------
-        :class:`pandas.DataFrame`
+    config_path = paths['data'] / 'historical' / 'mapping_conv_phase1.yaml'
 
-        """
-        # Make another request to get dataset information
-        ds = self.datasets(dataset_id)
+    top_most_dict_yaml = yaml.safe_load(open(config_path))
+    list_of_df = []
 
-        cache_path = (paths['historical'] / ds.uid).with_suffix('.csv')
-        log.info(f'Caching in {cache_path}')
+    for file in top_most_dict_yaml:
+        df = pd.read_csv(Path(input_dir) / file, sep=";")
+        top_dict = top_most_dict_yaml[file]  # Mapping rules for dataset
+        df = conversion_layer1(df, top_dict)
+        df["Source"] = file
+        list_of_df.append(df)
 
-        # Stream data
-        kwargs['stream'] = True
-        args = ['datasets', dataset_id, 'exports', 'csv']
-        with self.endpoint(*args, **kwargs) as response:
-            # Write content to file
-            with open(cache_path, 'wb') as cache:
-                for chunk in response.iter_content():
-                    cache.write(chunk)
+    df_output = pd.concat(list_of_df, sort=False, ignore_index=True)
+    df_output = df_output[["Region", "Variable", "Unit", "Mode", "Technology",
+                           "Fuel", "Year", "Value", "Source"]]
 
-        # Parse and return
-        return pd.read_csv(cache_path, sep=';')
+    df_output.to_csv(output_file, index=False)

@@ -4,7 +4,7 @@ from textwrap import indent
 import click
 
 from item.model.__main__ import model
-from item.historical.__main__ import historical
+from item.historical.cli import historical
 from item.utils import make_template
 
 

@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from item.historical import OpenKAPSARC
+from item.openkapsarc import OpenKAPSARC
 
 
 @pytest.fixture(scope='module')

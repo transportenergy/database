@@ -1,8 +1,8 @@
 import click
 from click import Group
 
-from . import OpenKAPSARC
-from .utils import main as _phase1
+from ..openkapsarc import OpenKAPSARC
+from . import main as _phase1
 
 historical = Group('historical', help="Manipulate the historical database.")
 
