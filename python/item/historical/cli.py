@@ -26,14 +26,11 @@ def demo(server):
 
 
 @historical.command()
-@click.argument('input_dir', type=click.Path(exists=True, file_okay=False),
-                default='IK2_Open_Data')
 @click.argument('output_file', type=click.Path(dir_okay=False, writable=True),
                 default='IK2_Open_Data_conv_phase1.csv')
-def phase1(input_dir, output_file):
+def phase1(output_file):
     """Convert raw data to have consistent columns and units.
 
-    INPUT_DIR defaults to 'IK2_Open_Data'.
     OUTPUT_FILE defaults to 'IK2_Open_Data_conv_phase1.csv'.
     """
-    _phase1(input_dir, output_file)
+    _phase1(output_file)

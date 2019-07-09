@@ -20,7 +20,8 @@
 #   note is used to describe the raw data set to provide more information for
 #   further processing
 
-electricity-consumption-by-industry-transport-activities-and-householdsservices-.csv:
+- id: electricity-consumption-by-industry-transport-activities-and-householdsservices-
+  uid: da_lqeg3z
   Added_columns_var_mapping:
     Technology: Total
     Variable: Energy
@@ -36,16 +37,17 @@ electricity-consumption-by-industry-transport-activities-and-householdsservices-
       MAPPING:
         Gigawatt-hour: PJ / yr
   Raw_columns_mapping:
-    Date: Year
-    Geo: Region
-    Indic_nrg: Mode
-    Measure: Unit
-    Product: Fuel
-    Value: Value
+    date: Year
+    geo_name: Region
+    indic_nrg_name: Mode
+    measure_name: Unit
+    product_name: Fuel
+    value: Value
   note:
     Energy: Final energy consumption
 
-final-energy-consumption-by-product.csv:
+- id: final-energy-consumption-by-product
+  uid: da_giy2uk
   Added_columns_var_mapping:
     Technology: Total
     Variable: Energy
@@ -57,16 +59,17 @@ final-energy-consumption-by-product.csv:
       MAPPING:
         Thousand TOE (tonnes of oil equivalent): PJ / yr
   Raw_columns_mapping:
-    Date: Year
-    Geo: Region
-    Indic nrg: Mode
-    Measure: Unit
-    Product: Fuel
-    Value: Value
+    date: Year
+    geo_name: Region
+    indic_nrg_name: Mode
+    measure_name: Unit
+    product_name: Fuel
+    value: Value
   note:
     Energy: Final energy consumption
 
-freight-transport.csv:
+- id: freight-transport
+  uid: da_n6d84u
   Added_columns_var_mapping:
     Fuel: '-'
     Technology: Total
@@ -95,17 +98,18 @@ freight-transport.csv:
         "10\u2076 tonne-km / yr": "10\u2079 tonne-km / yr"
         TEU: TEU
   Raw_columns_mapping:
-    Country: Region
-    Date: Year
-    Value: Value
-    Variable: Mode
+    country_name: Region
+    date: Year
+    value: Value
+    variable_name: Mode
   note:
     Activity: Variables collected are inland transport of goods (T-km), of passengers
       (P-km) and road injury accidents. Additional information is also gathered on
       containers transported by rail and sea (Tons and TEU) as well as short sea shipping
       data (T-km).
 
-goods-road-vehicle-fleet-by-vehicle-category-and-permissible-maximum-gross-weigh.csv:
+- id: goods-road-vehicle-fleet-by-vehicle-category-and-permissible-maximum-gross-weigh
+  uid: da_3ai3kc
   Added_columns_var_mapping:
     Fuel: '-'
     Technology: Total
@@ -119,15 +123,16 @@ goods-road-vehicle-fleet-by-vehicle-category-and-permissible-maximum-gross-weigh
       MAPPING:
         Number: "10\u2076 vehicle"
   Raw_columns_mapping:
-    Country: Region
-    Date: Year
-    Value: Value
-    Vehicle Category: Mode
+    country: Region
+    date: Year
+    value: Value
+    vehicle Category: Mode
   note:
     Stock: Goods road vehicle fleet at 31 December by vehicle category and permissible
       maximum gross weight group
 
-goods-transport-by-rail.csv:
+- id: goods-transport-by-rail
+  uid: da_2dp3ba
   Added_columns_var_mapping:
     Fuel: '-'
     Technology: Total
@@ -141,15 +146,16 @@ goods-transport-by-rail.csv:
         Million TKM (tonne-kilometre): "10\u2079 tonne-km / yr"
         Thousand tonnes: "10\u2079 tonne / yr"
   Raw_columns_mapping:
-    Date: Year
-    Geo: Region
-    Measure: Unit
-    Tra Cov: Mode
-    Value: Value
+    date: Year
+    geo_name: Region
+    measure_name: Unit
+    tra_cov_name: Mode
+    value: Value
   note:
     Activity: Goods Transport by Rail
 
-modal-split-of-freight-transport.csv:
+- id: modal-split-of-freight-transport
+  uid: da_vwdkmz
   Added_columns_var_mapping:
     Fuel: '-'
     Technology: Total
@@ -162,15 +168,16 @@ modal-split-of-freight-transport.csv:
         - sum of available data
       Roads: Freight Road
   Raw_columns_mapping:
-    Date: Year
-    Geo: Region
-    Measure: Unit
-    Tra Mode: Mode
-    Value: Value
+    date: Year
+    geo_name: Region
+    measure_name: Unit
+    tra_mode_name: Mode
+    value: Value
   note:
     Activity: Goods Transport Mode split based on tonne-km / yr.
 
-modal-split-of-passenger-transport.csv:
+- id: modal-split-of-passenger-transport
+  uid: da_dmggue
   Added_columns_var_mapping:
     Fuel: '-'
     Technology: Total
@@ -181,15 +188,16 @@ modal-split-of-passenger-transport.csv:
       Passenger cars: Passenger cars
       Trains: Trains
   Raw_columns_mapping:
-    Date: Year
-    Geo: Region
-    Measure: Unit
-    Value: Value
-    Vehicle: Mode
+    date: Year
+    geo_name: Region
+    measure_name: Unit
+    value: Value
+    vehicle_name: Mode
   note:
     Activity: Passenger Transport Mode split based on passenger-km / yr.
 
-new-goods-road-vehicles-registered-by-vehicle-category-and-permissible-maximum-g.csv:
+- id: new-goods-road-vehicles-registered-by-vehicle-category-and-permissible-maximum-g
+  uid: da_thtxzg
   Added_columns_var_mapping:
     Fuel: '-'
     Technology: Total
@@ -203,14 +211,15 @@ new-goods-road-vehicles-registered-by-vehicle-category-and-permissible-maximum-g
       MAPPING:
         Number: "10\u2076 vehicle / yr"
   Raw_columns_mapping:
-    Country: Region
-    Date: Year
-    Value: Value
-    Vehicle category: Mode
+    country: Region
+    date: Year
+    value: Value
+    vehicle category: Mode
   note:
     Activity: New registered goods vehicle / yr.
 
-new-passenger-car-registrations-by-fuel-type.csv:
+- id: new-passenger-car-registrations-by-fuel-type
+  uid: da_d6fwrl
   Added_columns_var_mapping:
     Mode: Passenger Road
     Technology: Total
@@ -236,14 +245,15 @@ new-passenger-car-registrations-by-fuel-type.csv:
       MAPPING:
         Number: "10\u2076 vehicle / yr"
   Raw_columns_mapping:
-    Country: Region
-    Date: Year
-    Fuel type: Fuel
-    Value: Value
+    country_name: Region
+    date: Year
+    fuel_type_name: Fuel
+    value: Value
   note:
     Activity: New registered passenger vehicle / yr.
 
-new-road-vehicle-registrations-by-vehicle-category-and-fuel-type.csv:
+- id: new-road-vehicle-registrations-by-vehicle-category-and-fuel-type
+  uid: da_cr1356
   Added_columns_var_mapping:
     Fuel: '-'
     Unit:
@@ -256,15 +266,16 @@ new-road-vehicle-registrations-by-vehicle-category-and-fuel-type.csv:
       MAPPING:
         Number: "10\u2076 vehicle / yr"
   Raw_columns_mapping:
-    Country: Region
-    Date: Year
-    Fuel type: Technology
-    Type of vehicle: Mode
-    Value: Value
+    country_name: Region
+    date: Year
+    fuel_type_name: Technology
+    type_of_vehicle_name: Mode
+    value: Value
   note:
     Sales: New registered road vehicles / yr.
 
-passenger-road-vehicle-fleet-and-rate-per-thousand-inhabitants-by-vehicle-catego.csv:
+- id: passenger-road-vehicle-fleet-and-rate-per-thousand-inhabitants-by-vehicle-catego
+  uid: da_3gti82
   Added_columns_var_mapping:
     Fuel: '-'
     Technology: Total
@@ -282,15 +293,16 @@ passenger-road-vehicle-fleet-and-rate-per-thousand-inhabitants-by-vehicle-catego
         absolute value: "10\u2076 vehicle"
         per 1000 inhabitants: "10\u2076 vehicle / k inhabitants"
   Raw_columns_mapping:
-    Country: Region
-    Date: Year
-    Measurement: Unit
-    Value: Value
-    Vehicle Category: Mode
+    country_name: Region
+    date: Year
+    measurement_name: Unit
+    value: Value
+    vehicle_category_name: Mode
   note:
     Stock: Passenger vehicles.
 
-passenger-transport.csv:
+- id: passenger-transport
+  uid: da_vmflhb
   Added_columns_var_mapping:
     Fuel: '-'
     Technology: Total
@@ -312,14 +324,15 @@ passenger-transport.csv:
       MAPPING:
         "10\u2076 passenger-km / yr": "10\u2079 passenger-km / yr"
   Raw_columns_mapping:
-    Country: Region
-    Date: Year
-    Value: Value
-    Variable: Mode
+    country_name: Region
+    date: Year
+    value: Value
+    variable_name: Mode
   note:
     Activity: Passenger road.
 
-rail-transport-of-passengers.csv:
+- id: rail-transport-of-passengers
+  uid: da_65zu61
   Added_columns_var_mapping:
     Fuel: '-'
     Technology: Total
@@ -332,15 +345,16 @@ rail-transport-of-passengers.csv:
       MAPPING:
         Millions of passenger-kilometres: "10\u2079 passenger-km / yr"
   Raw_columns_mapping:
-    Date: Year
-    Geo: Region
-    Measure: Unit
-    Tra Cov: Mode
-    Value: Value
+    date: Year
+    geo_name: Region
+    measure_name: Unit
+    tra_cov_name: Mode
+    value: Value
   note:
     Activity: Passenger Rail in total.
 
-road-vehicle-fleet-by-vehicle-category-and-fuel-type.csv:
+- id: road-vehicle-fleet-by-vehicle-category-and-fuel-type
+  uid: da_hc6nbq
   Added_columns_var_mapping:
     Technology: Total
     Unit:
@@ -359,15 +373,16 @@ road-vehicle-fleet-by-vehicle-category-and-fuel-type.csv:
       MAPPING:
         Number: "10\u2076 vehicle"
   Raw_columns_mapping:
-    Country: Region
-    Date: Year
-    Fuel type: Fuel
-    Type of vehicle: Mode
-    Value: Value
+    country_name: Region
+    date: Year
+    fuel_type_name: Fuel
+    type_of_vehicle_name: Mode
+    value: Value
   note:
     Activity: Road vehicle fleet at 31 December by vehicle category and fuel type.
 
-volume-of-passenger-transport-relative-to-gdp.csv:
+- id: volume-of-passenger-transport-relative-to-gdp
+  uid: da_az1b3n
   Added_columns_var_mapping:
     Fuel: '-'
     Mode: All Passenger
@@ -375,10 +390,10 @@ volume-of-passenger-transport-relative-to-gdp.csv:
     Variable: All Passenger / GDP
   Other_columns_var_mapping: {}
   Raw_columns_mapping:
-    Date: Year
-    Geo: Region
-    Measure: Unit
-    Value: Value
+    date: Year
+    geo_name: Region
+    measure_name: Unit
+    value: Value
   note:
     All Passenger: This indicator is defined as the ratio between the volume of inland
       passenger transport measured in passenger kilometres and GDP chain linked volumes,

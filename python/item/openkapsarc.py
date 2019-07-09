@@ -76,8 +76,10 @@ class OpenKAPSARC:
         self._modify_params(params)
         args = list(filter(None, args))
         url_parts = [self.server, self.source, name] + args
+
+        # Make the request
         r = requests.get('/'.join(url_parts), params=params, **kwargs)
-        log.info(r.url)
+        log.debug(r.url)
 
         r.raise_for_status()
 

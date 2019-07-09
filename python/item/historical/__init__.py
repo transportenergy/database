@@ -5,6 +5,7 @@ import pandas as pd
 import yaml
 
 from ..common import paths
+from ..openkapsarc import OpenKAPSARC
 
 
 # Define the function used for converting a unit from raw to standard in iTEM3
@@ -77,20 +78,21 @@ def conversion_layer1(df, top_dict):
     return df
 
 
-def main(input_dir, output_file):
-    dataList = os.listdir(input_dir)
-    dataList = [x for x in dataList if x[-4:] == ".csv"]
-
+def main(output_file):
+    # Get the configuration
     config_path = paths['data'] / 'historical' / 'mapping_conv_phase1.yaml'
-
     top_most_dict_yaml = yaml.safe_load(open(config_path))
+
+    # Access the OpenKAPSARC API
+    ok = OpenKAPSARC()
+
     list_of_df = []
 
-    for file in top_most_dict_yaml:
-        df = pd.read_csv(Path(input_dir) / file, sep=";")
-        top_dict = top_most_dict_yaml[file]  # Mapping rules for dataset
-        df = conversion_layer1(df, top_dict)
-        df["Source"] = file
+    for ds_info in top_most_dict_yaml:
+        df = ok.table(ds_info['id'])
+
+        df = conversion_layer1(df, ds_info)
+        df['Source'] = f"OpenKAPSARC/{ds_info['uid']}"
         list_of_df.append(df)
 
     df_output = pd.concat(list_of_df, sort=False, ignore_index=True)
