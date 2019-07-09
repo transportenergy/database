@@ -1,0 +1,401 @@
+# Structure of mapping rules in the conversion layer 1
+#
+# How to use: Load this file as a dictionary to convert raw data sets into the
+# standard version towards the iTEM3 template.
+#
+# Dictionary 1:
+#    Raw_columns_mapping is used to convert the raw data set's columns into the
+#    standard one and specify the missing columns:
+#       ["Model", "Scenario", "Region", "Variable", "Unit", "Mode",
+#        "Technology", "Fuel", "Year", "Value"]
+# Dictionary 2:
+#   Added_columns_var_mapping is used to add the missing columns with assigned
+#   values based on the data set's content
+# Dictionary 3:
+#   Other_columns_var_mapping is used to convert raw columns values to the
+#   template ones, e.g., Electrical energy->Electricity
+#   Other_columns_var_mapping contains basic mapping rules only to keep most
+#   the raw data set's taxonomy
+# Dictionary 4:
+#   note is used to describe the raw data set to provide more information for
+#   further processing
+
+- id: electricity-consumption-by-industry-transport-activities-and-householdsservices-
+  uid: da_lqeg3z
+  Added_columns_var_mapping:
+    Technology: Total
+    Variable: Energy
+  Other_columns_var_mapping:
+    Fuel:
+      Electrical energy: Electricity
+    Mode:
+      Final Energy Consumption - Industry: Industry
+      Final Energy Consumption - Other Sectors: Other
+      Final Energy Consumption - Transport: Transport
+    Unit:
+      DEPEND: None
+      MAPPING:
+        Gigawatt-hour: PJ / yr
+  rename:
+    date: Year
+    geo_name: Region
+    indic_nrg_name: Mode
+    measure_name: Unit
+    product_name: Fuel
+    value: Value
+  note:
+    Energy: Final energy consumption
+
+- id: final-energy-consumption-by-product
+  uid: da_giy2uk
+  Added_columns_var_mapping:
+    Technology: Total
+    Variable: Energy
+  Other_columns_var_mapping:
+    Mode:
+      Final Energy Consumption: Transport
+    Unit:
+      DEPEND: None
+      MAPPING:
+        Thousand TOE (tonnes of oil equivalent): PJ / yr
+  rename:
+    date: Year
+    geo_name: Region
+    indic_nrg_name: Mode
+    measure_name: Unit
+    product_name: Fuel
+    value: Value
+  note:
+    Energy: Final energy consumption
+
+- id: freight-transport
+  uid: da_n6d84u
+  Added_columns_var_mapping:
+    Fuel: '-'
+    Technology: Total
+    Unit:
+      DEPEND: Mode
+      MAPPING:
+        Coastal shipping (national transport) in million tonne-km: "10\u2076 tonne-km\
+          \ / yr"
+        Inland waterways freight transport: "10\u2076 tonne-km / yr"
+        Maritime containers transport (TEU): TEU
+        Maritime containers transport (weight): "10\xB3 tonne / yr"
+        Pipelines transport: "10\u2076 tonne-km / yr"
+        Rail containers transport (TEU): TEU
+        Rail containers transport (weight): "10\xB3 tonne / yr"
+        Rail freight transport: "10\u2076 tonne-km / yr"
+        Road freight transport: "10\u2076 tonne-km / yr"
+        Road freight transport for hire and reward: "10\u2076 tonne-km / yr"
+        Road freight transport on own account: "10\u2076 tonne-km / yr"
+        Total inland freight transport: "10\u2076 tonne-km / yr"
+    Variable: Activity
+  Other_columns_var_mapping:
+    Unit:
+      DEPEND: Mode
+      MAPPING:
+        "10\xB3 tonne / yr": "10\u2079 tonne / yr"
+        "10\u2076 tonne-km / yr": "10\u2079 tonne-km / yr"
+        TEU: TEU
+  rename:
+    country_name: Region
+    date: Year
+    value: Value
+    variable_name: Mode
+  note:
+    Activity: Variables collected are inland transport of goods (T-km), of passengers
+      (P-km) and road injury accidents. Additional information is also gathered on
+      containers transported by rail and sea (Tons and TEU) as well as short sea shipping
+      data (T-km).
+
+- id: goods-road-vehicle-fleet-by-vehicle-category-and-permissible-maximum-gross-weigh
+  uid: da_3ai3kc
+  Added_columns_var_mapping:
+    Fuel: '-'
+    Technology: Total
+    Unit:
+      DEPEND: None
+      MAPPING: Number
+    Variable: Stock
+  Other_columns_var_mapping:
+    Unit:
+      DEPEND: None
+      MAPPING:
+        Number: "10\u2076 vehicle"
+  rename:
+    country: Region
+    date: Year
+    value: Value
+    vehicle Category: Mode
+  note:
+    Stock: Goods road vehicle fleet at 31 December by vehicle category and permissible
+      maximum gross weight group
+
+- id: goods-transport-by-rail
+  uid: da_2dp3ba
+  Added_columns_var_mapping:
+    Fuel: '-'
+    Technology: Total
+    Variable: Activity
+  Other_columns_var_mapping:
+    Mode:
+      Total transport: Freight Rail
+    Unit:
+      DEPEND: None
+      MAPPING:
+        Million TKM (tonne-kilometre): "10\u2079 tonne-km / yr"
+        Thousand tonnes: "10\u2079 tonne / yr"
+  rename:
+    date: Year
+    geo_name: Region
+    measure_name: Unit
+    tra_cov_name: Mode
+    value: Value
+  note:
+    Activity: Goods Transport by Rail
+
+- id: modal-split-of-freight-transport
+  uid: da_vwdkmz
+  Added_columns_var_mapping:
+    Fuel: '-'
+    Technology: Total
+    Variable: Activity
+  Other_columns_var_mapping:
+    Mode:
+      Inland waterways: Freight Inland Water
+      Railways: Freight Rail
+      Railways, inland waterways - sum of available data: Railways, inland waterways
+        - sum of available data
+      Roads: Freight Road
+  rename:
+    date: Year
+    geo_name: Region
+    measure_name: Unit
+    tra_mode_name: Mode
+    value: Value
+  note:
+    Activity: Goods Transport Mode split based on tonne-km / yr.
+
+- id: modal-split-of-passenger-transport
+  uid: da_dmggue
+  Added_columns_var_mapping:
+    Fuel: '-'
+    Technology: Total
+    Variable: Activity
+  Other_columns_var_mapping:
+    Mode:
+      Motor coaches, buses and trolley buses: Motor coaches, buses and trolley buses
+      Passenger cars: Passenger cars
+      Trains: Trains
+  rename:
+    date: Year
+    geo_name: Region
+    measure_name: Unit
+    value: Value
+    vehicle_name: Mode
+  note:
+    Activity: Passenger Transport Mode split based on passenger-km / yr.
+
+- id: new-goods-road-vehicles-registered-by-vehicle-category-and-permissible-maximum-g
+  uid: da_thtxzg
+  Added_columns_var_mapping:
+    Fuel: '-'
+    Technology: Total
+    Unit:
+      DEPEND: None
+      MAPPING: Number
+    Variable: Sales (new vehicles)
+  Other_columns_var_mapping:
+    Unit:
+      DEPEND: None
+      MAPPING:
+        Number: "10\u2076 vehicle / yr"
+  rename:
+    country: Region
+    date: Year
+    value: Value
+    vehicle category: Mode
+  note:
+    Activity: New registered goods vehicle / yr.
+
+- id: new-passenger-car-registrations-by-fuel-type
+  uid: da_d6fwrl
+  Added_columns_var_mapping:
+    Mode: Passenger Road
+    Technology: Total
+    Unit:
+      DEPEND: None
+      MAPPING: Number
+    Variable: Sales (new vehicles)
+  Other_columns_var_mapping:
+    Fuel:
+      1400cc 1999cc: 1400cc 1999cc
+      2000cc and more: 2000cc and more
+      'Alternative  of Which:': 'Alternative  of Which:'
+      'Diesel of Which:': Diesel
+      Electricity: Electricity
+      LPG: LPG
+      Natural gas: Natural gas
+      Others: Others
+      'Petrol of Which:': Gasoline
+      Total: All
+      Up to 1399cc: Up to 1399cc
+    Unit:
+      DEPEND: None
+      MAPPING:
+        Number: "10\u2076 vehicle / yr"
+  rename:
+    country_name: Region
+    date: Year
+    fuel_type_name: Fuel
+    value: Value
+  note:
+    Activity: New registered passenger vehicle / yr.
+
+- id: new-road-vehicle-registrations-by-vehicle-category-and-fuel-type
+  uid: da_cr1356
+  Added_columns_var_mapping:
+    Fuel: '-'
+    Unit:
+      DEPEND: None
+      MAPPING: Number
+    Variable: Sales (new vehicles)
+  Other_columns_var_mapping:
+    Unit:
+      DEPEND: None
+      MAPPING:
+        Number: "10\u2076 vehicle / yr"
+  rename:
+    country_name: Region
+    date: Year
+    fuel_type_name: Technology
+    type_of_vehicle_name: Mode
+    value: Value
+  note:
+    Sales: New registered road vehicles / yr.
+
+- id: passenger-road-vehicle-fleet-and-rate-per-thousand-inhabitants-by-vehicle-catego
+  uid: da_3gti82
+  Added_columns_var_mapping:
+    Fuel: '-'
+    Technology: Total
+    Variable: Stock
+  Other_columns_var_mapping:
+    Mode:
+      Mopeds: Mopeds
+      Motor coaches, buses and trolley bus: Motor coaches, buses and trolley bus
+      Motorcycles: Motorcycles
+      Passenger cars: Passenger Road
+      Trams: Trams
+    Unit:
+      DEPEND: None
+      MAPPING:
+        absolute value: "10\u2076 vehicle"
+        per 1000 inhabitants: "10\u2076 vehicle / k inhabitants"
+  rename:
+    country_name: Region
+    date: Year
+    measurement_name: Unit
+    value: Value
+    vehicle_category_name: Mode
+  note:
+    Stock: Passenger vehicles.
+
+- id: passenger-transport
+  uid: da_vmflhb
+  Added_columns_var_mapping:
+    Fuel: '-'
+    Technology: Total
+    Unit:
+      DEPEND: None
+      MAPPING: "10\u2076 passenger-km / yr"
+    Variable: Activity
+  Other_columns_var_mapping:
+    Mode:
+      Rail passenger transport: Passenger Rail
+      Road passenger transport: Road passenger transport
+      Road passenger transport by buses and coaches: Road passenger transport by buses
+        and coaches
+      Road passenger transport by passenger cars: Road passenger transport by passenger
+        cars
+      Total inland passenger transport: Total inland passenger transport
+    Unit:
+      DEPEND: None
+      MAPPING:
+        "10\u2076 passenger-km / yr": "10\u2079 passenger-km / yr"
+  rename:
+    country_name: Region
+    date: Year
+    value: Value
+    variable_name: Mode
+  note:
+    Activity: Passenger road.
+
+- id: rail-transport-of-passengers
+  uid: da_65zu61
+  Added_columns_var_mapping:
+    Fuel: '-'
+    Technology: Total
+    Variable: Activity
+  Other_columns_var_mapping:
+    Mode:
+      Total transport: Passenger Rail
+    Unit:
+      DEPEND: None
+      MAPPING:
+        Millions of passenger-kilometres: "10\u2079 passenger-km / yr"
+  rename:
+    date: Year
+    geo_name: Region
+    measure_name: Unit
+    tra_cov_name: Mode
+    value: Value
+  note:
+    Activity: Passenger Rail in total.
+
+- id: road-vehicle-fleet-by-vehicle-category-and-fuel-type
+  uid: da_hc6nbq
+  Added_columns_var_mapping:
+    Technology: Total
+    Unit:
+      DEPEND: None
+      MAPPING: Number
+    Variable: Stock
+  Other_columns_var_mapping:
+    Fuel:
+      Alternative (total): Alternative (total)
+      Diesel: Diesel
+      Electricity: Electricity
+      Petrol: Gasoline
+      Total: Total
+    Unit:
+      DEPEND: None
+      MAPPING:
+        Number: "10\u2076 vehicle"
+  rename:
+    country_name: Region
+    date: Year
+    fuel_type_name: Fuel
+    type_of_vehicle_name: Mode
+    value: Value
+  note:
+    Activity: Road vehicle fleet at 31 December by vehicle category and fuel type.
+
+- id: volume-of-passenger-transport-relative-to-gdp
+  uid: da_az1b3n
+  Added_columns_var_mapping:
+    Fuel: '-'
+    Mode: All Passenger
+    Technology: Total
+    Variable: All Passenger / GDP
+  Other_columns_var_mapping: {}
+  rename:
+    date: Year
+    geo_name: Region
+    measure_name: Unit
+    value: Value
+  note:
+    All Passenger: This indicator is defined as the ratio between the volume of inland
+      passenger transport measured in passenger kilometres and GDP chain linked volumes,
+      at 2005 exchange rates It includes transport on national territory by passenger
+      car, bus and coach, and train.

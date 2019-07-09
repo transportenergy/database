@@ -1,118 +1,102 @@
-from json import JSONDecodeError
-import logging
-import sys
+import os
+from pathlib import Path
 
 import pandas as pd
-import requests
-import requests_cache
+import yaml
+
+from ..common import paths
+from ..openkapsarc import OpenKAPSARC
 
 
-log = logging.getLogger(__name__)
-log.setLevel(logging.INFO)
-log.addHandler(logging.StreamHandler(sys.stdout))
+# Define the function used for converting a unit from raw to standard in iTEM3
+# template
+def unit_conversion(unitA, unitB):
+    # Convert unitA to unitB
+    if (unitA, unitB) == ("Gigawatt-hour", 'PJ / yr'):
+        func = lambda x: x * 0.0036
+    if (unitA, unitB) == ("Thousand TOE (tonnes of oil equivalent)",'PJ / yr'):
+        func = lambda x: x * 0.0419
+    if unitA == unitB:
+        func = lambda x: x
+    if ((unitA, unitB) == ('10⁶ tonne-km / yr', "10⁹ tonne-km / yr")) | ((unitA, unitB) == ('Million TKM (tonne-kilometre)',"10⁹ tonne-km / yr")) \
+        | ((unitA, unitB) == ("10⁶ passenger-km / yr", "10⁹ passenger-km / yr")) | ((unitA, unitB) == ("Millions of passenger-kilometres","10⁹ passenger-km / yr")):
+        func = lambda x: x / 1000
+    if ((unitA, unitB) == ("10³ tonne / yr", "10⁹ tonne / yr")) | ((unitA, unitB) == ("Number", "10⁶ vehicle / yr"))  \
+        | ((unitA, unitB) == ('Thousand tonnes', "10⁹ tonne / yr")) | ((unitA, unitB) == ("Number", "10⁶ vehicle")) \
+        | ((unitA, unitB) == ("absolute value", "10⁶ vehicle")) | ((unitA, unitB) == ("per 1000 inhabitants","10⁶ vehicle / k inhabitants")):
+        func = lambda x: x / 10**6
+    return func
 
-requests_cache.install_cache('item')
 
-try:
-    import simplejson
-    JSONDecodeErrors = (JSONDecodeError, simplejson.JSONDecodeError)
-except ImportError:
-    JSONDecodeErrors = (JSONDecodeError,)
-
-
-class APIError(Exception):
-    """Error message returned by OpenKAPSARC."""
-    pass
+# For adding Unit column with defined one by the raw data set
+def add_unit_conversion(row, info):
+    if info["DEPEND"] == "None":
+        value = info["MAPPING"]
+    else:
+        depended_field = info["DEPEND"]
+        v = row[depended_field]
+        value = info["MAPPING"][v]
+    return value
 
 
-class OpenKAPSARC:
-    """Wrapper for the OpenKAPSARC APIs.
+# For converting Unit from raw to standard
+def value_conversion(row, info):
+    func = unit_conversion(row["Unit"], info["MAPPING"][row["Unit"]])
+    return func(row["Value"])
 
-    Parameters
-    ----------
-    server : str
-        Address of the server, e.g. `http://example.com:8888`.
 
-    """
-    ALL = sys.maxsize
+# Function of conversion phase 1
+def conversion_layer1(df, top_dict):
+    # Input:
+    #  df - raw data set loaded from IK2 Open Data
+    #  top_dict - raw-data-set-dependent dictionary with mapping rules loaded
+    #  from mapping_conv_phase1.yaml
 
-    def __init__(self, server):
-        self.server = server
+    # Rename existing columns that to match the template
+    col_dict = top_dict['rename']
+    df = df.loc[:, [x for x in col_dict]]
+    df.rename(columns=col_dict, inplace=True)
 
-    def endpoint(self, name, *args, params={}):
-        """Call the API endpoint *name* with any additional *args*."""
-        # Construct the URL
-        r = requests.get(self.server + '/'.join(['', name] + list(args)),
-                         params=params)
-        log.info(r.url)
+    # Add columns that are not included and mapping with pre-defined rules
+    for col, value in top_dict['Added_columns_var_mapping'].items():
+        if col == 'Unit':
+            df[col] = df.apply(add_unit_conversion, axis=1, args=(value,))
+        else:
+            df[col] = value
 
-        r.raise_for_status()
+    for field, info in top_dict.get('Other_columns_var_mapping', {}).items():
+        # Name conversion for some columns to keep as consistent as possible
+        # while keeping the raw data set's taxonomy
+        if field == 'Unit':
+            # Unit conversion if necessary
+            df['Value'] = df.apply(value_conversion, axis=1, args=(info,))
 
-        # All responses are in JSON
-        try:
-            return r.json()
-        except JSONDecodeErrors:
-            log.error(r.content)
-            raise
+            df[field] = df[field].apply(lambda x: info["MAPPING"][x])
+        else:
+            df[field] = df[field].apply(lambda x: info[x])
 
-    def datarepo(self, name=None):
-        """Return information about one or all data repositories.
+    return df
 
-        If *name* is None (the default), information on all repos is returned.
-        """
-        return self.endpoint('datarepo' if name else 'datarepos',
-                             *filter(None, [name]))
 
-    def table(self, repo, name, rows=None, offset=None):
-        """Return data from table *name* in *repo*.
+def main(output_file):
+    # Get the configuration
+    config_path = paths['data'] / 'historical' / 'mapping_conv_phase1.yaml'
+    top_most_dict_yaml = yaml.safe_load(open(config_path))
 
-        Currently only the latest data on the master branch is returned.
+    # Access the OpenKAPSARC API
+    ok = OpenKAPSARC()
 
-        Parameters
-        ----------
-        rows : int, optional
-            Number of rows to return. OpenKAPSARC returns 20 rows if this
-            parameter is unspecified.
-        offset : int, optional
-            Number of rows to skip from the beginning of the table.
+    list_of_df = []
 
-        Returns
-        -------
-        :class:`pandas.DataFrame`
+    for ds_info in top_most_dict_yaml:
+        df = ok.table(ds_info['id'])
 
-        """
-        params = {}
-        if rows:
-            params['_limit'] = int(rows)
-        if offset:
-            params['_offset'] = int(offset)
+        df = conversion_layer1(df, ds_info)
+        df['Source'] = f"OpenKAPSARC/{ds_info['uid']}"
+        list_of_df.append(df)
 
-        response = self.endpoint('dataset', repo, 'master', name,
-                                 params=params)
+    df_output = pd.concat(list_of_df, sort=False, ignore_index=True)
+    df_output = df_output[["Region", "Variable", "Unit", "Mode", "Technology",
+                           "Fuel", "Year", "Value", "Source"]]
 
-        # Parse table schema
-        schema = response.pop('tschema')
-
-        # Store column information according to the 'colorder' key
-        columns = {}
-        for col_info in schema.pop('columns'):
-
-            if col_info['name'] == 'uhash':
-                # FIXME the tschema includes information about a 'uhash'
-                # column, but the data include only a '_id' column for each
-                # row.
-                col_info['name'] = '_id'
-
-            columns[col_info.pop('colorder')] = col_info
-
-        # Prepare a pd.Index for the data using the 'name' key
-        col_index = pd.Index(col_info['name'] for _, col_info in
-                             sorted(columns.items()))
-
-        # Convert data to a pandas DataFrame
-        data = pd.DataFrame(response.pop('data')) \
-                 .reindex(columns=col_index)
-
-        assert len(response) == 0
-
-        return(data)
+    df_output.to_csv(output_file, index=False)

@@ -6,9 +6,9 @@ from setuptools import setup, find_packages
 
 
 MAJOR = 0
-MINOR = 1
+MINOR = 2
 MICRO = 0
-VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
+VERSION = '.'.join(map(str, (MAJOR, MINOR, MICRO, 'dev')))
 
 DISTNAME = 'item'
 AUTHOR = 'International Transport Energy Modeling group'
