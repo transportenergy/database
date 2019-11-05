@@ -1,2 +1,15 @@
+click
 codecov
+openpyxl
+pandas
+pint
+plotnine
+pycountry
+pytest
 pytest-cov
+pyyaml
+requests
+requests-cache
+sphinx_rtd_theme
+sphinx>2.2
+xarray

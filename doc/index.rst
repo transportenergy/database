@@ -1,24 +1,41 @@
-.. iTEM documentation master file, created by
-   sphinx-quickstart on Thu Dec 13 16:24:28 2018.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 International Transport Energy Modeling (iTEM) toolkit
-======================================================
+******************************************************
 
 `iTEM`_ maintains two databases:
 
 1. A **model database** of transport energy projections assembled as part of
-   the `iTEM workshops`_, of which there have been four so far, with a fourth
-   planned for late 2019. Because of restrictions from workshop participants,
-   the model database is currently *not public*, but only available to iTEM
-   workshop participants.
+   the `iTEM workshops`_, of which there have been four so far, with a fifth
+   planned for early 2020.
 
-2. A **statistics database** to form a common, public, “best available”
-   baseline for model calibration and projections. The statistics database is
-   currently *under development*.
+2. A **historical database** to form a common, public, “best available”
+   baseline for model calibration and projections.
 
-This repository contains tools for *both* databases, in *both* Python and R. The goals for these tools are that:
+This documentation, built automatically from the `transportenergy/database GitHub repository <https://github.com/transportenergy/database>`_, describes the Python and R toolkit for maintaining these databases.
+
+.. _iTEM: http://transportenergy.org
+.. _iTEM workshops: http://transportenergy.org/workshops
+.. _iTEM organizing group:
+   http://transportenergy.org/participants#organizing-group
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents
+
+   usage
+   model
+   historical
+   common
+   reference
+
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
+Goals
+=====
+
+The goals for these tools are that:
 
 - iTEM participants use the tools to *access* either database and perform basic
   data manipulations such as retrieval, selection, and aggregation, in either
@@ -29,23 +46,4 @@ This repository contains tools for *both* databases, in *both* Python and R. The
   reproducibly* derives the iTEM variables from immediate output files of their
   models.
 - The tools are well-tested and yield reproducible results.
-
-.. _iTEM: http://transportenergy.org
-.. _iTEM workshops: http://transportenergy.org/workshops
-.. _iTEM organizing group:
-   http://transportenergy.org/participants#organizing-group
-
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-   model
-   stats
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+- The tools are fully documented.

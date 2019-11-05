@@ -1,19 +1,3 @@
-"""Update item2-data
-
-The sub-modules in this directory read from the Excel reporting templates
-(BP, ExxonMobil, IEA, ITF, and MESSAGE) or GAMS GDX file (EPPA5). This script
-is run from the top item-scripts directory with:
-
-    $ python3 -m model COMMAND
-
-The actions depend on COMMAND:
-
-- 'import': the item2-data/model directory and subdirectories are populated
-   with CSV and other files containing the input data.
-- 'check':
-- 'variables':
-
-"""
 import errno
 from importlib import import_module
 import os
@@ -33,7 +17,12 @@ from item.model.dimensions import INDEX, load_template
 
 __all__ = [
     'concat_versions',
+    'coverage',
+    'get_model_info',
     'load_model_data',
+    'load_model_scenarios',
+    'make_regions_csv',
+    'make_regions_yaml',
     'select',
     'squash_scenarios',
     'to_wide',
@@ -300,9 +289,11 @@ def load_model_scenarios(name, version):
     """Load scenarios.yaml for model *name* in database *version*.
 
     Returns a dictionay where:
+
     - Keys are codes or names of scenarios.
     - Values are dictionaries with the key:
-      - category: either 'reference' or 'policy'.
+
+      - ``category``: either 'reference' or 'policy'.
     """
     # Don't do anything with the return value; just check arguments
     get_model_info(name, version)

@@ -152,8 +152,8 @@ def read_measures(path):
     measures = ConceptScheme(id='measure')
 
     with open(path) as f:
-        measures.children = read_hierarchy(yaml.load(f, Loader=yaml.FullLoader),
-                                           Measure)
+        measures.children = read_hierarchy(
+            yaml.load(f, Loader=yaml.FullLoader), Measure)
 
     return measures
 

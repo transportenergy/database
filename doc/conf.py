@@ -20,7 +20,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'iTEM'
-copyright = '2018, iTEM consortium'
+copyright = '2017–2019, iTEM consortium'
 author = 'iTEM consortium'
 
 # The short X.Y version
@@ -41,12 +41,13 @@ release = '0.2.0.dev'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
+    'sphinx.ext.coverage',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
+    # 'sphinx.ext.linkcode',
+    'sphinx.ext.napoleon',
     'sphinx.ext.todo',
-    'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
-    'numpydoc',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -187,7 +188,7 @@ epub_exclude_files = ['search.html']
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/', None),
+    'python': ('https://docs.python.org/3/', None),
     'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
     }
 
@@ -195,3 +196,16 @@ intersphinx_mapping = {
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
+
+# Temporarily disabled; see
+# https://github.com/bsmurphy/PyKrige/blob/master/doc/sphinxext/github_link.py
+#
+# GH_BASE = 'https://github.com/transportenergy/database/blob/master/python/'
+#
+#
+# def linkcode_resolve(domain, info):
+#     if domain != 'py':
+#         return None
+#     if not info['module']:
+#         return None
+#     return GH_BASE + info['module'].replace('.', '/') + '.py'

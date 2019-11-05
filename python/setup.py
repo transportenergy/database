@@ -22,22 +22,23 @@ CLASSIFIERS = [
     'Programming Language :: Python :: 3',
     'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
     'Topic :: Scientific/Engineering',
     ]
 
 INSTALL_REQUIRES = [
-    'click >= 0.6',
+    'click',
     'openpyxl',
-    'pandas >= 0.20',
-    'pint >= 0.8',
-    'plotnine >= 0.1',
-    'pycountry >= 17.5',
-    'pyyaml >= 3.12',
-    'xarray >= 0.9',
+    'pandas',
+    'pint',
+    'plotnine',
+    'pycountry',
+    'pyyaml',
+    'xarray',
     ]
-TESTS_REQUIRE = ['pytest >= 2.7']
+TESTS_REQUIRE = ['pytest']
 EXTRAS_REQUIRE = {
-    'doc': ['sphinx', 'sphinx-rtd-theme', 'numpydoc'],
+    'doc': ['sphinx', 'sphinx-rtd-theme'],
     'hist': ['requests', 'requests-cache'],
     'tests': ['pytest'],
     'eppa': ['gdx >= 3'],
