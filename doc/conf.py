@@ -44,6 +44,7 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
+    # 'sphinx.ext.linkcode',
     'sphinx.ext.napoleon',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
@@ -195,3 +196,16 @@ intersphinx_mapping = {
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
+
+# Temporarily disabled; see
+# https://github.com/bsmurphy/PyKrige/blob/master/doc/sphinxext/github_link.py
+#
+# GH_BASE = 'https://github.com/transportenergy/database/blob/master/python/'
+#
+#
+# def linkcode_resolve(domain, info):
+#     if domain != 'py':
+#         return None
+#     if not info['module']:
+#         return None
+#     return GH_BASE + info['module'].replace('.', '/') + '.py'

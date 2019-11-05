@@ -10,7 +10,7 @@ International Transport Energy Modeling (iTEM) toolkit
 2. A **historical database** to form a common, public, “best available”
    baseline for model calibration and projections.
 
-This documentation, built automatically from the `transportenergy/database GitHub repository <https://github.com/transportenergy/database>`_ describes the iTEM codes.
+This documentation, built automatically from the `transportenergy/database GitHub repository <https://github.com/transportenergy/database>`_, describes the Python and R toolkit for maintaining these databases.
 
 .. _iTEM: http://transportenergy.org
 .. _iTEM workshops: http://transportenergy.org/workshops
@@ -46,3 +46,4 @@ The goals for these tools are that:
   reproducibly* derives the iTEM variables from immediate output files of their
   models.
 - The tools are well-tested and yield reproducible results.
+- The tools are fully documented.
