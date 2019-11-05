@@ -268,7 +268,7 @@ def load_models_info():
         return
 
     with open(join(paths['data'], 'model', 'models.yaml')) as f:
-        MODELS = yaml.load(f)
+        MODELS = yaml.safe_load(f)
 
 
 def load_model_regions(name, version):
@@ -293,7 +293,7 @@ def load_model_regions(name, version):
             raise
 
     with open(join(paths['data'], 'model', name, 'regions.yaml')) as f:
-        return yaml.load(f)
+        return yaml.safe_load(f)
 
 
 def load_model_scenarios(name, version):
@@ -308,7 +308,7 @@ def load_model_scenarios(name, version):
     get_model_info(name, version)
 
     with open(join(paths['data'], 'model', name, 'scenarios.yaml')) as f:
-        return yaml.load(f)[version]
+        return yaml.safe_load(f)[version]
 
 
 def make_regions_csv(out_file, models, compare):

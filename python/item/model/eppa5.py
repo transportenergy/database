@@ -81,7 +81,7 @@ def import_data(data_path, metadata_path):
 
     # Read the metadata
     with open(join(metadata_path, 'variables.yaml')) as vars_f:
-        vars = yaml.load(vars_f)
+        vars = yaml.safe_load(vars_f)
 
     ureg = pint.UnitRegistry()
     for unit in vars['_units']:

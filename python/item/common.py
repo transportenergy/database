@@ -30,7 +30,7 @@ def load_config(path=None):
     _path = abspath('.' if path is None else path)
     try:
         with open(join(_path, 'item_config.yaml')) as f:
-            result = yaml.load(f)
+            result = yaml.safe_load(f)
             config['_from_file'] = result
             config.update(result)
             config['_filename'] = 'item_config.yaml'
