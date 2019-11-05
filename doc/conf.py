@@ -20,7 +20,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'iTEM'
-copyright = '2018, iTEM consortium'
+copyright = '2017–2019, iTEM consortium'
 author = 'iTEM consortium'
 
 # The short X.Y version
@@ -41,12 +41,12 @@ release = '0.2.0.dev'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
+    'sphinx.ext.coverage',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.napoleon',
     'sphinx.ext.todo',
-    'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
-    'numpydoc',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
