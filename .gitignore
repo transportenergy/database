@@ -1,6 +1,22 @@
+# Python
 *.egg-info
+*.log
+*.pdf
+
+.cache
 .coverage
 .pytest_cache
-.Rproj.user
+__pycache__
+build
+dist
+
+# Data files/generated
+*.csv
+*.xlsx
+
+# Sphinx documentation
 doc/_build
+
+# R
+.Rproj.user
 R/*.Rcheck

@@ -4,7 +4,7 @@ from os.path import abspath, join
 from pathlib import Path
 from warnings import filterwarnings
 
-from pkg_resources import resource_filename
+from pkg_resources import resource_filename  # noqa: F401
 import yaml
 
 
@@ -18,6 +18,10 @@ paths = {
     # Package data
     'data': Path(resource_filename(__name__, 'data')).resolve(),
     }
+
+if not paths['data'].exists():
+    # Workaround for editable pip install
+    paths['data'] = Path(__file__).parents[1] / 'data'
 
 
 config = {}
