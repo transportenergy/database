@@ -12,7 +12,17 @@ Tools for the iTEM databases
 2. A **historical database** to form a common, public, “best available” baseline for model calibration and projections.
    The historical database is currently *under development*.
 
-This repository contains tools for *both* databases, in *both* Python and R. The goals for these tools are that:
+This repository contains tools for:
+
+- the historical database, in Python.
+- the model database from the second iTEM model intercomparison project (MIP2), in R.
+
+Other relevant repositories:
+
+- https://github.com/transportenergy/item_mip_data_processing contains tools for iTEM MIP3.
+- https://github.com/transportenergy/metadata contains shared metadata about models and historical data sources.
+
+The goals for these tools are that:
 
 - iTEM participants use the tools to *access* either database and perform basic data manipulations such as retrieval, selection, and aggregation, in either Python, R (or possibly, in the future, other languages).
 - Members of the [iTEM organizing group](https://transportenergy.org/participants/#organizing-group) use the tools to prepare templates for data submission, and to aggregate & clean submitted data.
