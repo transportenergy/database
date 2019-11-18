@@ -20,7 +20,7 @@ paths = {
     }
 
 if not paths['data'].exists():
-    assert False, sorted(paths['data'].rglob('*.yaml'))
+    assert False, sorted(paths['data'].parent.rglob('*'))
     # Workaround for editable pip install
     paths['data'] = Path(__file__).parent / 'data'
 
