@@ -21,7 +21,7 @@ paths = {
 
 if not paths['data'].exists():
     # Workaround for editable pip install
-    paths['data'] = Path(__file__).parents[1] / 'data'
+    paths['data'] = Path(__file__).parent / 'data'
 
 
 config = {}

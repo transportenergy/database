@@ -1,10 +1,17 @@
 Transport energy model projections (:mod:`item.model`)
 ******************************************************
 
+- The `transportenergy/item_mip_data_processing <https://github.com/transportenergy/item_mip_data_processing>`_ repository contains R scripts for iTEM **MIP3** (2019–2020).
+- The `transportenergy/database <https://github.com/transportenergy/database>`_ repository contains:
+
+  - R scripts for the iTEM **MIP2** (2016–2017).
+  - Python tools for preparing data submission templates and plotting mode data.
+
 On separate pages:
 
 .. toctree::
 
+   model/mip2
    model/common
    model/dimensions
    model/plot

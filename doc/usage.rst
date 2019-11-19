@@ -32,16 +32,15 @@ Both the Python and R tools will operate on data stored in the following way; se
       stats     Manipulate the stats database.
       template  Generate the MIP3 submission template.
 
-Python
-======
 
 Installation
-------------
+============
 Use `pip <https://pip.pypa.io/en/stable/>`_.
 From source (for instance, to develop the code locally)::
 
-    $ git clone git@github.com:transportenergy/database.git
-    $ pip install --editable database/python
+    $ git clone --recurse-submodules git@github.com:transportenergy/database.git
+    $ cd database
+    $ pip install --editable .[doc,hist,tests]
 
 Or, without cloning the repository::
 
@@ -49,7 +48,7 @@ Or, without cloning the repository::
 
 
 Usage
------
+=====
 
 From Python scripts::
 
@@ -57,73 +56,13 @@ From Python scripts::
 
     data = item.load_model_data(1)
 
-Run tests
----------
 
-Tests in ``python/item/tests`` can be run with `py.test <https://pytest.org/>`_.
+Run tests
+=========
+
+Tests in ``item/tests`` can be run with `py.test <https://pytest.org/>`_.
 The command-line option ``--local-data`` must be defined in order for these tests to work::
 
     $ py.test --local-data=../../data/model/database item
     ================ test session starts ================
     …
-
-
-R
-===
-
-Installation
-------------
-
-Use `devtools <https://cran.r-project.org/package=devtools>`_.
-From source (for instance, to develop the code locally)::
-
-    $ git clone git@github.com:transportenergy/database.git
-    $ Rscript -e "devtools::install_local('database/R/item')"
-
-Or without cloning the repository::
-
-    devtools::install_github('transportenergy/database/R/item')
-
-
-Usage
------
-
-From R scripts::
-
-    library(item)
-
-    # Load version 1 of the iTEM models database
-    data <- item::load_model_data(1)
-
-From the command-line: ``run`` is an executable that invokes ``item::cli()``.
-It can be used without installing the package::
-
-    $ ./run
-    Loading item
-    Usage: ./run [OPTIONS] COMMAND
-    Command-line interface for the iTEM databases.
-
-    …
-
-    Commands:
-      mkdirs
-      debug
-      load_model_data
-
-
-Development
------------
-
-Code conventions and packaging follow the `“R packages” book <http://r-pkgs.had.co.nz/>`_.
-
-``test`` is an executable that runs the tests in ``R/item/tests/testthat``.
-The environment variable ``ITEM_TEST_DATA`` must be defined in order for these tests to work::
-
-  $ export ITEM_TEST_DATA=../../data/model/database
-  $ ./test
-  Loading item
-  Loading required package: testthat
-  Testing item
-  Model database: .
-
-  DONE ============================================
