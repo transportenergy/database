@@ -40,12 +40,16 @@ before_install:
 install:
 - source ci/install.sh
 - pip install --editable .[doc,eppa,hist,tests] --progress-bar off
-- Rscript -e "devtools::install('R/item', dep = T)"
+
+# Disabled: MIP3 code is in a separate repository
+# - Rscript -e "devtools::install('R/item', dep = T)"
 
 script:
 - pytest --pyargs item --cov=item --cov-report=term-missing
-- R CMD build R/item
-- R CMD check R/item
+
+# Disabled: MIP3 code is in a separate repository
+# - R CMD build R/item
+# - R CMD check R/item
 
 after_success:
 - coverage combine
