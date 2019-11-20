@@ -39,7 +39,7 @@ INSTALL_REQUIRES = [
 TESTS_REQUIRE = ['pytest']
 EXTRAS_REQUIRE = {
     'doc': ['sphinx', 'sphinx-rtd-theme'],
-    'hist': ['requests', 'requests-cache'],
+    'hist': ['jupyter', 'nbformat', 'pprint', 'requests', 'requests-cache'],
     'tests': ['pytest'],
     'eppa': ['gdx >= 3'],
     }
