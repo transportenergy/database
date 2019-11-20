@@ -20,6 +20,7 @@ def item1_data(item_tmp_dir):
     yield load_model_data(1)
 
 
+@pytest.mark.skip('Requires synthetic model data.')
 @pytest.mark.parametrize('model', ['bp', 'eia', 'exxonmobil', 'gcam', 'get',
                                    'itf', 'message', 'roadmap'])
 def test_process_raw(item_tmp_dir, model):
@@ -27,6 +28,7 @@ def test_process_raw(item_tmp_dir, model):
     assert exists(join(paths['model processed'], '2', '%s.csv' % model))
 
 
+@pytest.mark.skip('Requires synthetic model data.')
 @pytest.mark.slow
 @pytest.mark.parametrize('model', ['eppa5'])
 def test_process_raw_slow(item_tmp_dir, model):
@@ -34,6 +36,7 @@ def test_process_raw_slow(item_tmp_dir, model):
     assert exists(join(paths['model processed'], '2', '%s.csv' % model))
 
 
+@pytest.mark.skip('Requires synthetic model data.')
 @pytest.mark.slow
 def test_item1_dataframe(item_tmp_dir):
     # As a pd.DataFrame
@@ -50,6 +53,7 @@ def test_item1_dataframe(item_tmp_dir):
     assert data.notnull().sum() == 875589  # Omits intensity_new
 
 
+@pytest.mark.skip('Requires synthetic model data.')
 @pytest.mark.slow
 def test_item2(item_tmp_dir):
     # As a pd.DataFrame
@@ -72,6 +76,7 @@ def test_invalid_version():
         load_model_data(99)
 
 
+@pytest.mark.skip('Requires synthetic model data.')
 def test_select(item1_data):
     from item.model.dimensions import PAX
 
@@ -80,6 +85,7 @@ def test_select(item1_data):
     assert len(data) == 6752
 
 
+@pytest.mark.skip('Requires synthetic model data.')
 def test_squash_scenarios(item1_data):
     # The input data has multiple scenario names
     assert len(item1_data['scenario'].unique()) > 2

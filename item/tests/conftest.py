@@ -28,9 +28,9 @@ def item_tmp_dir(tmp_path_factory, pytestconfig):
     |  |- processed
 
     """
-    from item.common import init_paths, make_database_dirs
+    from item.common import config, init_paths, make_database_dirs
 
-    local_data = Path(pytestconfig.getoption('--local-data', skip=True))
+    local_data = pytestconfig.getoption('--local-data')
 
     tmp_path = tmp_path_factory.mktemp('item-user-data')
     try:
@@ -41,10 +41,17 @@ def item_tmp_dir(tmp_path_factory, pytestconfig):
         init_paths(**{
             'log': tmp_path,
             'model': tmp_path,
-            'model raw': local_data / 'model' / 'raw',
-            'model database': local_data / 'model' / 'database',
+            'model raw': tmp_path / 'model' / 'raw',
+            'model database': tmp_path / 'model' / 'database',
             'output': tmp_path / 'output',
             })
+
+        if local_data:
+            local_data = Path(local_data)
+            shutil.copytree(local_data / 'model' / 'raw',
+                            config['model raw'])
+            shutil.copytree(local_data / 'model' / 'database',
+                            config['model database'])
 
         # For use by test functions
         yield tmp_path
