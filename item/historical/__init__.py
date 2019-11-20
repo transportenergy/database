@@ -55,6 +55,20 @@ def convert_units(row, target_units=[]):
     return row
 
 
+def input_file(id: int):
+    """Return the path to a cached, raw input data file for data source *id*.
+
+    CSV files are located in the 'historical input' data path. If more than
+    one file has a name beginning with “T{id}”, the last sorted file is
+    returned.
+    """
+    # List of all matching files
+    all_files = sorted(paths['historical input'].glob(f'T{id:03}*.csv')
+
+    # The last file has the most recent timestamp
+    return all_files[-1]
+
+
 def map_values(row, mapping):
     """Return a mapped value from a DataFrame *row*.
 
