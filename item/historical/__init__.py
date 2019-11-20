@@ -63,7 +63,7 @@ def input_file(id: int):
     returned.
     """
     # List of all matching files
-    all_files = sorted(paths['historical input'].glob(f'T{id:03}*.csv')
+    all_files = sorted(paths['historical input'].glob(f'T{id:03}*.csv'))
 
     # The last file has the most recent timestamp
     return all_files[-1]
