@@ -1,0 +1,15 @@
+numpy
+pandas
+pprint
+pymongo[tls]
+dnspython
+matplotlib
+ipykernel
+joblib
+scipy
+scikit-learn
+selenium
+beautifulsoup4
+requests
+plotly==4.1.0
+nbformat
