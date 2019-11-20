@@ -1,5 +1,6 @@
 import logging
-from os import makedirs
+import logging.config
+import os
 from os.path import abspath, join
 from pathlib import Path
 from warnings import filterwarnings
@@ -48,16 +49,23 @@ def init(path=None):
     init_paths()
 
 
-def init_log():
-    # Configure logging
+def init_log(verbose=True):
+    with open(Path(__file__).with_name('logging.yaml')) as f:
+        log_config = yaml.safe_load(f)
+
+    # Set up the log file
+    log_config['handlers']['file_handler']['filename'] = \
+        paths['log'] / 'item.log'
+
+    # Activate verbose output
+    if verbose:
+        log_config['handlers']['console']['level'] = 'DEBUG'
+
+    # Configure the loggers
+    logging.config.dictConfig(log_config)
+
     global _logger
-    logging.basicConfig(format='%(message)s', level=logging.INFO)
-    formatter = logging.Formatter('%(message)s')
-    logfile = join(paths['log'], 'item.log')
-    file_handler = logging.FileHandler(logfile, mode='w')
-    file_handler.setFormatter(formatter)
     _logger = logging.getLogger('item')
-    _logger.addHandler(file_handler)
 
 
 def init_paths(**kwargs):
@@ -116,4 +124,4 @@ def make_database_dirs(path, dry_run):
         if dry_run:
             log('  ' + name)
         else:
-            makedirs(name, exist_ok=True)
+            os.makedirs(name, exist_ok=True)

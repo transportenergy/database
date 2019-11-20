@@ -1,8 +1,10 @@
 import os
 
+from click.testing import CliRunner
 import pandas as pd
 import pytest
 
+import item.cli
 from item.openkapsarc import OpenKAPSARC
 
 
@@ -20,3 +22,9 @@ def test_dataset(ok):
     result = ok.table('modal-split-of-freight-transport')
     assert isinstance(result, pd.DataFrame)
     assert len(result) == 1406
+
+
+def test_cli(ok):
+    runner = CliRunner()
+    result = runner.invoke(item.cli.main, ['historical', 'demo'])
+    assert result.exit_code == 0

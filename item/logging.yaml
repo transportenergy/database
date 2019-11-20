@@ -1,0 +1,24 @@
+version: 1
+disable_existing_loggers: False
+
+formatters:
+  simple:
+    format: '%(name)s.%(funcName)s: %(message)s'
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: simple
+    stream: ext://sys.stdout
+
+  file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: simple
+    backupCount: 100
+    delay: True
+
+root:
+  level: DEBUG
+  handlers: [console, file_handler]

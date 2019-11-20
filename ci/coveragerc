@@ -1,3 +1,11 @@
 [run]
 omit =
   item/tests/*
+  item/model/bp.py
+  item/model/cli.py
+  item/model/eia.py
+  item/model/eppa5.py
+  item/model/exxonmobil.py
+  item/model/get.py
+  item/model/itf.py
+  item/model/message.py
