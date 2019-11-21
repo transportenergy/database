@@ -40,9 +40,8 @@ def item_tmp_dir(tmp_path_factory, pytestconfig):
         # Override configuration for the test suite
         init_paths(**{
             'log': tmp_path,
-            'model': tmp_path,
-            'model raw': tmp_path / 'model' / 'raw',
-            'model database': tmp_path / 'model' / 'database',
+            'model': tmp_path / 'model',
+            'historical': tmp_path / 'historical',
             'output': tmp_path / 'output',
             })
 
