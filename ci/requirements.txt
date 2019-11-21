@@ -1,5 +1,7 @@
 click
 codecov
+jupyter
+nbformat
 openpyxl
 pandas
 pint
@@ -13,3 +15,15 @@ requests-cache
 sphinx_rtd_theme
 sphinx>2.2
 xarray
+
+# Possibly needed by item.historical
+#
+# beautifulsoup4
+# dnspython
+# joblib
+# plotly==4.1.0
+# pprint
+# pymongo[tls]
+# scikit-learn
+# scipy
+# selenium

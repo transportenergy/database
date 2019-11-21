@@ -92,6 +92,7 @@ def init_paths(**kwargs):
     init_path('models-2', paths['model database'] / '2.csv')
 
     init_path('historical', '.')
+    init_path('historical input', paths['historical'] / 'input')
     init_path('output', '.')
 
     init_path('plot', join('.', 'plot'))
@@ -116,6 +117,7 @@ def make_database_dirs(path, dry_run):
         ('model', 'processed'),
         ('model', 'raw'),
         ('historical',),
+        ('historical', 'input'),
         ('output',),
         ]
     dirs = [path] + [join(path, *d) for d in dirs]
