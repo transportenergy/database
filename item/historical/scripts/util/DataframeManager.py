@@ -1,13 +1,6 @@
 class DataframeManager:
 
     @classmethod
-    def get_dataset_description(cls, dataframe):
-        # Getting the shape of the df
-        rows, cols = dataframe.shape
-        print(">> Number of Columns: {}".format(cols))
-        print(">> Number of Rows: {}".format(rows))
-
-    @classmethod
     def simple_column_insert(
                             cls, dataframe,
                             column_name, cell_value, position=0):
