@@ -14,3 +14,7 @@ class DataframeManager:
                         'Vehicle Type', 'Technology',
                         'Fuel', 'Value', 'Year']
         return dataframe.reindex(columns=column_order)
+
+    @classmethod
+    def rename_column(cls, df, current_name, new_name):
+        df.rename(columns={current_name: new_name}, inplace=True)
