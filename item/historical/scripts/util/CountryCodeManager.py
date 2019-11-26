@@ -59,3 +59,28 @@ class CountryCodeManager:
         assert len(list_of_iso_codes) == len(list_of_country_names)
 
         return list_of_iso_codes
+
+    def get_list_of_iso_codes_with_no_region(self, list_of_iso_codes):
+        # ISO code with missing region
+        iso_code_with_no_region = []
+
+        # For each ISO code, find the ITEM region
+        for code in list_of_iso_codes:
+            region = self.get_item_region_for_iso_code(code)
+            if region == "N/A":
+                iso_code_with_no_region.append(code)
+
+        return iso_code_with_no_region
+
+    def get_list_of_regions_for_iso_codes(self, list_of_iso_codes):
+        item_region = []
+
+        # Getting the list of regions
+        for code in list_of_iso_codes:
+            region = self.get_item_region_for_iso_code(code)
+            item_region.append(region)
+
+        # Ensure the list of item_region and list iso codes are the same size
+        assert len(item_region) == len(list_of_iso_codes)
+
+        return item_region
