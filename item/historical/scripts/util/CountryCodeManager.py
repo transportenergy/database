@@ -36,3 +36,26 @@ class CountryCodeManager:
 
     def get_item_regions(self):
         return self.item_regions
+
+    def get_list_of_countries_with_no_iso_code(self, list_of_country_names):
+        # Variable for storing all the countries with no ISO code
+        countries_with_no_ISO_code = []
+
+        # For each country, get their ISO code
+        for country in list_of_country_names:
+            iso_code = self.get_iso_code_for_country(country)
+            if iso_code == "N/A":
+                countries_with_no_ISO_code.append(country)
+
+        return countries_with_no_ISO_code
+
+    def get_list_of_iso_for_countries(self, list_of_country_names):
+        list_of_iso_codes = []
+        for country in list_of_country_names:
+            iso_code = self.get_iso_code_for_country(country)
+            list_of_iso_codes.append(iso_code)
+
+        # Assert the result list and passed list are the same size
+        assert len(list_of_iso_codes) == len(list_of_country_names)
+
+        return list_of_iso_codes
