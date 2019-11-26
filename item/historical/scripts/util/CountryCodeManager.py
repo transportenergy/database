@@ -16,9 +16,9 @@ class CountryCodeManager:
             self.item_regions = json.load(json_file)
 
     def get_iso_code_for_country(self, country_name):
-        country_name = country_name.capitalize()
+        country_name = country_name.lower()
         if country_name in self.iso_codes:
-            return self.iso_codes[country_name]
+            return self.iso_codes[country_name].upper()
         else:
             return "N/A"
 
