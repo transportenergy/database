@@ -1,5 +1,5 @@
 class UnitConverter:
 
     @classmethod
-    def to_billion(cls, value):
-        return float(value) / float(1000000000)
+    def to_million(cls, value):
+        return float(value) / float(1000000)
