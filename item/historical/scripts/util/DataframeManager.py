@@ -1,3 +1,23 @@
+from enum import Enum
+
+
+class ColumnName(Enum):
+    SOURCE = "Source"
+    YEAR = "Year"
+    ISO_CODE = "ISO Code"
+    ITEM_REGION = "Region"
+    VARIABLE = "Variable"
+    UNIT = "Unit"
+    VALUE = "Value"
+    SERVICE = "Service"
+    MODE = "Mode"
+    VEHICLE_TYPE = "Vehicle Type"
+    FUEL = "Fuel"
+    TECHNOLOGY = "Technology"
+    ID = "Id"
+    COUNTRY = "Country"
+
+
 class DataframeManager:
 
     @classmethod
