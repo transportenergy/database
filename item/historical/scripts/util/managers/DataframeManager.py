@@ -1,4 +1,6 @@
 from enum import Enum
+import os
+import pandas as pd
 
 
 class ColumnName(Enum):
@@ -20,15 +22,34 @@ class ColumnName(Enum):
 
 class DataframeManager:
 
-    @classmethod
+    def __init__(self, dataset_id):
+        self.dataset_id = dataset_id
+
+    def get_dataframe_from_csv_file(self, path_to_file, delimeter=","):
+        if os.path.exists(path_to_file):
+            return pd.read_csv(path_to_file, delimeter)
+        else:
+            return pd.DataFrame({'Empty': []})
+
+    def create_user_friendly_file(self, dataframe, path):
+        pass
+
+    def create_programming_friendly_file(self, dataframe, path=None):
+        dataframe["ID"] = [self.dataset_id] * len(dataframe)
+        filename = "{}_cleaned_PF_.csv".format(self.dataset_id)
+        if path is None:
+            cwd = os.getcwd()
+            path = "{}/{}".format(cwd, filename)
+        dataframe.to_csv(path, index=False)
+        return "File saved at: {}".format(cwd)
+
     def simple_column_insert(
-                            cls, dataframe,
+                            self, dataframe,
                             column_name, cell_value, position=0):
         column_content = [cell_value] * len(dataframe)
         dataframe.insert(position, column_name, column_content, True)
 
-    @classmethod
-    def reorder_columns(cls, dataframe):
+    def reorder_columns(slef, dataframe):
         column_order = [
                 ColumnName.SOURCE.value,
                 ColumnName.COUNTRY.value,
@@ -45,6 +66,5 @@ class DataframeManager:
                 ColumnName.YEAR.value]
         return dataframe.reindex(columns=column_order)
 
-    @classmethod
-    def rename_column(cls, df, current_name, new_name):
+    def rename_column(self, df, current_name, new_name):
         df.rename(columns={current_name: new_name}, inplace=True)
