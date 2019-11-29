@@ -1,4 +1,4 @@
-class UnitConverter:
+class UnitConverterManager:
 
     @classmethod
     def to_million(cls, value):
