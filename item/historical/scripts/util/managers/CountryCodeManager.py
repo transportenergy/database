@@ -5,7 +5,7 @@ import os
 class CountryCodeManager:
 
     def __init__(self):
-        main_path = "{}/{}".format(os.getcwd(), "util")
+        main_path = "{}/{}".format(os.getcwd(), "util/json")
         self.iso_code_path = "{}/iso_codes.json".format(main_path)
         self.item_code_path = "{}/item_regions.json".format(main_path)
 
