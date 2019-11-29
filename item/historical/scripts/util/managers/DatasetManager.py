@@ -23,9 +23,3 @@ class DatasetManager:
         path = "{}/{}".format(cwd, filename)
         dataframe.to_csv(path, index=False)
         return "File saved at: {}".format(cwd)
-
-    def get_iso_code_for_country(country_name):
-        pass
-
-    def get_item_region_for_iso_code(iso_code):
-        pass

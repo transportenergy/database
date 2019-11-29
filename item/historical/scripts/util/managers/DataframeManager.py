@@ -29,10 +29,20 @@ class DataframeManager:
 
     @classmethod
     def reorder_columns(cls, dataframe):
-        column_order = ['Source', 'Region', 'Variable',
-                        'Unit', 'Service', 'Mode',
-                        'Vehicle Type', 'Technology',
-                        'Fuel', 'Value', 'Year']
+        column_order = [
+                ColumnName.SOURCE.value,
+                ColumnName.COUNTRY.value,
+                ColumnName.ISO_CODE.value,
+                ColumnName.ITEM_REGION.value,
+                ColumnName.VARIABLE.value,
+                ColumnName.UNIT.value,
+                ColumnName.SERVICE.value,
+                ColumnName.MODE.value,
+                ColumnName.VEHICLE_TYPE.value,
+                ColumnName.TECHNOLOGY.value,
+                ColumnName.FUEL.value,
+                ColumnName.VALUE.value,
+                ColumnName.YEAR.value]
         return dataframe.reindex(columns=column_order)
 
     @classmethod
