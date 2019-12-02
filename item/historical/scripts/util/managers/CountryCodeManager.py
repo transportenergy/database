@@ -6,7 +6,10 @@ import os
 class CountryCodeManager:
 
     def __init__(self):
-        self.mapping = {country.name.lower(): country.alpha_3 for country in pycountry.countries}
+        self.country_mapping = {
+                            country.name.lower():
+                            country.alpha_3 for country in pycountry.countries
+                            }
 
         main_path = "{}/{}".format(os.getcwd(), "util/json")
         self.item_code_path = "{}/item_regions.json".format(main_path)
@@ -15,7 +18,7 @@ class CountryCodeManager:
 
     def get_iso_code_for_country(self, country_name):
         country_name = country_name.lower()
-        iso_code = self.mapping.get(country_name)
+        iso_code = self.country_mapping.get(country_name)
 
         if iso_code:
             return iso_code
