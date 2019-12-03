@@ -106,33 +106,48 @@ class DataframeManager:
                 df_country_X_in_year_Y = df_per_year_for_country_X[year]
 
                 # Renaming and droping columns
-                df_country_X_in_year_Y.rename(columns={"Value":year}, inplace = True)
-                df_country_X_in_year_Y.drop(columns=["Year"], inplace = True)
+                df_country_X_in_year_Y.rename(
+                                        columns={"Value": year}, inplace=True)
+                df_country_X_in_year_Y.drop(columns=["Year"], inplace=True)
 
-            # Concatenating all the dataframes of a given country into a single dataframe
-            list_of_all_df_for_country_X = list(df_per_year_for_country_X.values())
-            df_concat_all_dfs_for_country_x = pd.concat(list_of_all_df_for_country_X,sort=False, verify_integrity=True,join='outer')
+            # Concatenating all the dataframes of a given country into one df
+            list_of_all_df_for_country_X = list(
+                                            df_per_year_for_country_X.values())
+            df_concat_all_dfs_for_country_x = pd.concat(
+                                                list_of_all_df_for_country_X,
+                                                sort=False,
+                                                verify_integrity=True,
+                                                join='outer')
 
-            # Creating the final df for country X by eliminating all NAN and combining rows
-            final_df_for_country_x = df_concat_all_dfs_for_country_x.groupby(columns_to_preserve)[list_of_years_for_country_X].first().reset_index()
+            # Creating the final df for country X by eliminating all NAN
+            final_df_for_country_x = df_concat_all_dfs_for_country_x.groupby(
+                            columns_to_preserve)[
+                            list_of_years_for_country_X].first().reset_index()
 
             # Saving the final df of country X in the list of all countries df
-            dict_of_final_dataframes_per_country[country] = final_df_for_country_x
+            dict_of_final_dataframes_per_country[
+                                            country] = final_df_for_country_x
 
         # Concatenate all the dataframes of the countries
-        list_df_for_all_countries_final = list(dict_of_final_dataframes_per_country.values())
-        df_with_all_countries_data = pd.concat(list_df_for_all_countries_final,sort=False, verify_integrity=True,join='outer',ignore_index=True)
+        list_df_for_all_countries_final = list(
+                                dict_of_final_dataframes_per_country.values())
+        df_with_all_countries_data = pd.concat(
+                                            list_df_for_all_countries_final,
+                                            sort=False, verify_integrity=True,
+                                            join='outer', ignore_index=True)
 
-        # Reordering the dataframe and ensuring all columns are in the correct order
+        # Reordering the dataframe columns
         all_column_names = set(df_with_all_countries_data.keys())
         none_year_columns = set(columns_to_preserve)
         numberic_columns = list(all_column_names - none_year_columns)
         numberic_columns.sort()
         order_of_columns = columns_to_preserve + numberic_columns
-        df_with_all_countries_data = df_with_all_countries_data.reindex(columns=order_of_columns)
+        df_with_all_countries_data = df_with_all_countries_data.reindex(
+                                                    columns=order_of_columns)
 
         # Setting the column id for the dataframe
-        df_with_all_countries_data["ID"] = [self.dataset_id] * len(df_with_all_countries_data)
+        df_with_all_countries_data["ID"] = [self.dataset_id] * len(
+                                                    df_with_all_countries_data)
 
         # Exporting the final dataframe
         filename = "{}_cleaned_UF.csv".format(self.dataset_id)
