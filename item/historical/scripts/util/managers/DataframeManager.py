@@ -16,7 +16,7 @@ class ColumnName(Enum):
     VEHICLE_TYPE = "Vehicle Type"
     FUEL = "Fuel"
     TECHNOLOGY = "Technology"
-    ID = "Id"
+    ID = "ID"
     COUNTRY = "Country"
 
 
@@ -87,10 +87,12 @@ class DataframeManager:
             df_country_X = group_by_country.get_group(country)
 
             # Get the list of years available for the given year
-            list_of_years_for_country_X = list(set(df_country_X["Year"]))
+            list_of_years_for_country_X = list(
+                                    set(df_country_X[ColumnName.YEAR.value]))
 
             # Group the data of country X by year
-            group_by_year_country_X = df_country_X.groupby(df_country_X.Year)
+            group_by_year_country_X = df_country_X.groupby(
+                                        df_country_X[ColumnName.YEAR.value])
 
             # Create a structure that will hold the dataframes of each year
             df_per_year_for_country_X = {}
@@ -107,8 +109,10 @@ class DataframeManager:
 
                 # Renaming and droping columns
                 df_country_X_in_year_Y.rename(
-                                        columns={"Value": year}, inplace=True)
-                df_country_X_in_year_Y.drop(columns=["Year"], inplace=True)
+                                        columns={ColumnName.VALUE.value: year},
+                                        inplace=True)
+                df_country_X_in_year_Y.drop(
+                                columns=[ColumnName.YEAR.value], inplace=True)
 
             # Concatenating all the dataframes of a given country into one df
             list_of_all_df_for_country_X = list(
@@ -146,7 +150,8 @@ class DataframeManager:
                                                     columns=order_of_columns)
 
         # Setting the column id for the dataframe
-        df_with_all_countries_data["ID"] = [self.dataset_id] * len(
+        df_with_all_countries_data[
+                        ColumnName.ID.value] = [self.dataset_id] * len(
                                                     df_with_all_countries_data)
 
         # Exporting the final dataframe
