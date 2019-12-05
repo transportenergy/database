@@ -6,15 +6,28 @@ import os
 class CountryCodeManager:
 
     def __init__(self):
-        self.country_mapping = {
-                            country.name.lower():
-                            country.alpha_3 for country in pycountry.countries
-                            }
+        self.country_mapping = {}
+        for country in pycountry.countries:
+            code = country.alpha_3
+            name = country.name.lower()
+            official_name = country.official_name.lower() if hasattr(
+                                            country, "official_name") else ""
+            common_name = country.common_name.lower() if hasattr(
+                                            country, "common_name") else ""
+
+            self.country_mapping[name] = code
+            if official_name:
+                self.country_mapping[official_name] = code
+            if common_name:
+                self.country_mapping[common_name] = code
 
         main_path = "{}/{}".format(os.getcwd(), "util/json")
         self.item_code_path = "{}/item_regions.json".format(main_path)
         with open(self.item_code_path) as json_file:
             self.item_regions = json.load(json_file)
+
+    def get_list_of_all_countries(self):
+        return list(pycountry.countries)
 
     def get_iso_code_for_country(self, country_name):
         country_name = country_name.lower()
