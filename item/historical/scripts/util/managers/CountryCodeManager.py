@@ -1,5 +1,5 @@
 import pycountry
-import json
+import yaml
 import os
 
 
@@ -21,10 +21,10 @@ class CountryCodeManager:
             if common_name:
                 self.country_mapping[common_name] = code
 
-        main_path = "{}/{}".format(os.getcwd(), "util/json")
-        self.item_code_path = "{}/item_regions.json".format(main_path)
-        with open(self.item_code_path) as json_file:
-            self.item_regions = json.load(json_file)
+        main_path = os.getcwd().split("/historical")[0]
+        regions_file = os.path.join(main_path, 'data', 'model', 'regions.yaml')
+        with open(regions_file) as file:
+            self.regions_list = yaml.load(file, Loader=yaml.FullLoader)
 
     def get_list_of_all_countries(self):
         return list(pycountry.countries)
@@ -63,9 +63,10 @@ class CountryCodeManager:
 
     def get_item_region_for_iso_code(self, iso_code):
         iso_code = iso_code.upper()
-        for region in self.item_regions:
-            codes_for_region = self.item_regions[region]
-            if iso_code in codes_for_region:
+
+        for region in list(self.regions_list.keys()):
+            countries_for_region = self.regions_list[region]["countries"]
+            if iso_code in countries_for_region:
                 return region
 
         return "N/A"
