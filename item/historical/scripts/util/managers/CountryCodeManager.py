@@ -1,6 +1,7 @@
 import pycountry
 import yaml
-import os
+
+from item.common import paths
 
 
 class CountryCodeManager:
@@ -21,8 +22,7 @@ class CountryCodeManager:
             if common_name:
                 self.country_mapping[common_name] = code
 
-        main_path = os.getcwd().split("/historical")[0]
-        regions_file = os.path.join(main_path, 'data', 'model', 'regions.yaml')
+        regions_file = paths['data'] / 'model' / 'regions.yaml'
         with open(regions_file) as file:
             self.regions_list = yaml.load(file, Loader=yaml.FullLoader)
 
