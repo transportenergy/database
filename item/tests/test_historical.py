@@ -10,11 +10,11 @@ from item.historical.util import run_notebook
 
 def test_import():
     # All historical database classes can be imported
-    from item.historical.scripts.util.managers.CountryCodeManager \
+    from item.historical.scripts.util.managers.country_code \
         import CountryCodeManager
-    from item.historical.scripts.util.managers.DataframeManager \
+    from item.historical.scripts.util.managers.dataframe \
         import DataframeManager
-    from item.historical.scripts.util.managers.UnitConverterManager \
+    from item.historical.scripts.util.managers.unit \
         import UnitConverterManager
 
     CountryCodeManager()

@@ -15,7 +15,7 @@ ipython_config.py
 *.pdf
 
 .cache
-.coverage
+.coverage*
 .pytest_cache
 __pycache__
 build
