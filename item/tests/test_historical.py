@@ -12,7 +12,7 @@ def test_import():
         import UnitConverterManager
 
     CountryCodeManager()
-    DataframeManager()
+    DataframeManager(dataset_id=None)
     UnitConverterManager()
 
 
