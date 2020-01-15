@@ -1,5 +1,6 @@
 import io
 import os
+from pathlib import Path
 import subprocess
 import sys
 
@@ -34,7 +35,7 @@ def run_notebook(nb_path, tmp_path, env=os.environ, kernel=None):
     kernel = kernel or 'python{}'.format(sys.version_info[0])
 
     # Temporary notebook to contain execution output
-    fname = tmp_path / 'test.ipynb'
+    fname = Path(tmp_path) / 'test.ipynb'
 
     command = [
         'jupyter', 'nbconvert',

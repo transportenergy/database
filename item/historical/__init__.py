@@ -6,6 +6,17 @@ from ..common import paths
 from ..openkapsarc import OpenKAPSARC
 
 
+# List of data processing scripts/IPython notebooks
+SCRIPTS = [
+    'T001',
+    'T002',
+    'T003',
+    'T004',
+    'T005',
+    'T006',
+]
+
+
 # Define a registry for tracking of units, and add units appearing in the data.
 ureg = pint.UnitRegistry()
 ureg.define("""

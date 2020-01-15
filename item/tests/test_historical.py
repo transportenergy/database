@@ -4,7 +4,7 @@ import pytest
 
 import item
 from item.common import paths
-from item.historical import input_file
+from item.historical import SCRIPTS, input_file
 from item.historical.util import run_notebook
 
 
@@ -39,15 +39,7 @@ def test_input_file(item_tmp_dir):
 nb_path = Path(item.__file__).parent / 'historical' / 'scripts'
 
 
-@pytest.mark.parametrize('dataset_id', [
-    'T000',
-    'T001',
-    'T002',
-    'T003',
-    'T004',
-    'T005',
-    'T006',
-])
+@pytest.mark.parametrize('dataset_id', SCRIPTS)
 def test_run_notebook(dataset_id, tmp_path):
     # Notebook runs top-to-bottom without cell errors
     nb, errors = run_notebook(nb_path / f'{dataset_id}.ipynb', tmp_path)
