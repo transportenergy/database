@@ -27,5 +27,10 @@ Style guide
 -----------
 
 - Follow `PEP 8 <https://www.python.org/dev/peps/pep-0008/>`_; use a linter to ensure compliance.
+- Document all public classes and functions following the `NumPy docstring
+  format`_.
+- Ensure new items appear in the built documentation.
 - All code must be importable from within :mod:`item`.
 - Clear all cell output, execution counts, etc. from IPython notebooks committed to the repository.
+
+.. _Numpy docstring format: https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard
