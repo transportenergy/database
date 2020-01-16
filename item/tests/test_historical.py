@@ -14,12 +14,9 @@ def test_import():
         import CountryCodeManager
     from item.historical.scripts.util.managers.dataframe \
         import DataframeManager
-    from item.historical.scripts.util.managers.unit \
-        import UnitConverterManager
 
     CountryCodeManager()
     DataframeManager(dataset_id=None)
-    UnitConverterManager()
 
 
 def test_input_file(item_tmp_dir):
