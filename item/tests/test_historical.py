@@ -4,8 +4,13 @@ import pytest
 
 import item
 from item.common import paths
-from item.historical import SCRIPTS, input_file
+from item.historical import SCRIPTS, fetch_source, input_file
 from item.historical.util import run_notebook
+
+
+@pytest.mark.parametrize('source_id', [1])
+def test_fetch(source_id):
+    fetch_source(source_id)
 
 
 def test_import():

@@ -1,9 +1,12 @@
+from copy import copy
+
 import pandas as pd
 import pint
 import yaml
 
-from ..common import paths
-from ..openkapsarc import OpenKAPSARC
+from item.common import paths
+from item.openkapsarc import OpenKAPSARC
+from item.remote import get_sdmx
 
 
 # List of data processing scripts/IPython notebooks
@@ -69,6 +72,34 @@ def convert_units(row, target_units=[]):
     return row
 
 
+def source_str(id):
+    """Return the canonical string name (e.g. 'T001') for a data source."""
+    return f'T{id:03}' if isinstance(id, int) else id
+
+
+def fetch_source(id):
+    """Fetch data from source *id*."""
+    # Retrieve source information from sources.yaml
+    id = source_str(id)
+    source_info = copy(SOURCES[id])
+
+    # Information for fetching the data
+    fetch_info = source_info['fetch']
+
+    remote_type = fetch_info.pop('type')
+    if remote_type == 'sdmx':
+        # Use SDMX to retrieve the data
+        result = get_sdmx(**fetch_info['args'])
+    elif remote_type == 'OpenKAPSARC':
+        pass
+    else:
+        raise ValueError(remote_type)
+
+    cache_path = paths['historical input'] / f'{id}.csv'
+    result.to_csv(cache_path)
+    return cache_path
+
+
 def input_file(id: int):
     """Return the path to a cached, raw input data file for data source *id*.
 
@@ -77,7 +108,8 @@ def input_file(id: int):
     returned.
     """
     # List of all matching files
-    all_files = sorted(paths['historical input'].glob(f'T{id:03}*.csv'))
+    all_files = sorted(paths['historical input']
+                       .glob(f'T{source_str(id)}*.csv'))
 
     # The last file has the most recent timestamp
     return all_files[-1]
@@ -165,6 +197,10 @@ def conversion_layer1(df, top_dict={}):
     df = df.apply(convert_units, axis=1, args=(preferred_units(top_dict),))
 
     return df
+
+
+with open(paths['data'] / 'historical' / 'sources.yaml') as f:
+    SOURCES = yaml.safe_load(f)
 
 
 def main(output_file, use_cache):
