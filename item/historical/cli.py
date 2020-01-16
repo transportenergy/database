@@ -4,15 +4,24 @@ from tempfile import TemporaryDirectory
 import click
 from click import Group
 
-from ..openkapsarc import OpenKAPSARC
+from item.openkapsarc import OpenKAPSARC
 from . import (
     SCRIPTS,
+    fetch_source,
     main as _phase1,
 )
 from .util import run_notebook
 
 
 historical = Group('historical', help="Manipulate the historical database.")
+
+
+@historical.command()
+@click.argument('source', type=int)
+def fetch(source):
+    """Retrieve raw data for SOURCE."""
+    path = fetch_source(source)
+    print(f'Retrieved {path}')
 
 
 @historical.command()

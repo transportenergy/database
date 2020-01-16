@@ -30,6 +30,7 @@ INSTALL_REQUIRES = [
     'click',
     'openpyxl',
     'pandas',
+    'pandaSDMX >= 1.0b1',
     'pint',
     'plotnine',
     'pycountry',
