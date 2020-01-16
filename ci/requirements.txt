@@ -4,6 +4,7 @@ jupyter
 nbformat
 openpyxl
 pandas
+git+git://github.com/dr-leo/pandaSDMX.git#egg=pandaSDMX
 pint
 plotnine
 pycountry
