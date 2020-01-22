@@ -8,12 +8,15 @@ from ..openkapsarc import OpenKAPSARC
 
 # List of data processing scripts/IPython notebooks
 SCRIPTS = [
+    'T000',
     'T001',
     'T002',
     'T003',
     'T004',
     'T005',
     'T006',
+    'T007',
+    'T008'
 ]
 
 
