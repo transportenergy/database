@@ -35,6 +35,7 @@ INSTALL_REQUIRES = [
     'pycountry',
     'pyyaml',
     'xarray',
+    'pprint',
     ]
 TESTS_REQUIRE = ['pytest']
 EXTRAS_REQUIRE = {
