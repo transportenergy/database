@@ -160,3 +160,34 @@ class DataframeManager:
         path = "{}/{}".format(cwd, filename)
         df_with_all_countries_data.to_csv(path, index=False)
         print("> UF File saved at: {}".format(cwd))
+
+    def transform_from_uf_to_pf_view(self, df, num_of_none_numeric_columns):
+        '''
+            num_of_none_numeric_columns represents the number of non-numeric
+            columns from df passed
+        '''
+
+        all_data_frames = []
+        counter = 0
+        for index, row in df.iterrows():
+            original_row = dict(row)
+            list_of_year_value = []
+            for column in list(original_row.keys()):
+                if column.isdigit():
+                    list_of_year_value.append(column)
+                    del original_row[column]
+
+            for year in list_of_year_value:
+                newdict = original_row.copy()
+                newdict[ColumnName.YEAR.value] = year
+                newdict[ColumnName.VALUE.value] = row[year]
+                local_df = pd.DataFrame(newdict, index=[counter])
+                all_data_frames.append(local_df)
+                counter = counter + 1
+
+        # Asserting that no info was missing.
+        assert len(all_data_frames) == ((df.shape[1] -
+                                        num_of_none_numeric_columns)
+                                        * df.shape[0])
+
+        return pd.concat(all_data_frames)
