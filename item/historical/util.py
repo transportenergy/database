@@ -41,7 +41,7 @@ def run_notebook(nb_path, tmp_path, env=os.environ, kernel=None):
         'jupyter', 'nbconvert',
         '--to', 'notebook',
         '--execute',
-        '--ExecutePreprocessor.timeout=60',
+        '--ExecutePreprocessor.timeout=600',
         f'--ExecutePreprocessor.kernel_name={kernel}',
         '--output', str(fname),
         str(nb_path)
