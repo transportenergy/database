@@ -9,6 +9,7 @@ COMMANDS = [
     ('historical',),
     ('historical', 'demo'),
     ('historical', 'phase1'),
+    ('historical', 'run-scripts'),
 
     # model
     ('model',),
