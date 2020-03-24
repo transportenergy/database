@@ -1,5 +1,22 @@
+from pathlib import Path
+
+import pytest
+
+import item
 from item.common import paths
-from item.historical import input_file
+from item.historical import SCRIPTS, input_file
+from item.historical.util import run_notebook
+
+
+def test_import():
+    # All historical database classes can be imported
+    from item.historical.scripts.util.managers.country_code \
+        import CountryCodeManager
+    from item.historical.scripts.util.managers.dataframe \
+        import DataframeManager
+
+    CountryCodeManager()
+    DataframeManager(dataset_id=None)
 
 
 def test_input_file(item_tmp_dir):
@@ -13,3 +30,14 @@ def test_input_file(item_tmp_dir):
 
     # input_file retrieves the last-sorted file:
     assert input_file(1) == paths['historical input'] / 'T001_foo.csv'
+
+
+# Path to IPython notebooks
+nb_path = Path(item.__file__).parent / 'historical' / 'scripts'
+
+
+@pytest.mark.parametrize('dataset_id', SCRIPTS)
+def test_run_notebook(dataset_id, tmp_path):
+    # Notebook runs top-to-bottom without cell errors
+    nb, errors = run_notebook(nb_path / f'{dataset_id}.ipynb', tmp_path)
+    assert errors == []
