@@ -23,7 +23,7 @@ def get_sdmx(source=None, **args):
     msg = req.get(resource_type='data', tofile='debug.json', **args)
 
     # Convert to pd.DataFrame, preserving attributes
-    df = sdmx.to_pandas(msg, attributes='dgso').dropna()
+    df = sdmx.to_pandas(msg, attributes='dgso')
     index_cols = df.index.names
 
     # Reset index, use categoricals
