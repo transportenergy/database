@@ -91,7 +91,7 @@ def init_paths(**kwargs):
     init_path('models-1', paths['model database'] / '1.csv')
     init_path('models-2', paths['model database'] / '2.csv')
 
-    init_path('historical', '.')
+    init_path('historical', Path(__file__).parent / 'data' / 'historical')
     init_path('historical input', paths['historical'] / 'input')
     init_path('output', '.')
 
