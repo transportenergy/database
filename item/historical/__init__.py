@@ -96,7 +96,7 @@ def fetch_source(id):
         raise ValueError(remote_type)
 
     cache_path = paths['historical input'] / f'{id}.csv'
-    result.to_csv(cache_path)
+    result.to_csv(cache_path, index=False)
     return cache_path
 
 
