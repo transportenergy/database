@@ -12,7 +12,10 @@ from item.historical.util import run_notebook
     # OECD via SDMX
     0, 1, 2, 3,
     # OpenKAPSARC
-    5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+    5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+    pytest.param(16, marks=pytest.mark.slow),  # 1.2m records/161 MiB
+    pytest.param(17, marks=pytest.mark.slow),  # 2.5m records/317 MiB
+    18, 19, 20, 21, 22, 23, 24,
 ])
 def test_fetch(source_id):
     """Raw data can be fetched from individual sources."""
