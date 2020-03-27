@@ -5,6 +5,7 @@ import click
 
 from item.model.cli import model
 from item.historical.cli import historical
+from item.remote.cli import remote
 from item.utils import make_template
 
 
@@ -90,3 +91,4 @@ def template():
 
 main.add_command(model)
 main.add_command(historical)
+main.add_command(remote)

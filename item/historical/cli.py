@@ -4,9 +4,9 @@ from tempfile import TemporaryDirectory
 import click
 from click import Group
 
-from ..openkapsarc import OpenKAPSARC
 from . import (
     SCRIPTS,
+    fetch_source,
     main as _phase1,
 )
 from .util import run_notebook
@@ -16,21 +16,11 @@ historical = Group('historical', help="Manipulate the historical database.")
 
 
 @historical.command()
-@click.argument('server', default=None, required=False)
-def demo(server):
-    """Access the KAPSARC APIs at the given SERVER."""
-    ok = OpenKAPSARC(server)
-
-    print('List of all datasets:')
-    for ds in ok.datasets():
-        print(ds)
-
-    print("\n\nDatasets with the 'iTEM' keyword:")
-    for ds in ok.datasets(kw='item'):
-        print(ds)
-
-    print('\n\nData from one table in a branch in a repository:')
-    print(ok.table('modal-split-of-freight-transport'))
+@click.argument('source', type=int)
+def fetch(source):
+    """Retrieve raw data for SOURCE."""
+    path = fetch_source(source)
+    print(f'Retrieved {path}')
 
 
 @historical.command()
