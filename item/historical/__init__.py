@@ -77,11 +77,23 @@ def source_str(id):
     return f'T{id:03}' if isinstance(id, int) else id
 
 
-def fetch_source(id):
-    """Fetch data from source *id*."""
+def fetch_source(id, use_cache=True):
+    """Fetch data from source *id*.
+
+    Parameters
+    ----------
+    use_cache : bool, optional
+        If given, use a cached file. No check of cache validity is performed.
+    """
     # Retrieve source information from sources.yaml
     id = source_str(id)
     source_info = copy(SOURCES[id])
+
+    # Path for cached data. NB OpenKAPSARC does its own caching
+    cache_path = paths['historical input'] / f'{id}.csv'
+
+    if use_cache and cache_path.exists():
+        return cache_path
 
     # Information for fetching the data
     fetch_info = source_info['fetch']
@@ -98,7 +110,6 @@ def fetch_source(id):
         raise ValueError(remote_type)
 
     # Cache the results
-    cache_path = paths['historical input'] / f'{id}.csv'
     result.to_csv(cache_path, index=False)
 
     return cache_path
