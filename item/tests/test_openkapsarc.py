@@ -27,5 +27,5 @@ def test_dataset(ok):
 
 def test_cli(ok):
     runner = CliRunner()
-    result = runner.invoke(item.cli.main, ['historical', 'demo'])
-    assert result.exit_code == 0
+    result = runner.invoke(item.cli.main, ['remote', 'demo'])
+    assert result.exit_code == 0, result.output
