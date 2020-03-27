@@ -46,7 +46,7 @@ install:
 # - Rscript -e "devtools::install('R/item', dep = T)"
 
 script:
-- pytest --pyargs item --cov=item --cov-report=term-missing
+- pytest --pyargs item --cov=item --cov-report=term-missing --verbose
 
 # Disabled: MIP3 code is in a separate repository
 # - R CMD build R/item
