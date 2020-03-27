@@ -3,16 +3,30 @@ from tempfile import TemporaryDirectory
 
 import click
 from click import Group
+import pandas as pd
 
 from . import (
     SCRIPTS,
     fetch_source,
     main as _phase1,
+    source_str,
 )
+from .diagnostic import coverage
 from .util import run_notebook
 
 
 historical = Group('historical', help="Manipulate the historical database.")
+
+
+@historical.command()
+@click.argument('output_path', type=click.Path(file_okay=False, writable=True))
+def diagnostics(output_path):
+    """Generate diagnostics on the historical input data sets."""
+    output_path = Path(output_path)
+    for source_id in [0, 1, 2, 3]:
+        data_file = fetch_source(source_id, use_cache=True)
+        report = coverage(pd.read_csv(data_file))
+        (output_path / f'{source_str(source_id)}.txt').write_text(report)
 
 
 @historical.command()
