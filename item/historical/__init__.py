@@ -1,4 +1,5 @@
 from copy import copy
+import os
 
 import pandas as pd
 import pint
@@ -89,14 +90,18 @@ def fetch_source(id):
     remote_type = fetch_info.pop('type')
     if remote_type == 'sdmx':
         # Use SDMX to retrieve the data
-        result = get_sdmx(**fetch_info['args'])
+        result = get_sdmx(**fetch_info)
     elif remote_type == 'OpenKAPSARC':
-        pass
+        # Retrieve data using the OpenKAPSARC API
+        ok_api = OpenKAPSARC(api_key=os.environ.get('OK_API_KEY', None))
+        result = ok_api.table(cache=False, **fetch_info)
     else:
         raise ValueError(remote_type)
 
+    # Cache the results
     cache_path = paths['historical input'] / f'{id}.csv'
     result.to_csv(cache_path, index=False)
+
     return cache_path
 
 
