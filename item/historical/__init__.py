@@ -93,7 +93,7 @@ def fetch_source(id):
     elif remote_type.lower() == 'openkapsarc':
         # Retrieve data using the OpenKAPSARC API
         ok_api = OpenKAPSARC(api_key=os.environ.get('OK_API_KEY', None))
-        result = ok_api.table(cache=False, **fetch_info)
+        result = ok_api.table(**fetch_info)
     else:
         raise ValueError(remote_type)
 

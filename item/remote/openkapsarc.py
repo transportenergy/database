@@ -1,3 +1,4 @@
+from datetime import datetime
 from json import JSONDecodeError
 import logging
 import sys
@@ -41,12 +42,13 @@ class Dataset:
         return self.data['dataset']['dataset_uid']
 
     @property
-    def record_count(self):
-        return self.data['dataset']['metas']['default']['record_count']
+    def records_count(self):
+        return self.data['dataset']['metas']['default']['records_count']
 
     @property
     def data_processed(self):
-        return self.data['dataset']['metas']['default']['data_processed']
+        return datetime.fromisoformat(
+            self.data['dataset']['metas']['default']['data_processed'])
 
     def __str__(self):
         return f"<Dataset {self.uid}: '{self.id}'>"
@@ -147,7 +149,33 @@ class OpenKAPSARC:
 
         # Cache path
         cache_path = (paths['historical'] / ds.uid).with_suffix('.csv')
+        cache_is_valid = False
         log.info(f'Cache path {cache_path}')
+
+        if cache and cache_path.exists():
+            cache_is_valid = True
+
+            # Check cache time
+            cache_time = datetime.fromtimestamp(cache_path.stat().st_mtime)
+            if cache_time < ds.data_processed.replace(tzinfo=None):
+                cache_is_valid = False
+                log.info(f'…is outdated → remove')
+
+            if cache_is_valid:
+                # Check cache length
+                with open(cache_path) as f:
+                    cache_records = sum(1 for _ in f)
+
+                if cache_records < ds.records_count:
+                    cache_is_valid = False
+                    log.info(f'...has fewer records ({cache_records}) than '
+                             f'source ({ds.records_count}) -> remove')
+
+            if not cache_is_valid:
+                cache_path.unlink()
+            else:
+                log.info('…is current; reading from file')
+                return pd.read_csv(cache_path, sep=';')
 
         # Stream data
         kwargs['stream'] = True
