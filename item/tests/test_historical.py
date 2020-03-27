@@ -8,7 +8,12 @@ from item.historical import SCRIPTS, fetch_source, input_file
 from item.historical.util import run_notebook
 
 
-@pytest.mark.parametrize('source_id', [1, 2, 3])
+@pytest.mark.parametrize('source_id', [
+    # OECD via SDMX
+    1, 2, 3,
+    # OpenKAPSARC
+    5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+])
 def test_fetch(source_id):
     """Raw data can be fetched from individual sources."""
     fetch_source(source_id)
