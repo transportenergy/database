@@ -7,7 +7,7 @@ import requests
 import requests_cache
 
 
-from .common import config, paths
+from item.common import config, paths
 
 
 log = logging.getLogger(__name__)
@@ -39,6 +39,14 @@ class Dataset:
     @property
     def uid(self):
         return self.data['dataset']['dataset_uid']
+
+    @property
+    def record_count(self):
+        return self.data['dataset']['metas']['default']['record_count']
+
+    @property
+    def data_processed(self):
+        return self.data['dataset']['metas']['default']['data_processed']
 
     def __str__(self):
         return f"<Dataset {self.uid}: '{self.id}'>"
@@ -137,12 +145,9 @@ class OpenKAPSARC:
         # Make another request to get dataset information
         ds = self.datasets(dataset_id)
 
+        # Cache path
         cache_path = (paths['historical'] / ds.uid).with_suffix('.csv')
-        log.info(f'Caching in {cache_path}')
-
-        # Set maximum rows
-        kwargs.setdefault('params', {})
-        kwargs['params'].setdefault('rows', self.max['rows'])
+        log.info(f'Cache path {cache_path}')
 
         # Stream data
         kwargs['stream'] = True

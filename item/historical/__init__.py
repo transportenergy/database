@@ -6,8 +6,7 @@ import pint
 import yaml
 
 from item.common import paths
-from item.openkapsarc import OpenKAPSARC
-from item.remote import get_sdmx
+from item.remote import OpenKAPSARC, get_sdmx
 
 
 # List of data processing scripts/IPython notebooks

@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 
 import item.cli
-from item.openkapsarc import OpenKAPSARC
+from item.remote import OpenKAPSARC
 
 
 @pytest.fixture(scope='module')
