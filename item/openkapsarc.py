@@ -56,7 +56,7 @@ class OpenKAPSARC:
 
     """
     ALL = sys.maxsize
-    max = {'rows': 100}
+    max = {'rows': 1000}
     server = 'https://datasource.kapsarc.org/api/v2'
 
     # Alternate values include 'opendatasoft', which includes all public data
@@ -139,6 +139,10 @@ class OpenKAPSARC:
 
         cache_path = (paths['historical'] / ds.uid).with_suffix('.csv')
         log.info(f'Caching in {cache_path}')
+
+        # Set maximum rows
+        kwargs.setdefault('params', {})
+        kwargs['params'].setdefault('rows', self.max['rows'])
 
         # Stream data
         kwargs['stream'] = True
