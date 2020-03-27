@@ -88,10 +88,10 @@ def fetch_source(id):
     fetch_info = source_info['fetch']
 
     remote_type = fetch_info.pop('type')
-    if remote_type == 'sdmx':
+    if remote_type.lower() == 'sdmx':
         # Use SDMX to retrieve the data
         result = get_sdmx(**fetch_info)
-    elif remote_type == 'OpenKAPSARC':
+    elif remote_type.lower() == 'openkapsarc':
         # Retrieve data using the OpenKAPSARC API
         ok_api = OpenKAPSARC(api_key=os.environ.get('OK_API_KEY', None))
         result = ok_api.table(cache=False, **fetch_info)
