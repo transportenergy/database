@@ -1,10 +1,12 @@
 from pathlib import Path
 
+import pandas as pd
 import pytest
 
 import item
 from item.common import paths
 from item.historical import SCRIPTS, fetch_source, input_file
+from item.historical.diagnostic import coverage
 from item.historical.util import run_notebook
 
 
@@ -55,3 +57,12 @@ def test_run_notebook(dataset_id, tmp_path):
     # Notebook runs top-to-bottom without cell errors
     nb, errors = run_notebook(nb_path / f'{dataset_id}.ipynb', tmp_path)
     assert errors == []
+
+
+@pytest.mark.parametrize('dataset_id, N_areas', [
+    (0, 56),
+    (1, 40),
+])
+def test_coverage(dataset_id, N_areas):
+    df = pd.read_csv(fetch_source(dataset_id, use_cache=True))
+    assert coverage(df).startswith(f'{N_areas} areas: ')
