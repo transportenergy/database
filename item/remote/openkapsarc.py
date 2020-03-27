@@ -120,8 +120,6 @@ class OpenKAPSARC:
                 raise ValueError("either give kw= or params={'where': …}")
             params['where'] = f"keyword LIKE '{kw}'"
 
-        params.setdefault('rows', self.max['rows'])
-
         result = self.endpoint('datasets', dataset_id, *args, params=params,
                                **kwargs)
 
