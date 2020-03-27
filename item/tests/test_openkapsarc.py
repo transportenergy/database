@@ -21,7 +21,8 @@ def test_dataset(ok):
     # Retrieve single dataset
     result = ok.table('modal-split-of-freight-transport')
     assert isinstance(result, pd.DataFrame)
-    assert len(result) == 1458
+    # NB sometimes 1406, sometimes 1458
+    assert len(result) > 1400
 
 
 def test_cli(ok):
