@@ -1,6 +1,20 @@
 """Diagnostics for historical data sets."""
 
+# Jinja2 template for diagnostics index page
+INDEX_TEMPLATE = """<html><body>
+{% for group_name, paths in groups.items() %}
+<h1>{{ group_name|title }}</h1>
 
+<ul>
+{% for path in paths %}
+  <li><a href="./{{ path }}">{{ path }}</a></li>
+{% endfor %}
+</ul>
+{% endfor %}
+</body></html>
+"""
+
+# Template for coverage()
 COV_TEXT = """{N_area} areas: {areas}
 {N_measures} measures: {measures}
 {N_periods} periods: {periods[0]}–{last_period}

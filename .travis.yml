@@ -25,7 +25,6 @@ install:
 script:
 - pytest --pyargs item --cov=item --cov-report=term-missing --verbose
 # Create diagnostics
-- mkdir output
 - item historical diagnostics output/
 
 after_success:

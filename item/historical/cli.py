@@ -11,7 +11,7 @@ from . import (
     main as _phase1,
     source_str,
 )
-from .diagnostic import coverage
+from .diagnostic import INDEX_TEMPLATE, coverage
 from .util import run_notebook
 
 
@@ -22,11 +22,26 @@ historical = Group('historical', help="Manipulate the historical database.")
 @click.argument('output_path', type=click.Path(file_okay=False, writable=True))
 def diagnostics(output_path):
     """Generate diagnostics on the historical input data sets."""
+    from jinja2 import Template
+
     output_path = Path(output_path)
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    groups = {'Coverage': []}
     for source_id in [0, 1, 2, 3]:
-        data_file = fetch_source(source_id, use_cache=True)
-        report = coverage(pd.read_csv(data_file))
-        (output_path / f'{source_str(source_id)}.txt').write_text(report)
+        # Output filename
+        filename = f'{source_str(source_id)}.txt'
+        groups['Coverage'].append(filename)
+
+        # Read source data
+        data = pd.read_csv(fetch_source(source_id, use_cache=True))
+
+        # Generate coverage and write to file
+        (output_path / filename).write_text(coverage(data))
+
+    # Generate index file
+    t = Template(INDEX_TEMPLATE)
+    (output_path / 'index.html').write_text(t.render(groups=groups))
 
 
 @historical.command()
