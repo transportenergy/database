@@ -32,3 +32,6 @@ doc/_build
 # R
 .Rproj.user
 R/*.Rcheck
+
+# Access keys for CI deployment
+ci/*.json

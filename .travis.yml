@@ -1,64 +1,40 @@
-# N.B. this file configures Travis to test *both* the Python and R item codes.
-#
-# References:
-# - The Travis documentation: https://docs.travis-ci.com/
-# - Example .travis.yml for a popular R package:
-#   https://github.com/tidyverse/ggplot2/blob/master/.travis.yml
-# - The community-developed R support for Travis:
-#   - https://github.com/travis-ci/travis-build , in particular the file:
-#     lib/travis/build/script/r.rb
-#   - Example output: https://travis-ci.org/tidyverse/ggplot2/jobs/232365761
-
-dist: xenial
-
-language: r
+os: linux
+dist: bionic
+language: python
+python: 3.8-dev
 
 cache:
   directories:
   - $HOME/.cache/item
   - $HOME/.cache/pip
   - $HOME/.conda/pkgs
-  - $HOME/R/Library
-
-r: release
-
-# NB see ci/install.sh; this is a no-op
-r_binary_packages:
-- devtools
 
 env:
   global:
   - CACHE=$HOME/.cache/item
-  - CONDAFNAME=Miniconda3-latest-Linux-x86_64.sh
-  - CONDAURL=https://repo.anaconda.com/miniconda/$CONDAFNAME
-  - PATH=$HOME/miniconda/bin:$PATH
   # OK_API_KEY
-  - secure: "gDIWMu6MUf20OBW5wBQek/m2mKVGAOgJ1VLAT358bsUB1JiJLByQLuFYa6OoaNvgSXre91kRIaklHMu58HFja5hwloV9KuEVyqGPIj8ZQU2jLPYjJJj1jsy0qFPv6FMShinb6gXhJ1+HKXFLHyZuDe6cL+lP7pgtBO7kFsEaYPB1rfb1gRIN9hyN6afHPF4KEBH/0umWsdRJEWeOOKmPbONJYqYTmPtt8clx51F/74MHGkv0+6RTPcibE8YgmnwfsaEdrEKzN9rgaaZof4yJl9qVBhRu4QeTYMmLvku7Uu6d4xEGVLDISUKyBKNGWynvpKYR6E+G0Vj7O4ZrpXEibWR5p4mG911m5wHpjJd2r2Xvw0Atkq2kXhjNrXnSOJ8EMlmIxD9kuZkVWT5YHdO6YGkxBkKdk9IzfTHS9y88RqBqHotPA7hGmzUYEPFCqw01QJEeXyowUmWYM/HwHo89G3PLEQGIKfRRe3w5J6uFI2q+vKsMHJciD93BB+hl9s8Ty3giRVZD4P354wt1vVGoM968YBdalXXpj0MV/4IFBizPzln2bDovsGN4nuEhsqnYgVqENh42rkGg58hm8lTpfDuBosj2KjuW8+j9DSR4sj335E6rzBE7vraM/maJnSvmXoPch+Oau7ePeVo6AfecTtH8vwqZ9EQoBPFpr5JaH+U="
+  - secure: gDIWMu6MUf20OBW5wBQek/m2mKVGAOgJ1VLAT358bsUB1JiJLByQLuFYa6OoaNvgSXre91kRIaklHMu58HFja5hwloV9KuEVyqGPIj8ZQU2jLPYjJJj1jsy0qFPv6FMShinb6gXhJ1+HKXFLHyZuDe6cL+lP7pgtBO7kFsEaYPB1rfb1gRIN9hyN6afHPF4KEBH/0umWsdRJEWeOOKmPbONJYqYTmPtt8clx51F/74MHGkv0+6RTPcibE8YgmnwfsaEdrEKzN9rgaaZof4yJl9qVBhRu4QeTYMmLvku7Uu6d4xEGVLDISUKyBKNGWynvpKYR6E+G0Vj7O4ZrpXEibWR5p4mG911m5wHpjJd2r2Xvw0Atkq2kXhjNrXnSOJ8EMlmIxD9kuZkVWT5YHdO6YGkxBkKdk9IzfTHS9y88RqBqHotPA7hGmzUYEPFCqw01QJEeXyowUmWYM/HwHo89G3PLEQGIKfRRe3w5J6uFI2q+vKsMHJciD93BB+hl9s8Ty3giRVZD4P354wt1vVGoM968YBdalXXpj0MV/4IFBizPzln2bDovsGN4nuEhsqnYgVqENh42rkGg58hm8lTpfDuBosj2KjuW8+j9DSR4sj335E6rzBE7vraM/maJnSvmXoPch+Oau7ePeVo6AfecTtH8vwqZ9EQoBPFpr5JaH+U=
 
-before_install:
-- source ci/before_install.sh
+before_install: source ci/before-install.sh
 
 install:
-- source ci/install.sh
-- pip install --editable .[doc,eppa,hist,tests] --progress-bar off
-
-# Disabled: MIP3 code is in a separate repository
-# - Rscript -e "devtools::install('R/item', dep = T)"
+# Install Python requirements
+- pip install --requirement ci/requirements.txt --progress-bar off
+- pip install --editable .[doc,eppa,hist,tests]
 
 script:
 - pytest --pyargs item --cov=item --cov-report=term-missing --verbose
-# Demonstrate performing diagnostics on CI
+# Create diagnostics
 - mkdir output
 - item historical diagnostics output/
-- cat output/*
-
-# Disabled: MIP3 code is in a separate repository
-# - R CMD build R/item
-# - R CMD check R/item
 
 after_success:
 - coverage combine
 - codecov
+# Upload diagnostic artifacts to Google Cloud Storage
+- >-
+  rclone --config=ci/rclone.conf --progress
+  copy output gcs:historical-data-ci.transportenergy.org/$TRAVIS_JOB_NUMBER/
 
 notifications:
   email: false
