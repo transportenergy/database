@@ -1,3 +1,4 @@
+from datetime import datetime
 from json import JSONDecodeError
 import logging
 import sys
@@ -7,7 +8,7 @@ import requests
 import requests_cache
 
 
-from .common import config, paths
+from item.common import config, paths
 
 
 log = logging.getLogger(__name__)
@@ -40,6 +41,15 @@ class Dataset:
     def uid(self):
         return self.data['dataset']['dataset_uid']
 
+    @property
+    def records_count(self):
+        return self.data['dataset']['metas']['default']['records_count']
+
+    @property
+    def data_processed(self):
+        return datetime.fromisoformat(
+            self.data['dataset']['metas']['default']['data_processed'])
+
     def __str__(self):
         return f"<Dataset {self.uid}: '{self.id}'>"
 
@@ -56,7 +66,7 @@ class OpenKAPSARC:
 
     """
     ALL = sys.maxsize
-    max = {'rows': 100}
+    max = {'rows': 1000}
     server = 'https://datasource.kapsarc.org/api/v2'
 
     # Alternate values include 'opendatasoft', which includes all public data
@@ -110,8 +120,6 @@ class OpenKAPSARC:
                 raise ValueError("either give kw= or params={'where': …}")
             params['where'] = f"keyword LIKE '{kw}'"
 
-        params.setdefault('rows', self.max['rows'])
-
         result = self.endpoint('datasets', dataset_id, *args, params=params,
                                **kwargs)
 
@@ -137,8 +145,35 @@ class OpenKAPSARC:
         # Make another request to get dataset information
         ds = self.datasets(dataset_id)
 
+        # Cache path
         cache_path = (paths['historical'] / ds.uid).with_suffix('.csv')
-        log.info(f'Caching in {cache_path}')
+        cache_is_valid = False
+        log.info(f'Cache path {cache_path}')
+
+        if cache and cache_path.exists():
+            cache_is_valid = True
+
+            # Check cache time
+            cache_time = datetime.fromtimestamp(cache_path.stat().st_mtime)
+            if cache_time < ds.data_processed.replace(tzinfo=None):
+                cache_is_valid = False
+                log.info(f'…is outdated → remove')
+
+            if cache_is_valid:
+                # Check cache length
+                with open(cache_path) as f:
+                    cache_records = sum(1 for _ in f)
+
+                if cache_records < ds.records_count:
+                    cache_is_valid = False
+                    log.info(f'...has fewer records ({cache_records}) than '
+                             f'source ({ds.records_count}) -> remove')
+
+            if not cache_is_valid:
+                cache_path.unlink()
+            else:
+                log.info('…is current; reading from file')
+                return pd.read_csv(cache_path, sep=';')
 
         # Stream data
         kwargs['stream'] = True

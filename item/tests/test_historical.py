@@ -4,8 +4,22 @@ import pytest
 
 import item
 from item.common import paths
-from item.historical import SCRIPTS, input_file
+from item.historical import SCRIPTS, fetch_source, input_file
 from item.historical.util import run_notebook
+
+
+@pytest.mark.parametrize('source_id', [
+    # OECD via SDMX
+    0, 1, 2, 3,
+    # OpenKAPSARC
+    5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+    pytest.param(16, marks=pytest.mark.slow),  # 1.2m records/161 MiB
+    pytest.param(17, marks=pytest.mark.slow),  # 2.5m records/317 MiB
+    18, 19, 20, 21, 22, 23, 24,
+])
+def test_fetch(source_id):
+    """Raw data can be fetched from individual sources."""
+    fetch_source(source_id)
 
 
 def test_import():

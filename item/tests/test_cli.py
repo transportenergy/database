@@ -7,7 +7,6 @@ import item.cli
 COMMANDS = [
     # historical
     ('historical',),
-    ('historical', 'demo'),
     ('historical', 'phase1'),
     ('historical', 'run-scripts'),
 
@@ -15,6 +14,10 @@ COMMANDS = [
     ('model',),
     ('model', 'process_raw'),
     ('model', 'list_pairs'),
+
+    # remote
+    ('remote',),
+    ('remote', 'demo'),
 
     # Top-level
     ('debug',),

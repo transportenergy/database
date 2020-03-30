@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 
 import item.cli
-from item.openkapsarc import OpenKAPSARC
+from item.remote import OpenKAPSARC
 
 
 @pytest.fixture(scope='module')
@@ -21,10 +21,11 @@ def test_dataset(ok):
     # Retrieve single dataset
     result = ok.table('modal-split-of-freight-transport')
     assert isinstance(result, pd.DataFrame)
-    assert len(result) == 1406
+    # NB sometimes 1406, sometimes 1458
+    assert len(result) > 1400
 
 
 def test_cli(ok):
     runner = CliRunner()
-    result = runner.invoke(item.cli.main, ['historical', 'demo'])
-    assert result.exit_code == 0
+    result = runner.invoke(item.cli.main, ['remote', 'demo'])
+    assert result.exit_code == 0, result.output
