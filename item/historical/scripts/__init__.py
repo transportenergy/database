@@ -32,7 +32,27 @@ with open(paths['data'] / 'model' / 'regions.yaml') as file:
 
 
 def process(id):
-    """Process a data set given its *id*."""
+    """Process a data set given its *id*.
+
+    Performs the following steps:
+
+    1. Load the data from cache.
+    2. Load a module defining dataset-specific processing steps. This module
+       is in a file named e.g. :file:`T001.py`.
+    3. Call the dataset's (optional) :meth:`check` method. This method receives
+       the input data frame as an argument, and can make one or more assertions
+       to ensure the data is in the expected format.
+    4. Drop columns in the dataset's (optional) :data:`DROP_COLUMNS`
+       :class:`list`.
+    5. Call the dataset's (required) :meth:`process` method. This method
+       receives the data frame from step (4), and performs any necessary
+       processing.
+    6. Assigns ISO 3166 alpha-3 codes and the iTEM region based on a column
+       containing country names.
+    7. Orders columns.
+    8. Outputs data to two files.
+
+    """
     # Creating the dataframe and viewing the data
 
     # Creating a dataframe from the csv data
@@ -42,6 +62,14 @@ def process(id):
 
     # Get the module for this data set
     dataset_module = MODULES[1]
+
+    try:
+        # Check that the input data is of the form required by the script
+        dataset_module.check(df)
+    except AttributeError:
+        print('No pre-processing checks to perform')
+    except AssertionError as e:
+        print(f'Input data is invalid: {e}')
 
     try:
         # Remove unnecessary columns

@@ -30,14 +30,16 @@ COMMON = dict(
 # Columns to drop
 DROP_COLUMNS = [
     'COUNTRY',
-    'YEAR',
     'VARIABLE',
-    'Reference Period Code',
-    'Unit Code',
-    'Reference Period',
+    'YEAR',
     'Flag Codes',
     'Flags',
     'PowerCode Code',
+    'PowerCode',
+    'Reference Period Code',
+    'Reference Period',
+    'Unit Code',
+    'Unit',
 ]
 
 
@@ -72,6 +74,16 @@ def convert_units(df, units_from, units_to):
     df['Unit'] = f'{qty.units:~}'
 
 
+def check(df):
+    """Check data set T001."""
+    # Check that input data contain the expected variable name
+    assert df['Variable'].unique() == ['Coastal shipping (national transport)']
+
+    # Check that the input data contain the expected units
+    assert df['PowerCode'].unique() == ['Millions']
+    assert df['Unit'].unique() == ['Tonnes-kilometres']
+
+
 def process(df):
     """Process data set T001."""
     # Getting a generic idea of what countries are missing values and dropping
@@ -90,16 +102,6 @@ def process(df):
 
     # Dropping the values
     df.dropna(inplace=True)
-
-    # Check that input data contain the expected variable name
-    assert df['Variable'].unique() == ['Coastal shipping (national transport)']
-
-    # Check that the input data contain the expected units
-    assert df['PowerCode'].unique() == ['Millions']
-    assert df['Unit'].unique() == ['Tonnes-kilometres']
-
-    # Drop the columns
-    df.drop(columns=['PowerCode', 'Unit'], inplace=True)
 
     # Assign single values for some dimensions
     df = assign(df, ['source', 'service', 'technology', 'fuel', 'mode',
