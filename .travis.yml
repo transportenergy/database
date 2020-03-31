@@ -38,12 +38,9 @@ after_success:
 notifications:
   email: false
   slack:
+    if: type = pull_request
     template:
-      - >-
-        Build <%{build_url}|#%{build_number}> (<%{compare_url}|%{commit}>) of
-        %{repository_slug}@%{branch} in PR
-        <%{pull_request_url}|#%{pull_request_number}> by %{author} %{result}
-        in %{duration}
-      - >-
-        Diagnostics may be available <https://storage.googleapis.com/historical-data-ci.transportenergy.org/%{build_number}.1/index.html|here>.
+    - "PR <%{pull_request_url}|%{repository_name}#%{pull_request_number}>: build <%{build_url}|#%{build_number}> *%{result}* in %{elapsed_time}"
+    - "for commit <%{compare_url}|%{commit}>: “%{commit_subject}”"
+    - "Diagnostics may be available <https://storage.googleapis.com/historical-data-ci.transportenergy.org/%{build_number}.1/index.html|here>."
     secure: rCH+JlN/1dU5innn7yVTeQ0RDWZHfT++qjhmKP3roXjjet+tRNpKHBvCmMG2nhSOkkG+OOuBuWRlbEUcohMKPImhZeiAUDz2YI8QHxPy5vQvYQm3FJs0hsX9+StDRKQ6RGOGwptwdc9zTys2NA8UdLMLuvfCB+9zfsMu+hpPyXLe64j8Wmb+NjtlvD8F6FyHMaZ1Dp0naSQK/Ye8N2KpOUPGg0gPGwoHRRC0T8EDat4u2UXLOGjtDI7WiSrIPFtVCRUyzVIjJm10U0PCYmOViHGdThnIvmwWTHtHFofJ2jSGNz9B5Q1VXjJkySBBsy/hELfNwDJlB1q8bl6xpX0dpGH/Lp3Wy33gdWDzBCGqHZ+PaUxy3/xjPU057NAE67582/FcrGAQg08FnRcecjCYG+WPA4L08bEuUlop2uHM1ITwsIkFNfxta4qMlsRDCVKa2DVL0p8wBiOWYbM9L1GO7RFd9i8dwXU0vh51+NJBBYMukoxkTlU67k57EdFtlNioKjD+JHbK29Mkdg5fzMe9yfKLFn9gVGKQeV7rBkQQC5jrDXuyy5eBf3EqxX9zC2R/ne9+10uubFXS6XxV4Su33VtktKZINoDaOPZJUX/Ol2Wbkq7nlLU8GDcnzfoUegRm/yh0iVaVRoP3ChemFcvSO9CXxfDIu3fpLPwokaXL5Vg=

@@ -101,7 +101,7 @@ def run_all(output_path):
     for path in source_data_paths:
         zf.write(filename=path, arcname=path.name)
 
-    groups['Cached raw source data'] = [output_path / 'data.zip']
+    groups['Cached raw source data'] = ['data.zip']
 
     # Generate index file
     t = Template(INDEX_TEMPLATE)
