@@ -110,7 +110,7 @@ def process(df):
     # "Freight Activity"
 
     # Dropping the current "Variable" column
-    df.drop(columns=["Variable"], inplace=True)
+    assert df['Variable'].unique() == ['Coastal shipping (national transport)']
 
     # Adding the new "Variable" column with the new data
     df = assign(df, 'variable')
