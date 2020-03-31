@@ -236,19 +236,4 @@ def process():
     # Adding the column to the dataframe
     df[ColumnName.ITEM_REGION.value] = item_region
 
-    # Reordering the columns
-    #
-    # Rule: The columns should follow the order established in the latest
-    # template
-
-    df = dataframeManager.reorder_columns(df)
-
-    # Exporting results
-
-    # Programming Friendly View
-    dataframeManager.create_programming_friendly_file(df)
-
-    # User Friendly View
-    dataframeManager.create_user_friendly_file(df)
-
     return df
