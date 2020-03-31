@@ -7,14 +7,16 @@ import yaml
 from item.common import paths
 from item.historical import source_str
 from . import T001
-from .util.managers.dataframe import ColumnName, DataframeManager
+from .util.managers.dataframe import ColumnName
 
 
 MODULES = {
     1: T001
 }
 
-# Non-ISO names appearing in 1 or more data sets
+OUTPUT_PATH = paths['data'] / 'historical' / 'output'
+
+#: Non-ISO names appearing in 1 or more data sets; see :meth:`iso_and_region`.
 COUNTRY_NAME = {
     "Montenegro, Republic of": "Montenegro",
     "Bosnia-Herzegovina": "Bosnia and Herzegovina",
@@ -96,16 +98,10 @@ def process(id):
     #
     # Rule: The columns should follow the order established in the latest
     # template
-    dfm = DataframeManager(source_str(id))
-    df = dfm.reorder_columns(df)
+    df = df.assign(**{ColumnName.ID.value: id_str}) \
+           .reindex(columns=[ev.value for ev in ColumnName])
 
-    # Exporting results
-
-    # Programming Friendly View
-    dfm.create_programming_friendly_file(df)
-
-    # User Friendly View
-    dfm.create_user_friendly_file(df)
+    cache_results(id_str, df)
 
     # Return the data for use by other code
     return df
@@ -128,3 +124,30 @@ def iso_and_region(name):
     return pd.Series(
         [alpha_3, REGION.get(alpha_3, 'N/A')],
         index=[ColumnName.ISO_CODE.value, ColumnName.ITEM_REGION.value])
+
+
+def cache_results(id_str, df):
+    """Write *df* to cache in two file formats.
+
+    The files written are:
+
+    - :file:`{id_str}_cleaned_PF.csv`, in long or 'programming-friendly'
+      format.
+    - :file:`{id_str}_cleaned_UF.csv`, in wide or 'user-friendly' format.
+    """
+    OUTPUT_PATH.mkdir(exist_ok=True)
+
+    # Long format ('programming friendly view')
+    path = OUTPUT_PATH / f'{id_str}_cleaned_PF.csv'
+    df.to_csv(path, index=False)
+    print(f'Write {path}')
+
+    # Pivot to wide format ('user friendly view') and write to CSV
+    columns = [ev.value for ev in ColumnName if ev != ColumnName.VALUE]
+    path = OUTPUT_PATH / f'{id_str}_cleaned_UF.csv'
+    df.set_index(columns) \
+      .unstack(ColumnName.YEAR.value) \
+      .reset_index()\
+      .to_csv(path, index=False)
+
+    print(f'Write {path}')
