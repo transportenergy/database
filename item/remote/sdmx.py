@@ -2,14 +2,14 @@ import pandasdmx as sdmx
 
 
 def get_sdmx(source=None, **args):
-    """Retrieve data from *source* using pandaSDMX.
+    """Retrieve data from *source* using :mod:`pandasdxm`.
 
     Arguments
     ---------
     source : str
         Name of a data source recognized by pandaSDMX, e.g. 'OECD'.
     args
-        Other arguments to :meth:`sdmx.Request.get`.
+        Other arguments to :meth:`pandasdmx.Request.get`.
 
     Returns
     -------

@@ -7,6 +7,7 @@ import item.cli
 COMMANDS = [
     # historical
     ('historical',),
+    ('historical', 'diagnostics'),
     ('historical', 'phase1'),
     ('historical', 'run-scripts'),
 

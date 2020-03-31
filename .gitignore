@@ -24,6 +24,7 @@ dist
 # Data files/generated
 *.csv
 *.xlsx
+output/
 
 # Sphinx documentation
 doc/_build
@@ -31,3 +32,6 @@ doc/_build
 # R
 .Rproj.user
 R/*.Rcheck
+
+# Access keys for CI deployment
+ci/*.json

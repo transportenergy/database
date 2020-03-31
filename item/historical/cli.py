@@ -9,10 +9,20 @@ from . import (
     fetch_source,
     main as _phase1,
 )
+
 from .util import run_notebook
 
 
 historical = Group('historical', help="Manipulate the historical database.")
+
+
+@historical.command()
+@click.argument('output_path', type=click.Path(file_okay=False, writable=True))
+def diagnostics(output_path):
+    """Generate diagnostics on the historical input data sets."""
+    from .diagnostic import run_all
+
+    run_all(output_path)
 
 
 @historical.command()
