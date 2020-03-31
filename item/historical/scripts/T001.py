@@ -1,13 +1,15 @@
 import pandas as pd
-from item.historical.scripts.util.managers.dataframe import DataframeManager
-from item.historical.scripts.util.managers.dataframe import ColumnName
+
+from item.common import paths
 from item.historical.scripts.util.managers.country_code import \
     CountryCodeManager
-from item.common import paths
+from item.historical.scripts.util.managers.dataframe import (
+    ColumnName,
+    DataframeManager,
+)
 
 
-# # Variables used all over the notebook
-
+# Variables used all over the notebook
 DATASET_ID = "T001"
 dataframeManager = DataframeManager(DATASET_ID)
 countryCodeManager = CountryCodeManager()
@@ -51,16 +53,15 @@ def assign(dim):
     # print(df)
 
 
-# # Creating the dataframe and viewing the data
+# Creating the dataframe and viewing the data
 
 # Creating a dataframe from the csv data
 path = paths['data'] / 'historical' / 'input' / 'T001_input.csv'
 df = pd.read_csv(path)
-df
 
-# # Removing all unnecessary columns
+# Removing all unnecessary columns
 #
-# ### Rule: To comply with the latest template, we will drop all the
+# Rule: To comply with the latest template, we will drop all the
 # unnecessary columns and rename others.
 
 # Droping the repeated columns
@@ -76,11 +77,11 @@ columns_to_delete = [
     "PowerCode Code",
 ]
 df.drop(columns=columns_to_delete, inplace=True)
-df
 
-# ## Getting a generic idea of what countries are missing values and dropping
+# Getting a generic idea of what countries are missing values and dropping
 # NaN values
-#     Rule: Erase all value with NaN
+#
+# Rule: Erase all value with NaN
 
 list_of_countries_with_missing_values = list(
     set(df[df['Value'].isnull()]["Country"]))
@@ -99,8 +100,9 @@ assign('service')
 assign('technology')
 assign('fuel')
 
-# # Setting the correct unit name in the "Unit" column
-#     Rule: Based on the template, the correct unit for "Fraight Activity" is
+# Setting the correct unit name in the "Unit" column
+#
+# Rule: Based on the template, the correct unit for "Fraight Activity" is
 # "10^9 tonne-km / yr", so we will assign those units to the data
 
 # Dropping the current "Unit" column
@@ -108,11 +110,11 @@ df.drop(columns=["Unit"], inplace=True)
 
 # Adding the new "Unit" column
 df[ColumnName.UNIT.value] = ["10^9 tonne-km / yr"]*len(df)
-df
 
-# # Setting the correct magnitude of the "Value" column
-#     Rule: The current data is in million. We will convert all values to
-# billions. In which (1M = 0.001B)
+# Setting the correct magnitude of the "Value" column
+#
+# Rule: The current data is in million. We will convert all values to billions.
+# In which (1M = 0.001B)
 
 # Removing the "PowerCode" column since it is not necessary
 df.drop(columns=["PowerCode"], inplace=True)
@@ -122,16 +124,16 @@ for index, row in df.iterrows():
     current_value = row.Value
     new_value = current_value * float(0.001)
     df.Value[index] = new_value
-df
 
 # Insert columns
 assign('mode')
 assign('vehicle_type')
 
-# # Renaming the column "Variable"
-#     Rule: There is only one activity being perform in this dataset and that
-# is the "Freight Activity". We are setting, for each row, the variable
-# "Freight Activity"
+# Renaming the column "Variable"
+#
+# Rule: There is only one activity being perform in this dataset and that is
+# the "Freight Activity". We are setting, for each row, the variable "Freight
+# Activity"
 
 # Dropping the current "Variable" column
 df.drop(columns=["Variable"], inplace=True)
@@ -139,11 +141,12 @@ df.drop(columns=["Variable"], inplace=True)
 # Adding the new "Variable" column with the new data
 assign('variable')
 
-# # Getting the ISO code for each country
-#     Rule: For each country, we need to assign their respective ISO Code
+# Getting the ISO code for each country
+# Rule: For each country, we need to assign their respective ISO Code
 
-# ## Determining which countries do not appear in the list of ISO Code
-#     As seen from the code below, four countries appear to not have ISO code.
+# Determining which countries do not appear in the list of ISO Code
+#
+# As seen from the code below, four countries appear to not have ISO code.
 # However, the reason is because the countries are written in a format that is
 # not understandable. So, this is how each those "missing" countries will be
 # called in order to obtain their ISO code
@@ -164,7 +167,7 @@ countries_with_no_ISO_code = \
 # Print this list of countries with no ISO codes
 countries_with_no_ISO_code
 
-# ## Adding the ISO column to the df
+# Adding the ISO column to the df
 
 dirty_list_of_all_countries = df["Country"]
 clean_list_of_all_countries = []
@@ -197,13 +200,14 @@ list_of_iso_codes = \
 
 # Adding the column to the dataframe
 df[ColumnName.ISO_CODE.value] = list_of_iso_codes
-df
 
-# # Getting the ITEM region for each country
-#     Rule: For each country, we need to assign an ITEM region
+# Getting the ITEM region for each country
+#
+# Rule: For each country, we need to assign an ITEM region
 
-# ## Determining which countries are missing an ITEM region
-#     As seen from the cell below, there is no country that does no have a
+# Determining which countries are missing an ITEM region
+#
+# As seen from the cell below, there is no country that does no have a
 # respective ITEM region. Therefore, no further cleaning needs to be done to
 # get the item regions.
 
@@ -217,7 +221,7 @@ iso_code_with_no_region = \
 # printing the list of ISO codes
 iso_code_with_no_region
 
-# ## Adding the ITEM region column to the dataset
+# Adding the ITEM region column to the dataset
 
 # Getting the complete list of iso codes
 list_of_all_codes = df["ISO Code"]
@@ -227,16 +231,15 @@ item_region = \
 
 # Adding the column to the dataframe
 df[ColumnName.ITEM_REGION.value] = item_region
-df
 
-# # Reordering the columns
-#     Rule: The columns should follow the order established in the latest
+# Reordering the columns
+#
+# Rule: The columns should follow the order established in the latest
 # template
 
 df = dataframeManager.reorder_columns(df)
-df
 
-# # Exporting results
+# Exporting results
 
 # Programming Friendly View
 dataframeManager.create_programming_friendly_file(df)
