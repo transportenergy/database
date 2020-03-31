@@ -34,7 +34,7 @@ COMMON = dict(
 )
 
 
-def assign(dim):
+def assign(df, dim):
     """Assign a single value for dimension *dim*."""
     name = getattr(ColumnName, dim.upper()).value
     value = COMMON[dim]
@@ -43,8 +43,7 @@ def assign(dim):
     # dataframeManager.simple_column_insert(df, name, value)
 
     # Use built-in pandas functionality, which is more efficient
-    global df
-    df = df.assign(**{name: value})
+    return df.assign(**{name: value})
 
     # The Jupyter notebook echoes the data frame after each such step
     # print(df)
@@ -89,10 +88,10 @@ def process(df):
     df.dropna(inplace=True)
 
     # Insert columns
-    assign('source')
-    assign('service')
-    assign('technology')
-    assign('fuel')
+    df = df.pipe(assign, 'source') \
+           .pipe(assign, 'service') \
+           .pipe(assign, 'technology') \
+           .pipe(assign, 'fuel')
 
     # Setting the correct unit name in the "Unit" column
     #
@@ -120,8 +119,8 @@ def process(df):
         df.Value[index] = new_value
 
     # Insert columns
-    assign('mode')
-    assign('vehicle_type')
+    df = df.pipe(assign, 'mode') \
+           .pipe(assign, 'vehicle_type')
 
     # Renaming the column "Variable"
     #
@@ -133,7 +132,7 @@ def process(df):
     df.drop(columns=["Variable"], inplace=True)
 
     # Adding the new "Variable" column with the new data
-    assign('variable')
+    df = assign(df, 'variable')
 
     # Getting the ISO code for each country
     # Rule: For each country, we need to assign their respective ISO Code
