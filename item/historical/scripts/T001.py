@@ -128,96 +128,36 @@ def process(df):
     # Adding the new "Variable" column with the new data
     df = assign(df, 'variable')
 
-    # Getting the ISO code for each country
-    # Rule: For each country, we need to assign their respective ISO Code
-
-    # Determining which countries do not appear in the list of ISO Code
+    # # Getting the ITEM region for each country
+    # #
+    # # Rule: For each country, we need to assign an ITEM region
     #
-    # As seen from the code below, four countries appear to not have ISO code.
-    # However, the reason is because the countries are written in a format that
-    # is not understandable. So, this is how each those "missing" countries
-    # will be called in order to obtain their ISO code
+    # # Determining which countries are missing an ITEM region
+    # #
+    # # As seen from the cell below, there is no country that does no have a
+    # # respective ITEM region. Therefore, no further cleaning needs to be done
+    # # to get the item regions.
     #
-    #     Original Name --> New name
-    #         > Montenegro, Republic of --> Montenegro
-    #         > Korea --> Korea, Republic of
-    #         > Serbia, Republic of --> Serbia
-
-    # Getting the list of countries available
-    list_of_countries = list(set(df["Country"]))
-
-    # Getting the list of countries with no ISO code
-    countries_with_no_ISO_code = \
-        countryCodeManager.get_list_of_countries_with_no_iso_code(
-            list_of_countries)
-
-    # Print this list of countries with no ISO codes
-    countries_with_no_ISO_code
-
-    # Adding the ISO column to the df
-
-    dirty_list_of_all_countries = df["Country"]
-    clean_list_of_all_countries = []
-
-    for country in dirty_list_of_all_countries:
-        if country == "Montenegro, Republic of":
-            clean_list_of_all_countries.append("Montenegro")
-        elif country == "Bosnia-Herzegovina":
-            clean_list_of_all_countries.append("Bosnia and Herzegovina")
-        elif country == "Korea":
-            clean_list_of_all_countries.append("Korea, Republic of")
-        elif country == "Serbia, Republic of":
-            clean_list_of_all_countries.append("Serbia")
-        else:
-            clean_list_of_all_countries.append(country)
-
-    # Ensure the size of the cleaned list is the same as the dirty list
-    assert len(clean_list_of_all_countries) == len(dirty_list_of_all_countries)
-
-    # Assert that for all elements in the new list, no country is left without
-    # an ISO code
-    assert len(
-        countryCodeManager.get_list_of_countries_with_no_iso_code(
-            clean_list_of_all_countries)) == 0
-
-    # Getting the list of iso codes
-    list_of_iso_codes = \
-        countryCodeManager.get_list_of_iso_for_countries(
-            clean_list_of_all_countries)
-
-    # Adding the column to the dataframe
-    df[ColumnName.ISO_CODE.value] = list_of_iso_codes
-
-    # Getting the ITEM region for each country
+    # # Getting the list of ISO codes
+    # list_of_iso_codes = list(set(df["ISO Code"]))
     #
-    # Rule: For each country, we need to assign an ITEM region
-
-    # Determining which countries are missing an ITEM region
+    # # Getting the list of ISO code with no region
+    # iso_code_with_no_region = \
+    #     countryCodeManager.get_list_of_iso_codes_with_no_region(
+    #         list_of_iso_codes)
     #
-    # As seen from the cell below, there is no country that does no have a
-    # respective ITEM region. Therefore, no further cleaning needs to be done
-    # to get the item regions.
-
-    # Getting the list of ISO codes
-    list_of_iso_codes = list(set(df["ISO Code"]))
-
-    # Getting the list of ISO code with no region
-    iso_code_with_no_region = \
-        countryCodeManager.get_list_of_iso_codes_with_no_region(
-            list_of_iso_codes)
-
-    # printing the list of ISO codes
-    iso_code_with_no_region
-
-    # Adding the ITEM region column to the dataset
-
-    # Getting the complete list of iso codes
-    list_of_all_codes = df["ISO Code"]
-
-    item_region = \
-        countryCodeManager.get_list_of_regions_for_iso_codes(list_of_all_codes)
-
-    # Adding the column to the dataframe
-    df[ColumnName.ITEM_REGION.value] = item_region
+    # # printing the list of ISO codes
+    # iso_code_with_no_region
+    #
+    # # Adding the ITEM region column to the dataset
+    #
+    # # Getting the complete list of iso codes
+    # list_of_all_codes = df["ISO Code"]
+    #
+    # item_region = \
+    #     countryCodeManager.get_list_of_regions_for_iso_codes(list_of_all_codes)
+    #
+    # # Adding the column to the dataframe
+    # df[ColumnName.ITEM_REGION.value] = item_region
 
     return df
