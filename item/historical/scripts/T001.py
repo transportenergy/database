@@ -1,5 +1,4 @@
-import pint
-
+from item.utils import convert_units
 from item.historical.scripts.util.managers.dataframe import ColumnName
 
 
@@ -53,25 +52,8 @@ def assign(df, dims):
         # Common value for this data set
         args[name] = COMMON[dim]
 
-    # Use the DataframeManager class
-    # dataframeManager.simple_column_insert(df, name, value)
-
     # Use built-in pandas functionality, which is more efficient
     return df.assign(**args)
-
-    # The Jupyter notebook echoes the data frame after each such step
-    # print(df)
-
-
-def convert_units(df, units_from, units_to):
-    """Convert units of *df*."""
-    # TODO move this method so it is usable across all scripts
-    ureg = pint.get_application_registry()
-    # Create a vector pint.Quantity; convert units
-    qty = ureg.Quantity(df['Value'].values, units_from).to(units_to)
-    # Assign Value and Unit columns in output DataFrame
-    df['Value'] = qty.magnitude
-    df['Unit'] = f'{qty.units:~}'
 
 
 def check(df):
@@ -100,15 +82,14 @@ def process(df):
     print(">> Number of rows to erase: {}"
           .format(len(df[df['Value'].isnull()])))
 
-    # Dropping the values
-    df.dropna(inplace=True)
-
-    # Assign single values for some dimensions
-    df = assign(df, ['source', 'service', 'technology', 'fuel', 'mode',
-                     'vehicle_type', 'variable'])
-
-    # Convert to the preferred iTEM units
-    # TODO read the preferred units (here 'Gt km / year') from a common place
-    convert_units(df, 'Mt km / year', 'Gt km / year')
+    # 1. Drop null values.
+    # 2. Assign single values for some dimensions.
+    # 3. Convert to the preferred iTEM units.
+    #    TODO read the preferred units (here 'Gt km / year') from a common
+    #    location
+    df = df.dropna() \
+           .pipe(assign, ['source', 'service', 'technology', 'fuel', 'mode',
+                          'vehicle_type', 'variable']) \
+           .pipe(convert_units, 'Mt km / year', 'Gt km / year')
 
     return df
