@@ -12,6 +12,45 @@ DATASET_ID = "T001"
 dataframeManager = DataframeManager(DATASET_ID)
 countryCodeManager = CountryCodeManager()
 
+
+# Dimensions and attributes which do not vary across this data set
+COMMON = dict(
+    variable='Freight Activity',
+    # Rule: Add the same source to all rows since all data comes from the same
+    # source
+    source='International Transport Forum',
+    # Rule: Since all the data is associated to "Freight," the Service is
+    # "Freight"
+    service='Freight',
+    # Rule: The dataset does not provide any data about those two columns, so
+    # we added the default value of "All" in both cases
+    technology='All',
+    fuel='All',
+    # Rule: Since all the data is about shipping, all rows have "Shipping" as
+    # mode
+    mode='Shipping',
+    # Rule: Since all the data in this dataset is associted to coastal
+    # shipping, the vehicle type is "Coastal"
+    vehicle_type='Coastal',
+)
+
+
+def assign(dim):
+    """Assign a single value for dimension *dim*."""
+    name = getattr(ColumnName, dim.upper()).value
+    value = COMMON[dim]
+
+    # Use the DataframeManager class
+    # dataframeManager.simple_column_insert(df, name, value)
+
+    # Use built-in pandas functionality, which is more efficient
+    global df
+    df = df.assign(**{name: value})
+
+    # The Jupyter notebook echoes the data frame after each such step
+    # print(df)
+
+
 # # Creating the dataframe and viewing the data
 
 # Creating a dataframe from the csv data
@@ -54,30 +93,11 @@ print(">> Number of rows to erase: {}".format(len(df[df['Value'].isnull()])))
 # Dropping the values
 df.dropna(inplace=True)
 
-# # Adding the "Source Column"
-#     Rule: Add the same source to all rows since all data comes from same
-# source
-
-dataframeManager.simple_column_insert(
-    df,
-    ColumnName.SOURCE.value,
-    "International Transport Forum")
-df
-
-# # Adding the "Service" column
-#     Rule: Since all the data is associated to "Freight," the Service is
-# "Freight"
-
-dataframeManager.simple_column_insert(df, ColumnName.SERVICE.value, "Freight")
-df
-
-# # Adding the "Technology" and "Fuel" columns
-#     Rule: The dataset does not provide any data about those two columns, so
-# we added the default value of "All" in both cases.
-
-dataframeManager.simple_column_insert(df, ColumnName.TECHNOLOGY.value, "All")
-dataframeManager.simple_column_insert(df, ColumnName.FUEL.value, "All")
-df
+# Insert columns
+assign('source')
+assign('service')
+assign('technology')
+assign('fuel')
 
 # # Setting the correct unit name in the "Unit" column
 #     Rule: Based on the template, the correct unit for "Fraight Activity" is
@@ -104,22 +124,9 @@ for index, row in df.iterrows():
     df.Value[index] = new_value
 df
 
-# # Adding the "Mode" column
-#     Rule: Since all the data is about shipping, all rows have "Shipping" as
-# mode
-
-dataframeManager.simple_column_insert(df, ColumnName.MODE.value, "Shipping")
-df
-
-# # Adding the column "Vehicle Type"
-#     Rule: Since all the data in this dataset is associted to coastal
-# shipping, the vehicle type is "Coastal"
-
-dataframeManager.simple_column_insert(
-    df,
-    ColumnName.VEHICLE_TYPE.value,
-    "Coastal")
-df
+# Insert columns
+assign('mode')
+assign('vehicle_type')
 
 # # Renaming the column "Variable"
 #     Rule: There is only one activity being perform in this dataset and that
@@ -130,11 +137,7 @@ df
 df.drop(columns=["Variable"], inplace=True)
 
 # Adding the new "Variable" column with the new data
-dataframeManager.simple_column_insert(
-    df,
-    ColumnName.VARIABLE.value,
-    "Freight Activity")
-df
+assign('variable')
 
 # # Getting the ISO code for each country
 #     Rule: For each country, we need to assign their respective ISO Code
