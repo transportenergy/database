@@ -20,7 +20,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'iTEM'
-copyright = '2017–2019, iTEM consortium'
+copyright = '2017–2020, iTEM consortium'
 author = 'iTEM consortium'
 
 # The short X.Y version
@@ -190,6 +190,7 @@ epub_exclude_files = ['search.html']
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
     'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
+    'sdmx': ('https://pandasdmx.readthedocs.io/en/master/', None),
     }
 
 # -- Options for todo extension ----------------------------------------------
