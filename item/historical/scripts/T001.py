@@ -1,3 +1,6 @@
+import pandas as pd
+import pint
+
 from item.historical.scripts.util.managers.dataframe import ColumnName
 
 
@@ -51,6 +54,15 @@ def assign(df, dim):
     # print(df)
 
 
+def convert_units(df, units_from, units_to):
+    ureg = pint.get_application_registry()
+    # Create a vector pint.Quantity; convert units
+    qty = ureg.Quantity(df['Value'].values, units_from).to(units_to)
+    # Assign Value and Unit columns in output DataFrame
+    df['Value'] = qty.magnitude
+    df['Unit'] = f'{qty.units:~}'
+
+
 def process(df):
     """Process data set T001."""
     # Getting a generic idea of what countries are missing values and dropping
@@ -76,30 +88,16 @@ def process(df):
            .pipe(assign, 'technology') \
            .pipe(assign, 'fuel')
 
-    # Setting the correct unit name in the "Unit" column
-    #
-    # Rule: Based on the template, the correct unit for "Fraight Activity" is
-    # "10^9 tonne-km / yr", so we will assign those units to the data
+    # Check that the input data contain the expected units
+    assert df['PowerCode'].unique() == ['Millions']
+    assert df['Unit'].unique() == ['Tonnes-kilometres']
 
-    # Dropping the current "Unit" column
-    df.drop(columns=["Unit"], inplace=True)
+    # Drop the columns
+    df.drop(columns=['PowerCode', 'Unit'], inplace=True)
 
-    # Adding the new "Unit" column
-    df[ColumnName.UNIT.value] = ["10^9 tonne-km / yr"]*len(df)
-
-    # Setting the correct magnitude of the "Value" column
-    #
-    # Rule: The current data is in million. We will convert all values to
-    # billions. In which (1M = 0.001B)
-
-    # Removing the "PowerCode" column since it is not necessary
-    df.drop(columns=["PowerCode"], inplace=True)
-
-    # Looping though each row and convert each value to billion magnitude
-    for index, row in df.iterrows():
-        current_value = row.Value
-        new_value = current_value * float(0.001)
-        df.Value[index] = new_value
+    # Convert to the preferred iTEM units
+    # TODO read the preferred units (here 'Gt km / year') from a common place
+    convert_units(df, 'Mt km / year', 'Gt km / year')
 
     # Insert columns
     df = df.pipe(assign, 'mode') \
