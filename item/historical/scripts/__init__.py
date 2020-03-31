@@ -6,8 +6,8 @@ from . import T001
 from .util.managers.dataframe import DataframeManager
 
 
-SCRIPTS = {
-    1: T001.process
+MODULES = {
+    1: T001
 }
 
 
@@ -20,9 +20,20 @@ def process(id):
     path = paths['data'] / 'historical' / 'input' / f'{id_str}_input.csv'
     df = pd.read_csv(path)
 
+    # Get the module for this data set
+    dataset_module = MODULES[1]
+
+    try:
+        # Remove unnecessary columns
+        df.drop(columns=dataset_module.DROP_COLUMNS, inplace=True)
+        print('Drop {len(dataset_module.DROP_COLUMNS)} extra column(s)')
+    except AttributeError:
+        # No variable DROP_COLUMNS in dataset_module
+        print(f'No columns to drop for {id_str}')
+
     # Call the dataset-specific processing
-    script = SCRIPTS[1]
-    df = script(df)
+    df = dataset_module.process(df)
+    print(f'{len(df)} observations')
 
     # Perform common cleaning tasks
     # TODO Assign ISO-3166 codes

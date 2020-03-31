@@ -33,6 +33,19 @@ COMMON = dict(
     vehicle_type='Coastal',
 )
 
+# Columns to drop
+DROP_COLUMNS = [
+    'COUNTRY',
+    'YEAR',
+    'VARIABLE',
+    'Reference Period Code',
+    'Unit Code',
+    'Reference Period',
+    'Flag Codes',
+    'Flags',
+    'PowerCode Code',
+]
+
 
 def assign(df, dim):
     """Assign a single value for dimension *dim*."""
@@ -51,25 +64,6 @@ def assign(df, dim):
 
 def process(df):
     """Process data set T001."""
-    # Removing all unnecessary columns
-    #
-    # Rule: To comply with the latest template, we will drop all the
-    # unnecessary columns and rename others.
-
-    # Droping the repeated columns
-    columns_to_delete = [
-        "COUNTRY",
-        "YEAR",
-        "VARIABLE",
-        "Reference Period Code",
-        "Unit Code",
-        "Reference Period",
-        "Flag Codes",
-        "Flags",
-        "PowerCode Code",
-    ]
-    df.drop(columns=columns_to_delete, inplace=True)
-
     # Getting a generic idea of what countries are missing values and dropping
     # NaN values
     #
