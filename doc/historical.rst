@@ -46,3 +46,12 @@ Code reference
 
 .. automodule:: item.historical
    :members:
+   :exclude-members: REGION, SOURCES
+
+   .. Omit the verbose printing of the data values.
+
+   .. autodata:: item.historical.REGION
+      :annotation:
+
+   .. autodata:: item.historical.SOURCES
+      :annotation: ← contents of sources.yaml
