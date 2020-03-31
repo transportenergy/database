@@ -4,12 +4,8 @@ from tempfile import TemporaryDirectory
 import click
 from click import Group
 
-from . import (
-    SCRIPTS,
-    fetch_source,
-    main as _phase1,
-)
-
+from . import SCRIPTS, fetch_source
+from .legacy import main as _phase1
 from .util import run_notebook
 
 
@@ -34,7 +30,8 @@ def fetch(source):
 
 
 @historical.command()
-@click.argument('output_file', type=click.Path(dir_okay=False, writable=True),
+@click.argument('output_file',
+                type=click.Path(dir_okay=False, writable=True),
                 default='IK2_Open_Data_conv_phase1.csv')
 @click.option('--use-cache/--no-cache', is_flag=True, default=True,
               help='Use cached files (no network traffic).')

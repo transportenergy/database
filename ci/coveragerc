@@ -1,6 +1,6 @@
 [run]
 omit =
-  item/tests/*
+  item/historical/legacy.py
   item/model/bp.py
   item/model/cli.py
   item/model/eia.py
@@ -9,3 +9,4 @@ omit =
   item/model/get.py
   item/model/itf.py
   item/model/message.py
+  item/tests/*
