@@ -1,6 +1,3 @@
-import pandas as pd
-
-from item.common import paths
 from item.historical.scripts.util.managers.country_code import \
     CountryCodeManager
 from item.historical.scripts.util.managers.dataframe import (
@@ -53,14 +50,8 @@ def assign(dim):
     # print(df)
 
 
-def process():
+def process(df):
     """Process data set T001."""
-    # Creating the dataframe and viewing the data
-
-    # Creating a dataframe from the csv data
-    path = paths['data'] / 'historical' / 'input' / 'T001_input.csv'
-    df = pd.read_csv(path)
-
     # Removing all unnecessary columns
     #
     # Rule: To comply with the latest template, we will drop all the
