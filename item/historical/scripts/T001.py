@@ -1,15 +1,4 @@
-from item.historical.scripts.util.managers.country_code import \
-    CountryCodeManager
-from item.historical.scripts.util.managers.dataframe import (
-    ColumnName,
-    DataframeManager,
-)
-
-
-# Variables used all over the notebook
-DATASET_ID = "T001"
-dataframeManager = DataframeManager(DATASET_ID)
-countryCodeManager = CountryCodeManager()
+from item.historical.scripts.util.managers.dataframe import ColumnName
 
 
 # Dimensions and attributes which do not vary across this data set
