@@ -1,4 +1,3 @@
-import pandas as pd
 import pint
 
 from item.historical.scripts.util.managers.dataframe import ColumnName
@@ -6,6 +5,9 @@ from item.historical.scripts.util.managers.dataframe import ColumnName
 
 # Dimensions and attributes which do not vary across this data set
 COMMON = dict(
+    # Rule: There is only one activity being perform in this dataset and that
+    # is the "Freight Activity". We are setting, for each row, the variable
+    # "Freight Activity"
     variable='Freight Activity',
     # Rule: Add the same source to all rows since all data comes from the same
     # source
@@ -39,22 +41,29 @@ DROP_COLUMNS = [
 ]
 
 
-def assign(df, dim):
-    """Assign a single value for dimension *dim*."""
-    name = getattr(ColumnName, dim.upper()).value
-    value = COMMON[dim]
+def assign(df, dims):
+    """Assign a single value for each dimension in *dims*."""
+    # TODO move this method so it is usable across all scripts
+    args = {}
+    for dim in dims:
+        # Standard name for the dimension
+        name = getattr(ColumnName, dim.upper()).value
+        # Common value for this data set
+        args[name] = COMMON[dim]
 
     # Use the DataframeManager class
     # dataframeManager.simple_column_insert(df, name, value)
 
     # Use built-in pandas functionality, which is more efficient
-    return df.assign(**{name: value})
+    return df.assign(**args)
 
     # The Jupyter notebook echoes the data frame after each such step
     # print(df)
 
 
 def convert_units(df, units_from, units_to):
+    """Convert units of *df*."""
+    # TODO move this method so it is usable across all scripts
     ureg = pint.get_application_registry()
     # Create a vector pint.Quantity; convert units
     qty = ureg.Quantity(df['Value'].values, units_from).to(units_to)
@@ -82,11 +91,8 @@ def process(df):
     # Dropping the values
     df.dropna(inplace=True)
 
-    # Insert columns
-    df = df.pipe(assign, 'source') \
-           .pipe(assign, 'service') \
-           .pipe(assign, 'technology') \
-           .pipe(assign, 'fuel')
+    # Check that input data contain the expected variable name
+    assert df['Variable'].unique() == ['Coastal shipping (national transport)']
 
     # Check that the input data contain the expected units
     assert df['PowerCode'].unique() == ['Millions']
@@ -95,24 +101,12 @@ def process(df):
     # Drop the columns
     df.drop(columns=['PowerCode', 'Unit'], inplace=True)
 
+    # Assign single values for some dimensions
+    df = assign(df, ['source', 'service', 'technology', 'fuel', 'mode',
+                     'vehicle_type', 'variable'])
+
     # Convert to the preferred iTEM units
     # TODO read the preferred units (here 'Gt km / year') from a common place
     convert_units(df, 'Mt km / year', 'Gt km / year')
-
-    # Insert columns
-    df = df.pipe(assign, 'mode') \
-           .pipe(assign, 'vehicle_type')
-
-    # Renaming the column "Variable"
-    #
-    # Rule: There is only one activity being perform in this dataset and that
-    # is the "Freight Activity". We are setting, for each row, the variable
-    # "Freight Activity"
-
-    # Dropping the current "Variable" column
-    assert df['Variable'].unique() == ['Coastal shipping (national transport)']
-
-    # Adding the new "Variable" column with the new data
-    df = assign(df, 'variable')
 
     return df
