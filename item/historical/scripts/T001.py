@@ -128,36 +128,4 @@ def process(df):
     # Adding the new "Variable" column with the new data
     df = assign(df, 'variable')
 
-    # # Getting the ITEM region for each country
-    # #
-    # # Rule: For each country, we need to assign an ITEM region
-    #
-    # # Determining which countries are missing an ITEM region
-    # #
-    # # As seen from the cell below, there is no country that does no have a
-    # # respective ITEM region. Therefore, no further cleaning needs to be done
-    # # to get the item regions.
-    #
-    # # Getting the list of ISO codes
-    # list_of_iso_codes = list(set(df["ISO Code"]))
-    #
-    # # Getting the list of ISO code with no region
-    # iso_code_with_no_region = \
-    #     countryCodeManager.get_list_of_iso_codes_with_no_region(
-    #         list_of_iso_codes)
-    #
-    # # printing the list of ISO codes
-    # iso_code_with_no_region
-    #
-    # # Adding the ITEM region column to the dataset
-    #
-    # # Getting the complete list of iso codes
-    # list_of_all_codes = df["ISO Code"]
-    #
-    # item_region = \
-    #     countryCodeManager.get_list_of_regions_for_iso_codes(list_of_all_codes)
-    #
-    # # Adding the column to the dataframe
-    # df[ColumnName.ITEM_REGION.value] = item_region
-
     return df
