@@ -188,7 +188,8 @@ def process(id):
         print(f'Input data is invalid: {e}')
 
     # Information about columns. If not defined, use defaults.
-    columns = getattr(dataset_module, 'COLUMNS', dict(country_name='Country'))
+    columns = dict(country_name='Country')
+    columns.update(getattr(dataset_module, 'COLUMNS', {}))
 
     try:
         # List of column names to drop
