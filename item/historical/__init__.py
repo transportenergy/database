@@ -77,13 +77,16 @@ def cache_results(id_str, df):
     print(f'Write {path}')
 
     # Pivot to wide format ('user friendly view') and write to CSV
-    columns = [ev.value for ev in ColumnName if ev != ColumnName.VALUE]
     path = OUTPUT_PATH / f'{id_str}_cleaned_UF.csv'
-    df.set_index(columns) \
-      .unstack(ColumnName.YEAR.value) \
-      .reset_index()\
-      .to_csv(path, index=False)
 
+    # - Set all columns but 'Value' as the index → pd.Series with MultiIndex.
+    # - 'Unstack' the 'Year' dimension to columns, i.e. wide format.
+    # - Return the index to columns in the dataframe.
+    # - Write to file.
+    df.set_index([ev.value for ev in ColumnName if ev != ColumnName.VALUE]) \
+      .unstack(ColumnName.YEAR.value) \
+      .reset_index() \
+      .to_csv(path, index=False)
     print(f'Write {path}')
 
 
