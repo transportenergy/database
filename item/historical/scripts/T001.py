@@ -4,8 +4,8 @@ from item.utils import convert_units
 
 #: Dimensions and attributes which do not vary across this data set.
 COMMON_DIMS = dict(
-    # TODO move the comments below into the #: comment above, which also appears
-    #      in the built documentation.
+    # TODO move the comments below into the #: comment above, so they also
+    #      appear in the built documentation.
     # There is only one activity being perform in this dataset and that is the
     # "Freight Activity". We are setting, for each row, the variable "Freight
     # Activity"
