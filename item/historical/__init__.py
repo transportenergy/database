@@ -137,7 +137,7 @@ def input_file(id: int):
 def process(id):
     """Process a data set given its *id*.
 
-    Performs the following steps:
+    Performs the following common processing steps:
 
     1. Load the data from cache.
     2. Load a module defining dataset-specific processing steps. This module
@@ -147,13 +147,15 @@ def process(id):
        to ensure the data is in the expected format.
     4. Drop columns in the dataset's (optional) :data:`DROP_COLUMNS`
        :class:`list`.
-    5. Call the dataset's (required) :meth:`process` method. This method
-       receives the data frame from step (4), and performs any necessary
+    5. Call the dataset-specific (required) :meth:`process` method. This method
+       receives the data frame from step (4), and performs any additional
        processing.
-    6. Assigns ISO 3166 alpha-3 codes and the iTEM region based on a column
+    6. Assign ISO 3166 alpha-3 codes and the iTEM region based on a column
        containing country names.
-    7. Orders columns.
-    8. Outputs data to two files.
+    7. Assign common dimensions from the dataset's (optional)
+       :data:`COMMON_DIMS` :class:`dict`.
+    8. Order columns.
+    9. Output data to two files.
 
     """
     # Creating the dataframe and viewing the data
@@ -195,13 +197,19 @@ def process(id):
     # the given column
     df = pd.concat([df, df[column].apply(iso_and_region)], axis=1)
 
-    # Reordering the columns
-    #
-    # Rule: The columns should follow the order established in the latest
-    # template
-    df = df.assign(**{ColumnName.ID.value: id_str}) \
+    # Assign a single value for each dimension in COMMON_DIMS
+    assign_values = {ColumnName.ID.value: id_str}
+    for dim, value in getattr(dataset_module, 'COMMON_DIMS', {}).items():
+        # Standard name for the column
+        col_name = getattr(ColumnName, dim.upper()).value
+        assign_values[col_name] = value
+
+    # - Assign the values.
+    # - Order the columns in the standard order.
+    df = df.assign(**assign_values) \
            .reindex(columns=[ev.value for ev in ColumnName])
 
+    # Save the result to cache
     cache_results(id_str, df)
 
     # Return the data for use by other code
