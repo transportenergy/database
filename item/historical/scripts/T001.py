@@ -1,3 +1,8 @@
+"""Processing information for dataset T001.
+
+See :meth:`.historical.process` for how COMMON_DIMS, COLUMNS, check(), and
+process() are used.
+"""
 from item.utils import convert_units
 
 
@@ -22,20 +27,25 @@ COMMON_DIMS = dict(
     vehicle_type='Coastal',
 )
 
-# Columns to drop
-DROP_COLUMNS = [
-    'COUNTRY',
-    'VARIABLE',
-    'YEAR',
-    'Flag Codes',
-    'Flags',
-    'PowerCode Code',
-    'PowerCode',
-    'Reference Period Code',
-    'Reference Period',
-    'Unit Code',
-    'Unit',
-]
+COLUMNS = dict(
+    # Columns to drop
+    drop=[
+        'COUNTRY',
+        'VARIABLE',
+        'YEAR',
+        'Flag Codes',
+        'Flags',
+        'PowerCode Code',
+        'PowerCode',
+        'Reference Period Code',
+        'Reference Period',
+        'Unit Code',
+        'Unit',
+    ],
+    # Column containing country name for determining ISO 3166 alpha-3 codes and
+    # iTEM regions. Commented, because this is the default value.
+    # country_name='Country',
+)
 
 
 def check(df):

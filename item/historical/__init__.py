@@ -158,9 +158,7 @@ def process(id):
     9. Output data to two files.
 
     """
-    # Creating the dataframe and viewing the data
-
-    # Creating a dataframe from the csv data
+    # Load the data from a common location, based on the dataset ID
     id_str = source_str(id)
     path = paths['data'] / 'historical' / 'input' / f'{id_str}_input.csv'
     df = pd.read_csv(path)
@@ -169,39 +167,46 @@ def process(id):
     dataset_module = MODULES[1]
 
     try:
-        # Check that the input data is of the form required by the script
+        # Check that the input data is of the form expected by process()
         dataset_module.check(df)
     except AttributeError:
+        # Optional check() function does not exist
         print('No pre-processing checks to perform')
     except AssertionError as e:
+        # An 'assert' statement in check() failed
         print(f'Input data is invalid: {e}')
 
-    try:
-        # Remove unnecessary columns
-        df.drop(columns=dataset_module.DROP_COLUMNS, inplace=True)
-        print('Drop {len(dataset_module.DROP_COLUMNS)} extra column(s)')
-    except AttributeError:
-        # No variable DROP_COLUMNS in dataset_module
-        print(f'No columns to drop for {id_str}')
+    # Information about columns. If not defined, use defaults.
+    columns = getattr(dataset_module, 'COLUMNS', dict(country_name='Country'))
 
-    # Call the dataset-specific processing
+    try:
+        # List of column names to drop
+        drop_cols = columns['drop']
+    except KeyError:
+        # No variable COLUMNS in dataset_module, or no key 'drop'
+        print(f'No columns to drop for {id_str}')
+    else:
+        df.drop(columns=drop_cols, inplace=True)
+        print('Drop {len(drop_cols)} extra column(s)')
+
+    # Call the dataset-specific process() function; returns a modified df
     df = dataset_module.process(df)
     print(f'{len(df)} observations')
 
-    # Perform common cleaning tasks
-
     # Assign ISO 3166 alpha-3 codes and iTEM regions from a country name column
-    column = 'Country'  # TODO read this name from dataset_module
-
+    country_col = columns['country_name']
     # Use pandas.Series.apply() to apply the same function to each entry in
-    # the given column
-    df = pd.concat([df, df[column].apply(iso_and_region)], axis=1)
+    # the column. Join these to the existing data frame as additional columns.
+    df = pd.concat([df, df[country_col].apply(iso_and_region)], axis=1)
 
-    # Assign a single value for each dimension in COMMON_DIMS
+    # Values to assign across all observations: the dataset ID
     assign_values = {ColumnName.ID.value: id_str}
+
+    # Handle any COMMON_DIMS, if defined
     for dim, value in getattr(dataset_module, 'COMMON_DIMS', {}).items():
         # Standard name for the column
         col_name = getattr(ColumnName, dim.upper()).value
+        # Copy the value to be assigned
         assign_values[col_name] = value
 
     # - Assign the values.
