@@ -8,17 +8,25 @@ This module contains the code that implements the `iTEM Open Data project <https
 
 Sources
 =======
-These are listed in :file:`sources.yaml` from the `iTEM metadata repository <https://github.com/transportenergy/metadata>`_.
-The current version of the file is always accessible at https://github.com/transportenergy/metadata/blob/master/historical/sources.yaml
+These are listed in :file:`sources.yaml`, loaded as :data:.`SOURCES`. from the `iTEM metadata repository <https://github.com/transportenergy/metadata>`_.
 
 Input data is retrieved using via OpenKAPSARC and SDMX APIs, according to the type supported by each data source. See :mod:`item.remote`.
 
 Processing
 ==========
 
-Input data sets are cleaned and transformed by IPython notebooks in the :file:`item/historical/scripts` directory.
+Current
+-------
 
-In general, the notebook name corresponds to the input data set which it handles.
+Input data sets are cleaned and transformed by IPython notebooks in the :file:`item/historical/scripts` directory, as listed in :data:`.SCRIPTS`.
+
+In general, the notebook name corresponds to the input data set which it handles, e.g. :file:`T001.ipynb`.
+
+Planned
+-------
+The general function :func:`~historical.process` applies common cleaning steps to each dataset, while loading and making use of dataset-specific checks, processing steps, and configuration from a submodule like :mod:`.T001`, as listed in :data:`.MODULES`.
+See the documentation of :func:`~historical.process` for a detailed description of the tests.
+
 
 Diagnostics
 ===========
@@ -44,6 +52,8 @@ For instance:
 Code reference
 ==============
 
+.. currentmodule:: item.historical
+
 .. automodule:: item.historical
    :members:
    :exclude-members: REGION, SOURCES
@@ -55,3 +65,24 @@ Code reference
 
    .. autodata:: item.historical.SOURCES
       :annotation: ← contents of sources.yaml
+
+.. currentmodule:: item.historical.scripts.util.managers.dataframe
+
+.. autoclass:: ColumnName
+   :show-inheritance:
+   :undoc-members:
+   :private-members:
+   :inherited-members:
+   :member-order: bysource
+
+
+Specific data sets
+==================
+
+T001
+----
+
+.. currentmodule:: item.historical.scripts.T001
+
+.. automodule:: item.historical.scripts.T001
+   :members:

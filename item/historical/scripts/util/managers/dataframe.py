@@ -4,7 +4,10 @@ import pandas as pd
 
 
 class ColumnName(Enum):
-    # NB the order of definition below is the standard one
+    """Column names for processed historical data.
+
+    The order of definition below is the standard order.
+    """
     SOURCE = "Source"
     COUNTRY = "Country"
     ISO_CODE = "ISO Code"

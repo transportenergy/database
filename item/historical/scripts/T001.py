@@ -1,13 +1,11 @@
-"""Processing information for dataset T001.
-
-See :meth:`.historical.process` for how COMMON_DIMS, COLUMNS, check(), and
-process() are used.
-"""
+"""Data cleaning code and configuration for T001."""
 from item.utils import convert_units
 
 
-# Dimensions and attributes which do not vary across this data set
+#: Dimensions and attributes which do not vary across this data set.
 COMMON_DIMS = dict(
+    # TODO move the comments below into the #: comment above, which also appears
+    #      in the built documentation.
     # There is only one activity being perform in this dataset and that is the
     # "Freight Activity". We are setting, for each row, the variable "Freight
     # Activity"
@@ -27,8 +25,8 @@ COMMON_DIMS = dict(
     vehicle_type='Coastal',
 )
 
+#: Columns to drop from the raw data.
 COLUMNS = dict(
-    # Columns to drop
     drop=[
         'COUNTRY',
         'VARIABLE',

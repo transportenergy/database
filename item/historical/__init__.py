@@ -25,14 +25,17 @@ SCRIPTS = [
     'T008'
 ]
 
-#:
+#: Submodules usable with :func:`process`.
 MODULES = {
     1: T001
 }
 
+#: Path for output from :func:`process`.
 OUTPUT_PATH = paths['data'] / 'historical' / 'output'
 
-#: Non-ISO names appearing in 1 or more data sets; see :meth:`iso_and_region`.
+#: Non-ISO names appearing in 1 or more data sets. These are used in
+#: :meth:`iso_and_region` to replace names before they are looked up using
+#: :mod:`pycountry`.
 COUNTRY_NAME = {
     "Montenegro, Republic of": "Montenegro",
     "Bosnia-Herzegovina": "Bosnia and Herzegovina",
@@ -50,18 +53,21 @@ with open(paths['data'] / 'model' / 'regions.yaml') as file:
 
 
 with open(paths['data'] / 'historical' / 'sources.yaml') as f:
-    #:
+    #: The current version of the file is always accessible at
+    #: https://github.com/transportenergy/metadata/blob/master/historical/
+    #: sources.yaml
     SOURCES = yaml.safe_load(f)
 
 
 def cache_results(id_str, df):
-    """Write *df* to cache in two file formats.
+    """Write *df* to :data:`.OUTPUT_PATH` in two file formats.
 
     The files written are:
 
     - :file:`{id_str}_cleaned_PF.csv`, in long or 'programming-friendly'
-      format.
-    - :file:`{id_str}_cleaned_UF.csv`, in wide or 'user-friendly' format.
+      format, i.e. with a 'Year' column.
+    - :file:`{id_str}_cleaned_UF.csv`, in wide or 'user-friendly' format, with
+      one column per year.
     """
     OUTPUT_PATH.mkdir(exist_ok=True)
 
@@ -84,10 +90,14 @@ def cache_results(id_str, df):
 def fetch_source(id, use_cache=True):
     """Fetch data from source *id*.
 
+    The remote data is fetched using the API for the particular source.
+    A network connection is required.
+
     Parameters
     ----------
     use_cache : bool, optional
-        If given, use a cached file. No check of cache validity is performed.
+        If given, use a cached local file, if available. No check of cache
+        validity is performed.
     """
     # Retrieve source information from sources.yaml
     id = source_str(id)
@@ -145,17 +155,18 @@ def process(id):
     3. Call the dataset's (optional) :meth:`check` method. This method receives
        the input data frame as an argument, and can make one or more assertions
        to ensure the data is in the expected format.
-    4. Drop columns in the dataset's (optional) :data:`DROP_COLUMNS`
+    4. Drop columns in the dataset's (optional) :data:`COLUMNS['drop']`
        :class:`list`.
     5. Call the dataset-specific (required) :meth:`process` method. This method
        receives the data frame from step (4), and performs any additional
        processing.
     6. Assign ISO 3166 alpha-3 codes and the iTEM region based on a column
-       containing country names.
+       containing country names; either :data:`COLUMNS['country_name']` or the
+       default, 'Country'. See :meth:`iso_and_region`.
     7. Assign common dimensions from the dataset's (optional)
        :data:`COMMON_DIMS` :class:`dict`.
-    8. Order columns.
-    9. Output data to two files.
+    8. Order columns according to :class:`.ColumnName`.
+    9. Output data to two files. See :meth:`cache_results`.
 
     """
     # Load the data from a common location, based on the dataset ID
@@ -223,7 +234,16 @@ def process(id):
 
 @lru_cache()
 def iso_and_region(name):
-    """Return (ISO 3166 alpha-3 code, iTEM region) for a country *name*."""
+    """Return (ISO 3166 alpha-3 code, iTEM region) for a country *name*.
+
+    Parameters
+    ----------
+    name : str
+        Country name. This is looked up in the `pycountry
+        <https://pypi.org/project/pycountry/#countries-iso-3166>`_ 'name',
+        'official_name', or 'common_name' field. Replacements from
+        :data:`COUNTRY_NAME` are applied.
+    """
     # lru_cache() ensures this function call is as fast as a dictionary lookup
     # after the first time each country name is seen
 
@@ -241,5 +261,11 @@ def iso_and_region(name):
 
 
 def source_str(id):
-    """Return the canonical string name (e.g. 'T001') for a data source."""
+    """Return the canonical string name (e.g. 'T001') for a data source.
+
+    Parameters
+    ----------
+    id : int or str
+        Integer ID of the data source.
+    """
     return f'T{id:03}' if isinstance(id, int) else id
