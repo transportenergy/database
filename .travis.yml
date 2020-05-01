@@ -3,6 +3,10 @@ dist: bionic
 language: python
 python: 3.8-dev
 
+branches:
+  only:
+  - master
+
 cache:
   directories:
   - $HOME/.cache/item
