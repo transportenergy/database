@@ -23,11 +23,6 @@ project = 'iTEM'
 copyright = '2017–2020, iTEM consortium'
 author = 'iTEM consortium'
 
-# The short X.Y version
-version = ''
-# The full version, including alpha/beta/rc tags
-release = '0.2.0.dev'
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -190,7 +185,7 @@ epub_exclude_files = ['search.html']
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
     'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
-    'sdmx': ('https://pandasdmx.readthedocs.io/en/master/', None),
+    'sdmx': ('https://sdmx1.readthedocs.io/en/latest/', None),
     }
 
 # -- Options for todo extension ----------------------------------------------
