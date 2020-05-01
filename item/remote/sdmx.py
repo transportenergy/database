@@ -1,4 +1,4 @@
-import pandasdmx as sdmx
+import sdmx
 
 
 def get_sdmx(source=None, **args):
