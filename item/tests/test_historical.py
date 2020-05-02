@@ -21,7 +21,7 @@ from item.historical.util import run_notebook
 ], ids=source_str)
 def test_fetch(source_id):
     """Raw data can be fetched from individual sources."""
-    fetch_source(source_id)
+    fetch_source(source_id, use_cache=False)
 
 
 def test_import():
