@@ -4,7 +4,6 @@ jupyter
 nbformat
 openpyxl
 pandas
-git+git://github.com/dr-leo/pandaSDMX.git#egg=pandaSDMX
 pint
 plotnine
 pycountry
@@ -13,6 +12,7 @@ pytest-cov
 pyyaml
 requests
 requests-cache
+sdmx1
 sphinx_rtd_theme
 sphinx>2.2
 xarray

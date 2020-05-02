@@ -1,1 +1,3 @@
+exclude *.yml
+exclude ci/
 recursive-include item/data *.yaml
