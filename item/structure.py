@@ -158,7 +158,7 @@ def read_measures(path):
     return measures
 
 
-def make_template(verbose=True):
+def make_template(output_path=None, verbose=True):
     """Generate a data template.
 
     Outputs files containing all keys specified in 'spec.yaml'. The file is
@@ -283,11 +283,11 @@ def make_template(verbose=True):
         # Combine 3 concepts with 'measure' ("Variable")
         lca_scope = row.pop('lca_scope')
         if len(lca_scope):
-           row['measure'] += ' (' + lca_scope + ')'
+            row['measure'] += ' (' + lca_scope + ')'
 
         pollutant = row.pop('pollutant')
         if len(pollutant):
-           row['measure'] = pollutant + ' ' + row['measure']
+            row['measure'] = pollutant + ' ' + row['measure']
 
         fleet = row.pop('fleet')
         if len(fleet):
@@ -338,8 +338,10 @@ def make_template(verbose=True):
               sep='\n\n')
 
     # Save in multiple formats
-    specs.to_csv(paths['output'] / 'template.csv', index=False)
-    specs.to_excel(paths['output'] / 'template.xlsx', index=False)
+    output_path = output_path or paths['output']
+
+    specs.to_csv(output_path / 'template.csv', index=False)
+    specs.to_excel(output_path / 'template.xlsx', index=False)
 
     # Save the index
     index = {'Full dimensionality': specs_full, 'Template (reduced)': specs}
@@ -347,5 +349,5 @@ def make_template(verbose=True):
               .drop(columns=common_dims + list(map(str.title, common_dims)),
                     axis=1, level=1) \
               .replace('', '---')
-    index.to_csv(paths['output'] / 'index.csv')
-    index.to_excel(paths['output'] / 'index.xlsx')
+    index.to_csv(output_path / 'index.csv')
+    index.to_excel(output_path / 'index.xlsx')
