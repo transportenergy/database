@@ -1,4 +1,6 @@
+from pathlib import Path
 from itertools import product
+from typing import Dict, List
 
 from item.common import paths
 import pandas as pd
@@ -7,7 +9,7 @@ from sdmx.model import Annotation, Concept, ConceptScheme
 import yaml
 
 
-def read_items(root, klass=Concept):
+def read_items(root: Dict, klass=Concept):
     """Recursively read items and children."""
     result = []
 
@@ -62,7 +64,7 @@ def common_dim_dummies():
     yield ConceptScheme(id='year', name='Year', items=c_all)
 
 
-def add_unit(key, concept):
+def add_unit(key: Dict, concept: Concept) -> None:
     """Add units to a key."""
     # Retrieve the unit information, stored by read_items()
     anno = list(filter(lambda a: a.id == 'unit', concept.annotations))
@@ -80,8 +82,14 @@ def add_unit(key, concept):
                 return
 
 
-def read_concepts_yaml(path):
-    """Read concepts from file."""
+def read_concepts_yaml(path: Path) -> Dict[str, ConceptScheme]:
+    """Read concepts from file.
+
+    See Also
+    --------
+    :ref:`concepts-yaml`
+    read_items
+    """
     data = yaml.safe_load(open(path))
 
     concept_schemes = []
@@ -98,8 +106,14 @@ def read_concepts_yaml(path):
     return {cs.id: cs for cs in concept_schemes}
 
 
-def read_measures_yaml(path):
-    """Read measures from file."""
+def read_measures_yaml(path: Path) -> ConceptScheme:
+    """Read measures from file.
+
+    See Also
+    --------
+    :ref:`measures-yaml`
+    read_items
+    """
     data = yaml.safe_load(open(path))
     return ConceptScheme(id='measure', items=read_items(data))
 
@@ -108,7 +122,7 @@ def collapse(row: pd.Series) -> pd.Series:
     """Collapse multiple concepts into fewer columns.
 
     - 'measure' column gets 'lca_scope', 'pollutant', and/or 'fleet'.
-    - 'mode' columns gets 'type', 'vehicle', and/or 'operator'.
+    - 'mode' column gets 'type', 'vehicle', and/or 'operator'.
     """
     # Combine 3 concepts with 'measure' ("Variable")
     lca_scope = row.pop('lca_scope')
@@ -148,8 +162,14 @@ def collapse(row: pd.Series) -> pd.Series:
     return row
 
 
-def name_for_id(concept_schemes: dict, ids: list) -> dict:
-    """Return a nested dict for use with :meth:`pandas.DataFrame.replace`."""
+def name_for_id(concept_schemes: Dict, ids: List) -> Dict[str, Dict[str, str]]:
+    """Return a nested dict for use with :meth:`pandas.DataFrame.replace`.
+
+    For the concept schemes `ids` (e.g. 'mode'), the
+    :attr:`~.IdentifiableArtefact.id` attribute of a particulate
+    :class:`.Concept` (e.g. 'air') is replaced with its
+    :attr:`~.NameableArtefact.name` (e.g. 'Aviation').
+    """
     result = dict()
     for id in ids:
         cs = concept_schemes[id]
@@ -163,17 +183,22 @@ def name_for_id(concept_schemes: dict, ids: list) -> dict:
     return result
 
 
-def make_template(output_path=None, verbose=True):
+def make_template(output_path: Path = None, verbose: bool = True):
     """Generate a data template.
 
-    Outputs files containing all keys specified in 'spec.yaml'. The file is
-    produced in two formats:
+    Outputs files containing all keys specified in the :ref:`spec-yaml`. The
+    file is produced in two formats:
 
-    - template.csv
-    - template.xlsx
+    - :file:`template.csv`: comma-separated values.
+    - :file:`template.xlsx`: Microsoft Excel.
 
-    .. todo:: Allow filtering on concepts that are parents of other concepts.
+    An 'index' file is also created (:file:`index.csv`, :file:`index.xlsx`).
+    This file maps between 'Full dimensionality' keys (i.e. with all conceptual
+    dimensions), and the 'Template (reduced)' columns appearing in
+    :file:`template.csv`.
     """
+    # TODO Use SDMX constraints to filter on concepts that are parents of other
+    #      concepts
 
     # Concepts (used as dimensions) and possible values
     cs = read_concepts_yaml(paths['data'] / 'concepts.yaml')

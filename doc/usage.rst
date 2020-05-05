@@ -13,24 +13,7 @@ Both the Python and R tools will operate on data stored in the following way; se
 3. Copy the file ``item_config_example.yaml`` to ``item_config.yaml`` in any working directory where you intend to use this code.
    Edit the file (see the inline comments) to point to the directories created in #2 above.
 
-4. Use the tools through the command-line interface::
-
-    $ item
-    Usage: item [OPTIONS] COMMAND [ARGS]...
-
-      Command-line interface for the iTEM databases.
-
-    Options:
-      --path <KEY> <PATH>  Override data paths (multiple allowed).
-      --help               Show this message and exit.
-
-    Commands:
-      debug     Show debugging information, including paths.
-      help      Show extended help for the command-line tool.
-      mkdirs    Create a directory tree for the database.
-      model     Manipulate the model database.
-      stats     Manipulate the stats database.
-      template  Generate the MIP3 submission template.
+4. Use the tools through the :doc:`cli`.
 
 
 Installation
