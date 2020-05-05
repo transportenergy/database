@@ -1,22 +1,5 @@
-Common code
-***********
-
-Utilities (:mod:`item.utils`)
-=============================
-
-.. automodule:: item.utils
-   :members:
-
-
-Tools for fetching remote data (:mod:`item.remote`)
-===================================================
-
-.. automodule:: item.remote
-   :members:
-
-
 Command-line interface (:mod:`item.cli`)
-========================================
+****************************************
 
 The command ``item`` is installed with the package.
 The CLI provides help with the ``--help`` option::
@@ -37,7 +20,4 @@ The CLI provides help with the ``--help`` option::
       mkdirs      Create a directory tree for the database.
       model       Manipulate the model database.
       remote      Access remote data sources.
-      template    Generate the MIP3 submission template.
-
-.. automodule:: item.cli
-   :members:
+      template    Generate the MIP submission template.

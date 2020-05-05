@@ -2,7 +2,6 @@ import pytest
 
 from item.common import paths
 from item.model.dimensions import check, generate, list_pairs
-from item.utils import make_template
 
 
 @pytest.mark.skip('Requires synthetic model data.')
@@ -20,8 +19,3 @@ def test_generate():
 def test_check(item_tmp_dir):
     dims = generate()
     check(dims, item_tmp_dir / 'check.tsv')
-
-
-def test_make_template():
-    make_template()
-    assert (paths['output'] / 'template.csv').exists()

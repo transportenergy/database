@@ -1,8 +1,8 @@
-Reference
-*********
+Development notes
+*****************
 
 Repository organization
------------------------
+=======================
 
 - ``item/`` — Python code for accessing & maintaining the database.
 
@@ -24,7 +24,7 @@ Repository organization
 
 
 Style guide
------------
+===========
 
 - Follow `PEP 8 <https://www.python.org/dev/peps/pep-0008/>`_; use a linter to ensure compliance.
 - Document all public classes and functions following the `NumPy docstring

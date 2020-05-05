@@ -24,8 +24,11 @@ This documentation, built automatically from the `transportenergy/database GitHu
    usage
    model
    historical
-   common
-   reference
+   structure
+   remote
+   cli
+   metadata
+   developing
 
 
 * :ref:`genindex`

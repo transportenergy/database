@@ -6,7 +6,7 @@ import click
 from item.model.cli import model
 from item.historical.cli import historical
 from item.remote.cli import remote
-from item.utils import make_template
+from item.structure import make_template
 
 
 @click.group(help=__doc__)
@@ -85,7 +85,7 @@ def mkdirs(path, dry_run):
 
 @main.command()
 def template():
-    """Generate the MIP3 submission template."""
+    """Generate the MIP submission template."""
     make_template()
 
 
