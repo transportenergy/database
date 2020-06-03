@@ -157,7 +157,7 @@ class OpenKAPSARC:
             cache_time = datetime.fromtimestamp(cache_path.stat().st_mtime)
             if cache_time < ds.data_processed.replace(tzinfo=None):
                 cache_is_valid = False
-                log.info(f'…is outdated → remove')
+                log.info('…is outdated → remove')
 
             if cache_is_valid:
                 # Check cache length

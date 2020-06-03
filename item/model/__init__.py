@@ -273,7 +273,7 @@ def load_model_regions(name, version):
     # IDEA load from either regions-1.yaml or regions-2.yaml
     try:
         get_model_info(name, version)
-    except:
+    except Exception:
         if name.lower() == 'item':
             # Use an empty path in the join() call below; this causes the
             # overall regions.yaml to be loaded
