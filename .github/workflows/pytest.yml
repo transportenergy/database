@@ -1,0 +1,60 @@
+# TODO add OK_API_KEY secret
+# TODO add Slack notification
+
+name: pytest
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - uses: actions/setup-python@v2
+
+    - name: Cache Python packages
+      uses: actions/cache@v2
+      with:
+        path: |
+          $HOME/.cache/pip
+          $HOME/.cache/rclone*.zip
+        key: ubuntu-latest
+
+    - name: Install rclone for Google Cloud Storage uploads
+      env:
+        service_account_json: ${{ secrets.GCS_SERVICE_ACCOUNT_0 }}
+      run: |
+        mkdir -p $HOME/.cache
+        pushd $HOME/.cache
+        curl -O https://downloads.rclone.org/rclone-current-linux-amd64.zip
+        popd
+        unzip $HOME/.cache/rclone-current-linux-amd64.zip
+        echo "::add-path::$(ls -d rclone-v*)"
+        echo "$service_account_json" >ci/item-historical-database.json
+
+    - name: Upgrade pip, wheel
+      run: python -m pip install --upgrade pip wheel
+
+    - name: Install the Python package and dependencies
+      run: pip install .[doc,hist,tests]
+
+    - name: Run pytest
+      run: pytest item
+
+    - name: Upload test coverage to Codecov.io
+      uses: codecov/codecov-action@v1
+
+    - name: Create diagnostics and upload to Google Cloud Storage
+      run: |
+        item historical diagnostics output/
+        rclone --config=ci/rclone.conf --progress \
+          copy output \
+          gcs:historical-data-ci.transportenergy.org/$GITHUB_RUN_NUMBER/
