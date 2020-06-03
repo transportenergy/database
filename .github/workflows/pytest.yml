@@ -48,6 +48,8 @@ jobs:
       run: pip install --editable .[doc,hist,tests]
 
     - name: Run pytest
+      env:
+        OK_API_KEY: ${{ secrets.OPENKAPSARC_API_KEY }}
       run: pytest item
 
     - name: Upload test coverage to Codecov.io
