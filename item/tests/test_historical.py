@@ -5,7 +5,13 @@ import pytest
 
 import item
 from item.common import paths
-from item.historical import SCRIPTS, fetch_source, input_file, source_str
+from item.historical import (
+    SCRIPTS,
+    fetch_source,
+    input_file,
+    process,
+    source_str,
+)
 from item.historical.diagnostic import coverage
 from item.historical.util import run_notebook
 
@@ -46,6 +52,12 @@ def test_input_file(item_tmp_dir):
 
     # input_file retrieves the last-sorted file:
     assert input_file(1) == paths['historical input'] / 'T001_foo.csv'
+
+
+@pytest.mark.parametrize('dataset_id', [1])
+def test_process(dataset_id):
+    """Test common interface for processing scripts."""
+    process(dataset_id)
 
 
 # Path to IPython notebooks

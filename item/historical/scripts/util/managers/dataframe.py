@@ -4,40 +4,32 @@ import pandas as pd
 
 
 class ColumnName(Enum):
+    """Column names for processed historical data.
+
+    The order of definition below is the standard order.
+    """
     SOURCE = "Source"
-    YEAR = "Year"
+    COUNTRY = "Country"
     ISO_CODE = "ISO Code"
     ITEM_REGION = "Region"
     VARIABLE = "Variable"
     UNIT = "Unit"
-    VALUE = "Value"
     SERVICE = "Service"
     MODE = "Mode"
     VEHICLE_TYPE = "Vehicle Type"
-    FUEL = "Fuel"
     TECHNOLOGY = "Technology"
+    FUEL = "Fuel"
+    VALUE = "Value"
+    YEAR = "Year"
     ID = "ID"
-    COUNTRY = "Country"
 
 
 class DataframeManager:
 
     def __init__(self, dataset_id):
         self.dataset_id = dataset_id
-        self.column_order = [
-                ColumnName.SOURCE.value,
-                ColumnName.COUNTRY.value,
-                ColumnName.ISO_CODE.value,
-                ColumnName.ITEM_REGION.value,
-                ColumnName.VARIABLE.value,
-                ColumnName.UNIT.value,
-                ColumnName.SERVICE.value,
-                ColumnName.MODE.value,
-                ColumnName.VEHICLE_TYPE.value,
-                ColumnName.TECHNOLOGY.value,
-                ColumnName.FUEL.value,
-                ColumnName.VALUE.value,
-                ColumnName.YEAR.value]
+        self.column_order = [ev.value for ev in ColumnName]
+        self.column_order.pop()  # Remove 'ID' from the list
 
     def get_dataframe_from_csv_file(self, path_to_file, delimeter=","):
         if os.path.exists(path_to_file):
