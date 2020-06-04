@@ -6,7 +6,7 @@ import pytest
 import item
 from item.common import paths
 from item.historical import SCRIPTS, fetch_source, input_file, process, source_str
-from item.historical.diagnostic import coverage
+from item.historical.diagnostic import A003, coverage
 from item.historical.util import run_notebook
 
 
@@ -92,3 +92,10 @@ def test_coverage(dataset_id, N_areas):
     df = pd.read_csv(fetch_source(dataset_id, use_cache=True))
     result = coverage(df)
     assert result.startswith(f"{N_areas} areas: ")
+
+
+def test_A003():
+    """Test historical.diagnostic.A003."""
+    activity = process(3)
+    stock = process(10)
+    result = A003.compute(activity, stock)
