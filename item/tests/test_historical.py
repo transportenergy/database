@@ -69,7 +69,7 @@ def test_input_file(item_tmp_dir):
     assert input_file(1) == paths["historical input"] / "T001_foo.csv"
 
 
-@pytest.mark.parametrize("dataset_id", [0, 1])
+@pytest.mark.parametrize("dataset_id", [0, 1, 3])
 def test_process(dataset_id):
     """Test common interface for processing scripts."""
     process(dataset_id)

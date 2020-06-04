@@ -56,8 +56,7 @@ with open(paths["data"] / "model" / "regions.yaml") as file:
 
 with open(paths["data"] / "historical" / "sources.yaml") as f:
     #: The current version of the file is always accessible at
-    #: https://github.com/transportenergy/metadata/blob/master/historical/
-    #: sources.yaml
+    #: https://github.com/transportenergy/metadata/blob/master/historical/sources.yaml
     SOURCES = yaml.safe_load(f)
 
 

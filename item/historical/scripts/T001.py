@@ -89,7 +89,11 @@ def check(df):
 
 
 def process(df):
-    """Process data set T001."""
+    """Process data set T001.
+
+    - Drop null values.
+    - Convert from Mt km / year to Gt km / year.
+    """
     # Drop rows with nulls in "Value"; log corresponding values in "Country"
     df = dropna_logged(df, "Value", ["Country"])
 

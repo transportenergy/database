@@ -8,7 +8,7 @@ This module contains the code that implements the `iTEM Open Data project <https
 
 Sources
 =======
-These are listed in :file:`sources.yaml`, loaded as :data:.`SOURCES`. from the `iTEM metadata repository <https://github.com/transportenergy/metadata>`_.
+These are listed in :file:`sources.yaml`, loaded as :data:`.SOURCES`, from the `iTEM metadata repository <https://github.com/transportenergy/metadata>`_.
 
 Input data is retrieved using via OpenKAPSARC and SDMX APIs, according to the type supported by each data source. See :mod:`item.remote`.
 
@@ -103,3 +103,16 @@ T001
    .. literalinclude:: ../item/data/historical/sources.yaml
       :language: yaml
       :lines: 12-20
+
+
+T003
+----
+
+.. currentmodule:: item.historical.scripts.T003
+
+.. automodule:: item.historical.scripts.T003
+   :members:
+
+   .. literalinclude:: ../item/data/historical/sources.yaml
+      :language: yaml
+      :lines: 32-40

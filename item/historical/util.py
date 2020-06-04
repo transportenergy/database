@@ -28,6 +28,17 @@ def dropna_logged(df, column, log_columns=[]):
     return df[~to_drop]
 
 
+def dropna_verbose(df):
+    """Drop from `df` where the "Value" column is null, logging about "Country"."""
+    missing = df["Value"].isnull()
+    countries = df.loc[missing, "Country"].unique()
+    print(
+        f"{len(countries)} countries with a total of {missing.sum()} missing values:\n"
+        f"{sorted(countries)}"
+    )
+    return df.dropna(subset=["Value"])
+
+
 def run_notebook(nb_path, tmp_path, env=os.environ, kernel=None):
     """Execute a Jupyter notebook via nbconvert and collect output.
 
