@@ -17,27 +17,26 @@ SCENARIOS = None
 
 def as_xarray(data, version, fmt):
     # Columns to preserve as a multi-index
-    data.set_index(INDEX + ['year'], inplace=True)
+    data.set_index(INDEX + ["year"], inplace=True)
 
     # variable name → xr.DataArray
     das = {}
 
     # Iterate over variables. Some variables (intensities) appear twice with
     # different units for freight, passenger
-    for key, d in data.groupby(level=['variable', 'unit']):
+    for key, d in data.groupby(level=["variable", "unit"]):
         variable, unit = key
 
-        log('Variable: {0[0]} [{0[1]}]\n  {1} values'.format(key, len(d)),
-            level=DEBUG)
+        log("Variable: {0[0]} [{0[1]}]\n  {1} values".format(key, len(d)), level=DEBUG)
 
         # Version-specific fixes
         # TODO move
         if version == 1:
-            if variable == 'intensity_new':
-                log('  skipping', level=DEBUG)
+            if variable == "intensity_new":
+                log("  skipping", level=DEBUG)
                 continue
-            elif variable in ['ef_co2 (service)', 'intensity_service']:
-                variable = variable.replace('service', unit[-3:])
+            elif variable in ["ef_co2 (service)", "intensity_service"]:
+                variable = variable.replace("service", unit[-3:])
 
         # *d* (the data for this variable) has all the MultiIndex levels of
         # *data*; drop the unused ones (requires pandas 0.20)
@@ -45,9 +44,9 @@ def as_xarray(data, version, fmt):
 
         # Convert to xr.DataArray
         try:
-            d = xr.DataArray.from_series(d['value'].astype(float))
+            d = xr.DataArray.from_series(d["value"].astype(float))
         except Exception as e:
-            if 'non-unique multi-index' in str(e):
+            if "non-unique multi-index" in str(e):
                 log(d.index[d.index.duplicated()].to_series(), level=DEBUG)
             raise
 
@@ -60,12 +59,15 @@ def as_xarray(data, version, fmt):
                 squeeze_dims.append(c)
         d = d.squeeze(squeeze_dims, drop=True)
         d.name = variable
-        d.attrs['unit'] = unit
+        d.attrs["unit"] = unit
 
         fill = float(100 * d.notnull().sum() / np.prod(list(d.sizes.values())))
-        log('  {:2.0f}% full\n  coords: {}\n  attrs: {}'
-            .format(fill, ', '.join(d.coords.keys()), d.attrs),
-            level=DEBUG)
+        log(
+            "  {:2.0f}% full\n  coords: {}\n  attrs: {}".format(
+                fill, ", ".join(d.coords.keys()), d.attrs
+            ),
+            level=DEBUG,
+        )
 
         das[variable] = d
 
@@ -73,14 +75,17 @@ def as_xarray(data, version, fmt):
 
     # The resulting dataset is very sparse
     if fmt == xr.Dataset:
-        log('Merging\n  sparseness:', level=DEBUG)
+        log("Merging\n  sparseness:", level=DEBUG)
 
         result = xr.merge(das.values())
 
         for v in result:
-            fill = float(100 * result[v].notnull().sum() /
-                         np.prod(list(result[v].sizes.values())))
-            log('  {:3.0f}% full — {}'.format(fill, v), level=DEBUG)
+            fill = float(
+                100
+                * result[v].notnull().sum()
+                / np.prod(list(result[v].sizes.values()))
+            )
+            log("  {:3.0f}% full — {}".format(fill, v), level=DEBUG)
 
     return result
 
@@ -92,7 +97,7 @@ def concat_versions(dataframes={}):
     """
     dfs = []
     for version, df in dataframes.items():
-        df['version'] = version
+        df["version"] = version
         dfs.append(df)
     return pd.concat(dfs)
 
@@ -115,8 +120,8 @@ def drop_empty(df, columns=None):
     rows = df.shape[0]
     if columns is None:
         columns = data_columns(df)
-    df = df.dropna(how='all', subset=columns)
-    log('  dropped %d empty rows' % (rows - df.shape[0]))
+    df = df.dropna(how="all", subset=columns)
+    log("  dropped %d empty rows" % (rows - df.shape[0]))
     return df
 
 
@@ -124,13 +129,13 @@ def load():
     """Load model & scenario data."""
     global SCENARIOS
 
-    with open(join(paths['data'], 'model', 'models.yaml')) as f:
+    with open(join(paths["data"], "model", "models.yaml")) as f:
         MODELS = yaml.load(f, Loader=yaml.SafeLoader)
 
     # Load scenario information
     scenarios = []
     for model in MODELS:
-        fn = join(paths['data'], 'model', model, 'scenarios.yaml')
+        fn = join(paths["data"], "model", model, "scenarios.yaml")
         try:
             with open(fn) as f:
                 m_s = yaml.load(f, Loader=yaml.SafeLoader)
@@ -139,12 +144,14 @@ def load():
 
         for version, m_s_v in m_s.items():
             for name, m_s_v_n in m_s_v.items():
-                scenarios.append({
-                    'model': model,
-                    'version': version,
-                    'scenario': name,
-                    'category': m_s_v_n.get('category')
-                    })
+                scenarios.append(
+                    {
+                        "model": model,
+                        "version": version,
+                        "scenario": name,
+                        "category": m_s_v_n.get("category"),
+                    }
+                )
 
     SCENARIOS = pd.DataFrame(scenarios)
 
@@ -157,11 +164,11 @@ def tidy(df):
     def _rename(colname):
         try:
             if isinstance(colname, str):
-                colname = colname.lstrip('X')
+                colname = colname.lstrip("X")
             return int(colname)
         except ValueError:
-            if colname == 'Tech':
-                colname = 'Technology'
+            if colname == "Tech":
+                colname = "Technology"
             return colname.lower()
 
     df.rename(columns=_rename, inplace=True)
@@ -174,13 +181,16 @@ def select(data, *args, **kwargs):
     """
     # Process arguments
     if len(args) > 1:
-        raise ValueError(("can't determine dimensions for >1 positional "
-                          "arguments: {}").format(' '.join(args)))
+        raise ValueError(
+            ("can't determine dimensions for >1 positional " "arguments: {}").format(
+                " ".join(args)
+            )
+        )
 
     dims = {k: None for k in INDEX}
 
     for d, v in kwargs.items():
-        d = 'technology' if d == 'tech' else d
+        d = "technology" if d == "tech" else d
         if isinstance(v, (int, str)):
             dims[d] = set([v])
         elif v is None:
@@ -188,8 +198,8 @@ def select(data, *args, **kwargs):
         else:
             dims[d] = set(v)
 
-    if len(args) and dims['variable'] is None:
-        dims['variable'] = set(args)
+    if len(args) and dims["variable"] is None:
+        dims["variable"] = set(args)
 
     # Code to this point is generic (doesn't depend on the format of *data*)
 
@@ -212,9 +222,9 @@ def select(data, *args, **kwargs):
     return data[keep].copy()
 
 
-def to_wide(data, dimension='year'):
+def to_wide(data, dimension="year"):
     """Convert *data* to wide format, one column per year."""
-    return data.set_index(INDEX + ['year'])['value'].unstack(dimension)
+    return data.set_index(INDEX + ["year"])["value"].unstack(dimension)
 
 
 load()

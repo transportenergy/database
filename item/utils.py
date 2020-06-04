@@ -1,7 +1,7 @@
 import pint
 
 
-def convert_units(df, units_from, units_to, cols=('Value', 'Unit')):
+def convert_units(df, units_from, units_to, cols=("Value", "Unit")):
     """Convert units of *df*.
 
     Uses a vector :class:`pint.Quantity` to convert an entire column of values
@@ -28,6 +28,6 @@ def convert_units(df, units_from, units_to, cols=('Value', 'Unit')):
 
     # Assign magnitude and unit columns in output DataFrame
     df[cols[0]] = qty.magnitude
-    df[cols[1]] = f'{qty.units:~}'
+    df[cols[1]] = f"{qty.units:~}"
 
     return df

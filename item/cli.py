@@ -10,15 +10,18 @@ from item.structure import make_template
 
 
 @click.group(help=__doc__)
-@click.option('--path', 'paths',
-              type=(str, click.Path()),
-              multiple=True,
-              metavar='<KEY> <PATH>',
-              help='Override data paths (multiple allowed).')
+@click.option(
+    "--path",
+    "paths",
+    type=(str, click.Path()),
+    multiple=True,
+    metavar="<KEY> <PATH>",
+    help="Override data paths (multiple allowed).",
+)
 def main(paths):
     from item.common import init_paths
 
-    paths = {k.replace('_', ' '): v for (k, v) in paths}
+    paths = {k.replace("_", " "): v for (k, v) in paths}
 
     init_paths(**paths)
 
@@ -26,8 +29,9 @@ def main(paths):
 @main.command()
 def help():
     """Show extended help for the command-line tool."""
-    print(__doc__, end='\n\n')
-    print("""This tool takes configuration options in one of two ways:
+    print(__doc__, end="\n\n")
+    print(
+        """This tool takes configuration options in one of two ways:
 
 1. From a file named item_config.yaml in the current directory. For
    instance, to override the path to the raw model data, put the
@@ -47,7 +51,8 @@ In a Python script, the following is equivalent:
     import item
     item.init_paths(model_raw='../custom/data/location')
     …
-""")
+"""
+    )
 
 
 @main.command()
@@ -60,22 +65,21 @@ def debug():
     dump_args = dict(indent=2, default_flow_style=False)
 
     def _dump(data):
-        print(indent(yaml.dump(data, **dump_args), '  '))
+        print(indent(yaml.dump(data, **dump_args), "  "))
 
-    print('Configuration file: %s' % config.get('_filename', 'none'))
-    _dump(config.get('_from_file', {}))
+    print("Configuration file: %s" % config.get("_filename", "none"))
+    _dump(config.get("_from_file", {}))
 
-    print('Command-line overrides:')
-    _dump(config.get('_cli', {}))
+    print("Command-line overrides:")
+    _dump(config.get("_cli", {}))
 
-    print('Paths:')
+    print("Paths:")
     _dump(paths)
 
 
 @main.command()
-@click.option('--dry-run', '-n', is_flag=True,
-              help='Only show what would be done.')
-@click.argument('path', type=click.Path())
+@click.option("--dry-run", "-n", is_flag=True, help="Only show what would be done.")
+@click.argument("path", type=click.Path())
 def mkdirs(path, dry_run):
     """Create a directory tree for the database."""
     from item.common import make_database_dirs

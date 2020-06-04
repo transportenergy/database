@@ -5,9 +5,9 @@ from typing import Dict, List
 import pandas as pd
 import yaml
 from pandas.core.computation.ops import UndefinedVariableError
+from sdmx.model import Annotation, Concept, ConceptScheme
 
 from item.common import paths
-from sdmx.model import Annotation, Concept, ConceptScheme
 
 
 def read_items(root: Dict, klass=Concept):
@@ -16,7 +16,7 @@ def read_items(root: Dict, klass=Concept):
 
     # Iterate over keys and children
     for item_id, contents in root.items():
-        if item_id.startswith('_'):
+        if item_id.startswith("_"):
             # This child is an attribute value like _name
             continue
 
@@ -26,14 +26,14 @@ def read_items(root: Dict, klass=Concept):
         # Create an object
         item = klass(
             id=item_id,
-            name=contents.get('_name', item_id.title()),
-            description=contents.get('_description', {}),
-            )
+            name=contents.get("_name", item_id.title()),
+            description=contents.get("_description", {}),
+        )
 
-        unit = contents.get('_unit', None)
+        unit = contents.get("_unit", None)
         if unit:
             item.annotations.append(
-                Annotation(id='unit', type='py:dict', text=repr(unit))
+                Annotation(id="unit", type="py:dict", text=repr(unit))
             )
 
         # Append to the result
@@ -54,32 +54,32 @@ def common_dim_dummies():
     along each of these dimensions.
     """
 
-    c_all = Concept(id='[All]', name='[all model values]')
+    c_all = Concept(id="[All]", name="[all model values]")
     c_all = {c_all.id: c_all}
-    c_total = Concept(id='[All + World]', name='[Global total or average]')
+    c_total = Concept(id="[All + World]", name="[Global total or average]")
     c_total = {c_total.id: c_total}
 
-    yield ConceptScheme(id='model', name='Model', items=c_all)
-    yield ConceptScheme(id='scenario', name='Scenario', items=c_all)
-    yield ConceptScheme(id='region', name='Region', items=c_total)
-    yield ConceptScheme(id='year', name='Year', items=c_all)
+    yield ConceptScheme(id="model", name="Model", items=c_all)
+    yield ConceptScheme(id="scenario", name="Scenario", items=c_all)
+    yield ConceptScheme(id="region", name="Region", items=c_total)
+    yield ConceptScheme(id="year", name="Year", items=c_all)
 
 
 def add_unit(key: Dict, concept: Concept) -> None:
     """Add units to a key."""
     # Retrieve the unit information, stored by read_items()
-    anno = list(filter(lambda a: a.id == 'unit', concept.annotations))
+    anno = list(filter(lambda a: a.id == "unit", concept.annotations))
     assert len(anno) == 1
     unit = eval(anno[0].text.localized_default(None))
 
     if isinstance(unit, str):
-        key['unit'] = unit
+        key["unit"] = unit
     else:
         # Conditional units
         for condition, unit in unit.items():
-            dim, value = condition.split(' == ')
+            dim, value = condition.split(" == ")
             if dim in key and key[dim] == value:
-                key['unit'] = unit
+                key["unit"] = unit
                 return
 
 
@@ -96,9 +96,7 @@ def read_concepts_yaml(path: Path) -> Dict[str, ConceptScheme]:
     concept_schemes = []
 
     for id, cs_data in data.items():
-        concept_schemes.append(
-            ConceptScheme(id=id, items=read_items(cs_data, Concept))
-        )
+        concept_schemes.append(ConceptScheme(id=id, items=read_items(cs_data, Concept)))
 
     # Add common dimensions
     concept_schemes.extend(common_dim_dummies())
@@ -116,7 +114,7 @@ def read_measures_yaml(path: Path) -> ConceptScheme:
     read_items
     """
     data = yaml.safe_load(open(path))
-    return ConceptScheme(id='measure', items=read_items(data))
+    return ConceptScheme(id="measure", items=read_items(data))
 
 
 def collapse(row: pd.Series) -> pd.Series:
@@ -126,39 +124,39 @@ def collapse(row: pd.Series) -> pd.Series:
     - 'mode' column gets 'type', 'vehicle', and/or 'operator'.
     """
     # Combine 3 concepts with 'measure' ("Variable")
-    lca_scope = row.pop('lca_scope')
+    lca_scope = row.pop("lca_scope")
     if len(lca_scope):
-        row['measure'] += ' (' + lca_scope + ')'
+        row["measure"] += " (" + lca_scope + ")"
 
-    pollutant = row.pop('pollutant')
+    pollutant = row.pop("pollutant")
     if len(pollutant):
-        row['measure'] = pollutant + ' ' + row['measure']
+        row["measure"] = pollutant + " " + row["measure"]
 
-    fleet = row.pop('fleet')
+    fleet = row.pop("fleet")
     if len(fleet):
-        if row['measure'] == 'Energy intensity' and fleet == 'all':
-            fleet = ''
+        if row["measure"] == "Energy intensity" and fleet == "all":
+            fleet = ""
         else:
-            fleet = ' (' + fleet + ' vehicles)'
-        row['measure'] += fleet
+            fleet = " (" + fleet + " vehicles)"
+        row["measure"] += fleet
 
     # Combine 4 concepts with 'mode'
-    type = row.pop('type')
+    type = row.pop("type")
     if len(type):
-        if row['mode'] in ['Road', 'Rail']:
-            row['mode'] = type + ' ' + row['mode']
-        elif row['mode'] == 'All':
-            row['mode'] = row['mode'] + ' ' + type
+        if row["mode"] in ["Road", "Rail"]:
+            row["mode"] = type + " " + row["mode"]
+        elif row["mode"] == "All":
+            row["mode"] = row["mode"] + " " + type
 
-    vehicle = row.pop('vehicle')
-    if len(vehicle) and vehicle != 'All':
-        row['mode'] = vehicle
+    vehicle = row.pop("vehicle")
+    if len(vehicle) and vehicle != "All":
+        row["mode"] = vehicle
 
-    operator = row.pop('operator')
-    automation = row.pop('automation')
-    if len(operator) and len(automation) and row['mode'] == 'LDV':
-        automation = '' if automation == 'Human' else ' AV'
-        row['mode'] += ' ({}{})'.format(operator.lower(), automation)
+    operator = row.pop("operator")
+    automation = row.pop("automation")
+    if len(operator) and len(automation) and row["mode"] == "LDV":
+        automation = "" if automation == "Human" else " AV"
+        row["mode"] += " ({}{})".format(operator.lower(), automation)
 
     return row
 
@@ -174,12 +172,11 @@ def name_for_id(concept_schemes: Dict, ids: List) -> Dict[str, Dict[str, str]]:
     result = dict()
     for id in ids:
         cs = concept_schemes[id]
-        result[id] = {c.id: c.name.localized_default()
-                      for c in cs.items.values()}
+        result[id] = {c.id: c.name.localized_default() for c in cs.items.values()}
 
     # Where 'all' appears in the technology column, the template requests
     # totals
-    result['technology']['all'] = 'Total'
+    result["technology"]["all"] = "Total"
 
     return result
 
@@ -202,16 +199,16 @@ def make_template(output_path: Path = None, verbose: bool = True):
     #      concepts
 
     # Concepts (used as dimensions) and possible values
-    cs = read_concepts_yaml(paths['data'] / 'concepts.yaml')
+    cs = read_concepts_yaml(paths["data"] / "concepts.yaml")
 
     # Measures, annotated by their units
-    cs['measure'] = read_measures_yaml(paths['data'] / 'measures.yaml')
+    cs["measure"] = read_measures_yaml(paths["data"] / "measures.yaml")
 
     # Common dimensions applied to all keys
-    common_dims = ['model', 'scenario', 'region', 'year']
+    common_dims = ["model", "scenario", "region", "year"]
 
     # Read specification of the template
-    specs = yaml.safe_load(open(paths['data'] / 'spec.yaml'))
+    specs = yaml.safe_load(open(paths["data"] / "spec.yaml"))
 
     # Filters to reduce the set of Keys; see below at 'Filter Keys'
     exclude_global = []
@@ -226,15 +223,15 @@ def make_template(output_path: Path = None, verbose: bool = True):
 
         try:
             # Retrieve the measure to add to the key later
-            measure_id = spec.pop('measure')
-            measure_concept = cs['measure'][measure_id]
+            measure_id = spec.pop("measure")
+            measure_concept = cs["measure"][measure_id]
         except KeyError:
             # Entry without a 'measure:' key is a list of global filters
-            exclude_global = spec.pop('exclude')
+            exclude_global = spec.pop("exclude")
             continue
 
         # List of dimensions for these Keys
-        key_dims = common_dims + spec.pop('dims', [])
+        key_dims = common_dims + spec.pop("dims", [])
 
         # A list of iterable objects containing the values along each dimension
         iters = [iter(cs[d]) for d in key_dims]
@@ -255,15 +252,15 @@ def make_template(output_path: Path = None, verbose: bool = True):
             keys.append(key)
 
         if verbose:
-            print(f'\nSpec for {repr(measure_concept.id)}: {len(keys)} keys')
+            print(f"\nSpec for {repr(measure_concept.id)}: {len(keys)} keys")
 
         # Convert list → DataFrame for filtering
-        df = pd.DataFrame(keys).fillna('')
+        df = pd.DataFrame(keys).fillna("")
 
         # Filter Keys by both global and spec-specific filters
-        for filter in exclude_global + spec.pop('exclude', []):
+        for filter in exclude_global + spec.pop("exclude", []):
             # 'not' operator (~) to exclude the matching rows
-            query_str = '~({})'.format(filter)
+            query_str = "~({})".format(filter)
 
             try:
                 df.query(query_str, inplace=True)
@@ -273,28 +270,52 @@ def make_template(output_path: Path = None, verbose: bool = True):
                 continue
 
             if verbose:
-                print(f'  {df.shape[0]:5d} after constraint {query_str}')
+                print(f"  {df.shape[0]:5d} after constraint {query_str}")
 
         # Store the filtered keys as a dataframe
         dfs.append(df)
 
     # Combine all dataframes
-    specs = pd.concat(dfs, axis=0, sort=False) \
-              .fillna('')
+    specs = pd.concat(dfs, axis=0, sort=False).fillna("")
 
     # Convert to the traditional iTEM format
 
     # Use names instead of IDs for these columns
-    use_name_cols = ['type', 'mode', 'vehicle', 'technology', 'fuel',
-                     'pollutant', 'automation', 'operator', 'measure']
+    use_name_cols = [
+        "type",
+        "mode",
+        "vehicle",
+        "technology",
+        "fuel",
+        "pollutant",
+        "automation",
+        "operator",
+        "measure",
+    ]
 
     # Order of output columns
-    target_cols = common_dims[:-1] + ['measure', 'unit', 'mode', 'technology',
-                                      'fuel', 'year']
+    target_cols = common_dims[:-1] + [
+        "measure",
+        "unit",
+        "mode",
+        "technology",
+        "fuel",
+        "year",
+    ]
 
     # Columns to sort content
-    sort_cols = ['sort_order', 'measure', 'unit', 'type', 'mode', 'vehicle',
-                 'technology', 'fuel', 'lca_scope', 'pollutant']
+    sort_cols = [
+        "sort_order",
+        "measure",
+        "unit",
+        "type",
+        "mode",
+        "vehicle",
+        "technology",
+        "fuel",
+        "lca_scope",
+        "pollutant",
+    ]
 
     replacements = name_for_id(cs, use_name_cols)
 
@@ -305,34 +326,37 @@ def make_template(output_path: Path = None, verbose: bool = True):
     # - Collapse multiple columns into fewer
     # - Set preferred column order, drop the integer index
     # - Rename columns to Title Case
-    specs_full = specs.replace(replacements) \
-                      .sort_values(by=sort_cols) \
-                      .reset_index(drop=True)
-    specs = specs_full.apply(collapse, axis=1) \
-                      .reindex(columns=target_cols) \
-                      .rename(columns={'measure': 'variable'}) \
-                      .rename(columns=lambda name: name.title())
+    specs_full = (
+        specs.replace(replacements).sort_values(by=sort_cols).reset_index(drop=True)
+    )
+    specs = (
+        specs_full.apply(collapse, axis=1)
+        .reindex(columns=target_cols)
+        .rename(columns={"measure": "variable"})
+        .rename(columns=lambda name: name.title())
+    )
 
     if verbose:
-        print('', f'Total keys: {specs.shape[0]}', specs.head(10), sep='\n\n')
+        print("", f"Total keys: {specs.shape[0]}", specs.head(10), sep="\n\n")
 
     # Save in multiple formats
-    output_path = output_path or paths['output']
+    output_path = output_path or paths["output"]
 
-    specs.to_csv(output_path / 'template.csv', index=False)
-    specs.to_excel(output_path / 'template.xlsx', index=False)
+    specs.to_csv(output_path / "template.csv", index=False)
+    specs.to_excel(output_path / "template.xlsx", index=False)
 
     # Construct the index:
     # - Horizontally concatenate the full-dimension and 'collapse' (with
     #   'variable' column) data frames.
     # - Drop the dummy dimensions.
     # - Use '---' in empty cells for clarity.
-    index = {'Full dimensionality': specs_full, 'Template (reduced)': specs}
-    index = pd.concat(index, axis=1) \
-              .drop(columns=common_dims + list(map(str.title, common_dims)),
-                    axis=1, level=1) \
-              .replace('', '---')
+    index = {"Full dimensionality": specs_full, "Template (reduced)": specs}
+    index = (
+        pd.concat(index, axis=1)
+        .drop(columns=common_dims + list(map(str.title, common_dims)), axis=1, level=1)
+        .replace("", "---")
+    )
 
     # Save the index
-    index.to_csv(output_path / 'index.csv')
-    index.to_excel(output_path / 'index.xlsx')
+    index.to_csv(output_path / "index.csv")
+    index.to_excel(output_path / "index.xlsx")

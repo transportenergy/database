@@ -14,25 +14,23 @@ from .scripts.util.managers.dataframe import ColumnName
 
 #: List of data processing Jupyter/IPython notebooks.
 SCRIPTS = [
-    'T000',
+    "T000",
     # Converted to a submodule, below.
     # 'T001',
-    'T002',
-    'T003',
-    'T004',
-    'T005',
-    'T006',
-    'T007',
-    'T008'
+    "T002",
+    "T003",
+    "T004",
+    "T005",
+    "T006",
+    "T007",
+    "T008",
 ]
 
 #: Submodules usable with :func:`process`.
-MODULES = {
-    1: T001
-}
+MODULES = {1: T001}
 
 #: Path for output from :func:`process`.
-OUTPUT_PATH = paths['data'] / 'historical' / 'output'
+OUTPUT_PATH = paths["data"] / "historical" / "output"
 
 #: Non-ISO names appearing in 1 or more data sets. These are used in
 #: :meth:`iso_and_region` to replace names before they are looked up using
@@ -48,12 +46,12 @@ COUNTRY_NAME = {
 #: Map from ISO 3166 alpha-3 code to region name.
 REGION = {}
 # Populate the map from the regions.yaml file
-with open(paths['data'] / 'model' / 'regions.yaml') as file:
+with open(paths["data"] / "model" / "regions.yaml") as file:
     for region_name, info in yaml.safe_load(file).items():
-        REGION.update({c: region_name for c in info['countries']})
+        REGION.update({c: region_name for c in info["countries"]})
 
 
-with open(paths['data'] / 'historical' / 'sources.yaml') as f:
+with open(paths["data"] / "historical" / "sources.yaml") as f:
     #: The current version of the file is always accessible at
     #: https://github.com/transportenergy/metadata/blob/master/historical/
     #: sources.yaml
@@ -73,22 +71,21 @@ def cache_results(id_str, df):
     OUTPUT_PATH.mkdir(exist_ok=True)
 
     # Long format ('programming friendly view')
-    path = OUTPUT_PATH / f'{id_str}_cleaned_PF.csv'
+    path = OUTPUT_PATH / f"{id_str}_cleaned_PF.csv"
     df.to_csv(path, index=False)
-    print(f'Write {path}')
+    print(f"Write {path}")
 
     # Pivot to wide format ('user friendly view') and write to CSV
-    path = OUTPUT_PATH / f'{id_str}_cleaned_UF.csv'
+    path = OUTPUT_PATH / f"{id_str}_cleaned_UF.csv"
 
     # - Set all columns but 'Value' as the index → pd.Series with MultiIndex.
     # - 'Unstack' the 'Year' dimension to columns, i.e. wide format.
     # - Return the index to columns in the dataframe.
     # - Write to file.
-    df.set_index([ev.value for ev in ColumnName if ev != ColumnName.VALUE]) \
-      .unstack(ColumnName.YEAR.value) \
-      .reset_index() \
-      .to_csv(path, index=False)
-    print(f'Write {path}')
+    df.set_index([ev.value for ev in ColumnName if ev != ColumnName.VALUE]).unstack(
+        ColumnName.YEAR.value
+    ).reset_index().to_csv(path, index=False)
+    print(f"Write {path}")
 
 
 def fetch_source(id, use_cache=True):
@@ -108,21 +105,21 @@ def fetch_source(id, use_cache=True):
     source_info = copy(SOURCES[id])
 
     # Path for cached data. NB OpenKAPSARC does its own caching
-    cache_path = paths['historical input'] / f'{id}.csv'
+    cache_path = paths["historical input"] / f"{id}.csv"
 
     if use_cache and cache_path.exists():
         return cache_path
 
     # Information for fetching the data
-    fetch_info = source_info['fetch']
+    fetch_info = source_info["fetch"]
 
-    remote_type = fetch_info.pop('type')
-    if remote_type.lower() == 'sdmx':
+    remote_type = fetch_info.pop("type")
+    if remote_type.lower() == "sdmx":
         # Use SDMX to retrieve the data
         result = get_sdmx(**fetch_info)
-    elif remote_type.lower() == 'openkapsarc':
+    elif remote_type.lower() == "openkapsarc":
         # Retrieve data using the OpenKAPSARC API
-        ok_api = OpenKAPSARC(api_key=os.environ.get('OK_API_KEY', None))
+        ok_api = OpenKAPSARC(api_key=os.environ.get("OK_API_KEY", None))
         result = ok_api.table(**fetch_info)
     else:
         raise ValueError(remote_type)
@@ -141,8 +138,7 @@ def input_file(id: int):
     returned.
     """
     # List of all matching files
-    all_files = sorted(paths['historical input']
-                       .glob(f'{source_str(id)}*.csv'))
+    all_files = sorted(paths["historical input"].glob(f"{source_str(id)}*.csv"))
 
     # The last file has the most recent timestamp
     return all_files[-1]
@@ -175,7 +171,7 @@ def process(id):
     """
     # Load the data from a common location, based on the dataset ID
     id_str = source_str(id)
-    path = paths['data'] / 'historical' / 'input' / f'{id_str}_input.csv'
+    path = paths["data"] / "historical" / "input" / f"{id_str}_input.csv"
     df = pd.read_csv(path)
 
     # Get the module for this data set
@@ -186,31 +182,31 @@ def process(id):
         dataset_module.check(df)
     except AttributeError:
         # Optional check() function does not exist
-        print('No pre-processing checks to perform')
+        print("No pre-processing checks to perform")
     except AssertionError as e:
         # An 'assert' statement in check() failed
-        print(f'Input data is invalid: {e}')
+        print(f"Input data is invalid: {e}")
 
     # Information about columns. If not defined, use defaults.
-    columns = dict(country_name='Country')
-    columns.update(getattr(dataset_module, 'COLUMNS', {}))
+    columns = dict(country_name="Country")
+    columns.update(getattr(dataset_module, "COLUMNS", {}))
 
     try:
         # List of column names to drop
-        drop_cols = columns['drop']
+        drop_cols = columns["drop"]
     except KeyError:
         # No variable COLUMNS in dataset_module, or no key 'drop'
-        print(f'No columns to drop for {id_str}')
+        print(f"No columns to drop for {id_str}")
     else:
         df.drop(columns=drop_cols, inplace=True)
-        print('Drop {len(drop_cols)} extra column(s)')
+        print("Drop {len(drop_cols)} extra column(s)")
 
     # Call the dataset-specific process() function; returns a modified df
     df = dataset_module.process(df)
-    print(f'{len(df)} observations')
+    print(f"{len(df)} observations")
 
     # Assign ISO 3166 alpha-3 codes and iTEM regions from a country name column
-    country_col = columns['country_name']
+    country_col = columns["country_name"]
     # Use pandas.Series.apply() to apply the same function to each entry in
     # the column. Join these to the existing data frame as additional columns.
     df = pd.concat([df, df[country_col].apply(iso_and_region)], axis=1)
@@ -219,7 +215,7 @@ def process(id):
     assign_values = {ColumnName.ID.value: id_str}
 
     # Handle any COMMON_DIMS, if defined
-    for dim, value in getattr(dataset_module, 'COMMON_DIMS', {}).items():
+    for dim, value in getattr(dataset_module, "COMMON_DIMS", {}).items():
         # Standard name for the column
         col_name = getattr(ColumnName, dim.upper()).value
         # Copy the value to be assigned
@@ -227,8 +223,7 @@ def process(id):
 
     # - Assign the values.
     # - Order the columns in the standard order.
-    df = df.assign(**assign_values) \
-           .reindex(columns=[ev.value for ev in ColumnName])
+    df = df.assign(**assign_values).reindex(columns=[ev.value for ev in ColumnName])
 
     # Save the result to cache
     cache_results(id_str, df)
@@ -261,8 +256,9 @@ def iso_and_region(name):
 
     # Look up the region, construct a Series, and return
     return pd.Series(
-        [alpha_3, REGION.get(alpha_3, 'N/A')],
-        index=[ColumnName.ISO_CODE.value, ColumnName.ITEM_REGION.value])
+        [alpha_3, REGION.get(alpha_3, "N/A")],
+        index=[ColumnName.ISO_CODE.value, ColumnName.ITEM_REGION.value],
+    )
 
 
 def source_str(id):
@@ -273,4 +269,4 @@ def source_str(id):
     id : int or str
         Integer ID of the data source.
     """
-    return f'T{id:03}' if isinstance(id, int) else id
+    return f"T{id:03}" if isinstance(id, int) else id

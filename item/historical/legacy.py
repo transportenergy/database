@@ -12,7 +12,8 @@ from item.remote import OpenKAPSARC
 
 # Define a registry for tracking of units, and add units appearing in the data.
 ureg = pint.UnitRegistry()
-ureg.define("""
+ureg.define(
+    """
 idx_2005_100 = [index, 2005=100]
 person = [person]
 passenger = person
@@ -20,7 +21,8 @@ TEU = [container]
 TOE = 41.9 GJ
 vehicle = [vehicle]
 yr = year
-""".strip())
+""".strip()
+)
 
 
 def convert_units(row, target_units=[]):
@@ -32,7 +34,7 @@ def convert_units(row, target_units=[]):
     *target_units* contains zero or more (scaling_factor, target_unit) tuples,
     where *target_unit* is a pint.Unit and scaling_factor is a float.
     """
-    result = ureg.Quantity(row['Value'], row['Unit'])
+    result = ureg.Quantity(row["Value"], row["Unit"])
     scaling_factor = 1
 
     # If no target_units are supplied, this code does not run
@@ -48,13 +50,13 @@ def convert_units(row, target_units=[]):
             raise
 
     # Set the resulting values
-    row['Value'] = result.magnitude
-    row['Unit'] = result.units
+    row["Value"] = result.magnitude
+    row["Unit"] = result.units
 
     # scaling_factor had the value from the preferred unit
     if scaling_factor != 1:
-        row['Value'] /= scaling_factor
-        row['Unit'] *= scaling_factor
+        row["Value"] /= scaling_factor
+        row["Unit"] *= scaling_factor
 
     return row
 
@@ -65,7 +67,7 @@ def map_values(row, mapping):
     *mapping* is a dict with a key '_column'. The value in this column of *row*
     is used to return a value from *mapping*.
     """
-    column = mapping['_column']
+    column = mapping["_column"]
     return mapping[row[column]]
 
 
@@ -77,7 +79,7 @@ def preferred_units(info):
     """
     result = []
 
-    for unit in info.get('preferred_units', []):
+    for unit in info.get("preferred_units", []):
         try:
             result.append[(1, ureg.parse_units(unit))]
         except ValueError:
@@ -119,23 +121,22 @@ def conversion_layer1(df, top_dict={}):
     """
 
     # Rename existing columns to preferred dimensions, dropping others
-    rename = top_dict.get('rename', {})
-    df = df.take(rename.keys(), axis=1) \
-           .rename(columns=rename)
+    rename = top_dict.get("rename", {})
+    df = df.take(rename.keys(), axis=1).rename(columns=rename)
 
     # Add columns that are not included and mapping with pre-defined rules
-    for col, value in top_dict.get('add', {}).items():
-        if '_depend' in value:
+    for col, value in top_dict.get("add", {}).items():
+        if "_depend" in value:
             df[col] = df.apply(map_values, axis=1, args=(value,))
         else:
             df[col] = value
 
     # Replace values in fields
-    for col, mapping in top_dict.get('replace', {}).items():
+    for col, mapping in top_dict.get("replace", {}).items():
         df[col].replace(mapping, inplace=True)
 
     # Replace '-' with ' '. pint interprets '-' to mean subtraction.
-    df['Unit'] = df['Unit'].str.replace('-', ' ')
+    df["Unit"] = df["Unit"].str.replace("-", " ")
 
     # Convert units
     df = df.apply(convert_units, axis=1, args=(preferred_units(top_dict),))
@@ -152,7 +153,7 @@ def main(output_file, use_cache):
     # Get the configuration
     # TODO load these from all the files appearing in one directory, so that
     #      each data set can be specified in a separate file
-    ds_info_path = paths['data'] / 'historical' / 'mapping_conv_phase1.yaml'
+    ds_info_path = paths["data"] / "historical" / "mapping_conv_phase1.yaml"
     all_ds_info = yaml.safe_load(open(ds_info_path))
 
     # Access the OpenKAPSARC API
@@ -163,31 +164,41 @@ def main(output_file, use_cache):
     for ds_info in all_ds_info:
         if use_cache:
             # Locate a previously-cached CSV file
-            cache_path = (paths['historical'] /
-                          ds_info['uid']).with_suffix('.csv')
+            cache_path = (paths["historical"] / ds_info["uid"]).with_suffix(".csv")
             try:
-                df = pd.read_csv(cache_path, sep=';')
+                df = pd.read_csv(cache_path, sep=";")
                 cache_miss = False
             except FileNotFoundError:
                 cache_miss = True
 
         if not use_cache or cache_miss:
             # Retrieve the data from the OpenKAPSARC datahub
-            df = ok.table(ds_info['id'])
+            df = ok.table(ds_info["id"])
 
         # Process the data
         df = conversion_layer1(df, ds_info)
 
         # Add a source annotation
-        df['Source'] = f"OpenKAPSARC:{ds_info['uid']}"
+        df["Source"] = f"OpenKAPSARC:{ds_info['uid']}"
 
         # Store
         list_of_df.append(df)
 
     # Combine to single dataframe
     df_output = pd.concat(list_of_df, sort=False, ignore_index=True)
-    df_output = df_output[["Region", "Variable", "Unit", "Mode", "Technology",
-                           "Fuel", "Year", "Value", "Source"]]
+    df_output = df_output[
+        [
+            "Region",
+            "Variable",
+            "Unit",
+            "Mode",
+            "Technology",
+            "Fuel",
+            "Year",
+            "Value",
+            "Source",
+        ]
+    ]
 
     df_output.to_csv(output_file, index=False)
 
