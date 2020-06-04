@@ -1,6 +1,6 @@
+import operator
 from functools import reduce
 from itertools import chain
-import operator
 from os.path import join
 from textwrap import indent
 
@@ -9,7 +9,6 @@ import plotnine
 from item.common import paths
 from item.model.common import INDEX, select
 from item.model.dimensions import INFO
-
 
 scale_linetype_scenario = plotnine.scale_linetype(limits=['reference',
                                                           'policy'])

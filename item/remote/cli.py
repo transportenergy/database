@@ -3,7 +3,6 @@ from click import Group
 
 from . import OpenKAPSARC
 
-
 remote = Group('remote', help="Access remote data sources.")
 
 

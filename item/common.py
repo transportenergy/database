@@ -5,9 +5,8 @@ from os.path import abspath, join
 from pathlib import Path
 from warnings import filterwarnings
 
-from pkg_resources import resource_filename  # noqa: F401
 import yaml
-
+from pkg_resources import resource_filename  # noqa: F401
 
 # Occurs with pandas 0.20 and xarray 0.9.1
 filterwarnings('ignore',

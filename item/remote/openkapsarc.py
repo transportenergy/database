@@ -1,15 +1,13 @@
-from datetime import datetime
-from json import JSONDecodeError
 import logging
 import sys
+from datetime import datetime
+from json import JSONDecodeError
 
 import pandas as pd
 import requests
 import requests_cache
 
-
 from item.common import config, paths
-
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)

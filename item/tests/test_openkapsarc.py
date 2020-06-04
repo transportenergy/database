@@ -1,8 +1,8 @@
 import os
 
-from click.testing import CliRunner
 import pandas as pd
 import pytest
+from click.testing import CliRunner
 
 import item.cli
 from item.remote import OpenKAPSARC

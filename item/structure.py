@@ -1,12 +1,13 @@
-from pathlib import Path
 from itertools import product
+from pathlib import Path
 from typing import Dict, List
 
-from item.common import paths
 import pandas as pd
-from pandas.core.computation.ops import UndefinedVariableError
-from sdmx.model import Annotation, Concept, ConceptScheme
 import yaml
+from pandas.core.computation.ops import UndefinedVariableError
+
+from item.common import paths
+from sdmx.model import Annotation, Concept, ConceptScheme
 
 
 def read_items(root: Dict, klass=Concept):

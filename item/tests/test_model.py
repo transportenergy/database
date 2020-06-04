@@ -1,20 +1,13 @@
 from os.path import exists, join
+
 import pytest
 import xarray as xr
 
 from item.common import paths
-from item.model import (
-    get_model_names,
-    load_model_data,
-    load_model_regions,
-    load_model_scenarios,
-    load_models_info,
-    make_regions_csv,
-    process_raw,
-    select,
-    squash_scenarios,
-    )
-
+from item.model import (get_model_names, load_model_data, load_model_regions,
+                        load_model_scenarios, load_models_info,
+                        make_regions_csv, process_raw, select,
+                        squash_scenarios)
 
 item1_size = 928541
 item2_size = 1994943

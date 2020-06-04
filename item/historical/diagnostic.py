@@ -5,7 +5,6 @@ import pandas as pd
 
 from . import fetch_source, source_str
 
-
 # Jinja2 template for diagnostics index page
 INDEX_TEMPLATE = """<html><body>
 {% for group_name, paths in groups.items() %}

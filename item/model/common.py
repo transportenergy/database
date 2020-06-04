@@ -10,7 +10,6 @@ import yaml
 from item.common import log, paths
 from item.model.dimensions import INDEX
 
-
 # Information about the models
 MODELS = {}
 SCENARIOS = None

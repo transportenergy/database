@@ -1,14 +1,9 @@
 import click
 from click import Argument, Option
 
-from item.model import (
-    make_regions_csv,
-    make_regions_yaml,
-    process_raw,
-    )
+from item.model import make_regions_csv, make_regions_yaml, process_raw
 from item.model.dimensions import list_pairs
 from item.model.plot import plot_all_item1
-
 
 model = click.Group('model', help="Manipulate the model database.")
 

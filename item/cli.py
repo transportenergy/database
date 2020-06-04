@@ -3,8 +3,8 @@ from textwrap import indent
 
 import click
 
-from item.model.cli import model
 from item.historical.cli import historical
+from item.model.cli import model
 from item.remote.cli import remote
 from item.structure import make_template
 

@@ -5,13 +5,8 @@ import pytest
 
 import item
 from item.common import paths
-from item.historical import (
-    SCRIPTS,
-    fetch_source,
-    input_file,
-    process,
-    source_str,
-)
+from item.historical import (SCRIPTS, fetch_source, input_file, process,
+                             source_str)
 from item.historical.diagnostic import coverage
 from item.historical.util import run_notebook
 

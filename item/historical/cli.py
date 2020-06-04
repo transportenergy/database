@@ -8,7 +8,6 @@ from . import SCRIPTS, fetch_source
 from .legacy import main as _phase1
 from .util import run_notebook
 
-
 historical = Group('historical', help="Manipulate the historical database.")
 
 

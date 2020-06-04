@@ -6,7 +6,6 @@ import yaml
 
 from item.common import paths
 
-
 # Metadata on database dimensions
 INFO = {}
 
