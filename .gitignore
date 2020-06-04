@@ -16,9 +16,11 @@ ipython_config.py
 
 .cache
 .coverage*
+.mypy_cache
 .pytest_cache
 __pycache__
 build
+coverage.xml
 dist
 htmlcov/
 

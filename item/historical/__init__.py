@@ -15,7 +15,8 @@ from .scripts.util.managers.dataframe import ColumnName
 #: List of data processing Jupyter/IPython notebooks.
 SCRIPTS = [
     'T000',
-    'T001',
+    # Converted to a submodule, below.
+    # 'T001',
     'T002',
     'T003',
     'T004',

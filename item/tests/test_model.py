@@ -4,7 +4,12 @@ import xarray as xr
 
 from item.common import paths
 from item.model import (
+    get_model_names,
     load_model_data,
+    load_model_regions,
+    load_model_scenarios,
+    load_models_info,
+    make_regions_csv,
     process_raw,
     select,
     squash_scenarios,
@@ -70,10 +75,40 @@ def test_item2_xr(item_tmp_dir):
     assert size == item2_size
 
 
+@pytest.mark.parametrize("arg", [(1,), (2,), tuple()])
+def test_get_model_names(arg):
+    get_model_names(*arg)
+
+
 def test_invalid_version():
     # Load an invalid model database version
     with pytest.raises(ValueError):
         load_model_data(99)
+
+
+@pytest.mark.parametrize("model", [
+    "item",
+    "message",
+    pytest.param("foo", marks=pytest.mark.xfail(raises=ValueError)),
+])
+@pytest.mark.parametrize("version", [1, 2])
+def test_load_model_regions(model, version):
+    load_models_info()
+    load_model_regions(model, version)
+
+
+@pytest.mark.parametrize("model", [
+    "message",
+    pytest.param("foo", marks=pytest.mark.xfail(raises=ValueError)),
+])
+@pytest.mark.parametrize("version", [1, 2])
+def test_load_model_scenarios(model, version):
+    load_models_info()
+    load_model_scenarios(model, version)
+
+
+def test_make_regions_csv(tmp_path):
+    make_regions_csv(tmp_path / "output.csv")
 
 
 @pytest.mark.skip('Requires synthetic model data.')

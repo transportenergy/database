@@ -1,4 +1,3 @@
-from copy import deepcopy
 from functools import reduce
 from itertools import chain
 import operator
