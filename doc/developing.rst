@@ -26,7 +26,12 @@ Repository organization
 Style guide
 ===========
 
-- Follow `PEP 8 <https://www.python.org/dev/peps/pep-0008/>`_; use a linter to ensure compliance.
+- Run the following tools on all new and modified code::
+
+      isort -rc . && black . && mypy . && flake8
+
+  The continuous integration workflow checks that these have been applied; PRs will fail unless they are.
+
 - Document all public classes and functions following the `NumPy docstring
   format`_.
 - Ensure new items appear in the built documentation.

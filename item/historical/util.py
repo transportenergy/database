@@ -1,8 +1,8 @@
 import io
 import os
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 import nbformat
 
@@ -32,19 +32,22 @@ def run_notebook(nb_path, tmp_path, env=os.environ, kernel=None):
         Any execution errors.
     """
     # IPython kernel
-    kernel = kernel or 'python{}'.format(sys.version_info[0])
+    kernel = kernel or "python{}".format(sys.version_info[0])
 
     # Temporary notebook to contain execution output
-    fname = Path(tmp_path) / 'test.ipynb'
+    fname = Path(tmp_path) / "test.ipynb"
 
     command = [
-        'jupyter', 'nbconvert',
-        '--to', 'notebook',
-        '--execute',
-        '--ExecutePreprocessor.timeout=600',
-        f'--ExecutePreprocessor.kernel_name={kernel}',
-        '--output', str(fname),
-        str(nb_path)
+        "jupyter",
+        "nbconvert",
+        "--to",
+        "notebook",
+        "--execute",
+        "--ExecutePreprocessor.timeout=600",
+        f"--ExecutePreprocessor.kernel_name={kernel}",
+        "--output",
+        str(fname),
+        str(nb_path),
     ]
 
     # Change to directory containing the notebook to be executed
@@ -54,14 +57,13 @@ def run_notebook(nb_path, tmp_path, env=os.environ, kernel=None):
     subprocess.check_call(command, env=env)
 
     # Read the output notebook
-    nb = nbformat.read(io.open(fname, encoding='utf-8'),
-                       nbformat.current_nbformat)
+    nb = nbformat.read(io.open(fname, encoding="utf-8"), nbformat.current_nbformat)
 
     # Store errors
     errors = []
     for cell in nb.cells:
-        for output in cell.get('outputs', []):
-            if output.output_type == 'error':
+        for output in cell.get("outputs", []):
+            if output.output_type == "error":
                 errors.append(output)
 
     # Remove output

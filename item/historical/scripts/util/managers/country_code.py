@@ -5,16 +5,19 @@ from item.common import paths
 
 
 class CountryCodeManager:
-
     def __init__(self):
         self.country_mapping = {}
         for country in pycountry.countries:
             code = country.alpha_3
             name = country.name.lower()
-            official_name = country.official_name.lower() if hasattr(
-                                            country, "official_name") else ""
-            common_name = country.common_name.lower() if hasattr(
-                                            country, "common_name") else ""
+            official_name = (
+                country.official_name.lower()
+                if hasattr(country, "official_name")
+                else ""
+            )
+            common_name = (
+                country.common_name.lower() if hasattr(country, "common_name") else ""
+            )
 
             self.country_mapping[name] = code
             if official_name:
@@ -22,7 +25,7 @@ class CountryCodeManager:
             if common_name:
                 self.country_mapping[common_name] = code
 
-        regions_file = paths['data'] / 'model' / 'regions.yaml'
+        regions_file = paths["data"] / "model" / "regions.yaml"
         with open(regions_file) as file:
             self.regions_list = yaml.load(file, Loader=yaml.FullLoader)
 
