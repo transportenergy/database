@@ -69,7 +69,7 @@ def test_input_file(item_tmp_dir):
     assert input_file(1) == paths["historical input"] / "T001_foo.csv"
 
 
-@pytest.mark.parametrize("dataset_id", [0, 1, 3])
+@pytest.mark.parametrize("dataset_id", [0, 1, 3, 9])
 def test_process(dataset_id):
     """Test common interface for processing scripts."""
     process(dataset_id)
@@ -97,5 +97,5 @@ def test_coverage(dataset_id, N_areas):
 def test_A003():
     """Test historical.diagnostic.A003."""
     activity = process(3)
-    stock = process(10)
+    stock = process(9)
     result = A003.compute(activity, stock)

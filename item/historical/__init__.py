@@ -9,7 +9,7 @@ import yaml
 
 from item.common import paths
 from item.remote import OpenKAPSARC, get_sdmx
-from .scripts import T000, T001, T003, T010
+from .scripts import T000, T001, T003, T009
 from .scripts.util.managers.dataframe import ColumnName
 
 log = logging.getLogger(__name__)
@@ -30,7 +30,7 @@ SCRIPTS = [
 ]
 
 #: Submodules usable with :func:`process`.
-MODULES = {0: T000, 1: T001, 3: T003, 10: T010}
+MODULES = {0: T000, 1: T001, 3: T003, 9: T009}
 
 #: Path for output from :func:`process`.
 OUTPUT_PATH = paths["data"] / "historical" / "output"
@@ -171,13 +171,21 @@ def process(id):
     9. Output data to two files. See :meth:`cache_results`.
 
     """
-    # Load the data from a common location, based on the dataset ID
     id_str = source_str(id)
-    path = paths["data"] / "historical" / "input" / f"{id_str}_input.csv"
-    df = pd.read_csv(path)
 
     # Get the module for this data set
     dataset_module = MODULES[id]
+
+    if getattr(dataset_module, "FETCH", False):
+        # Fetch directly from source
+        path = fetch_source(id)
+    else:
+        # Load the data from version stored in the transportenergy/metadata repo
+        # TODO remove this option; always fetch from source or cache
+        path = paths["historical input"] / f"{id_str}_input.csv"
+
+    # Read the data
+    df = pd.read_csv(path)
 
     try:
         # Check that the input data is of the form expected by process()
@@ -213,7 +221,7 @@ def process(id):
     country_col = columns["country_name"]
     # Use pandas.Series.apply() to apply the same function to each entry in
     # the column. Join these to the existing data frame as additional columns.
-    df = pd.concat([df, df[country_col].apply(iso_and_region)], axis=1)
+    df = df.combine_first(df[country_col].apply(iso_and_region))
 
     # Values to assign across all observations: the dataset ID
     assign_values = {ColumnName.ID.value: id_str}
@@ -256,7 +264,10 @@ def iso_and_region(name):
 
     # Use pycountry's built-in, case-insensitive lookup on all fields including
     # name, official_name, and common_name
-    alpha_3 = pycountry.countries.lookup(name).alpha_3
+    try:
+        alpha_3 = pycountry.countries.lookup(name).alpha_3
+    except LookupError:
+        alpha_3 = ""
 
     # Look up the region, construct a Series, and return
     return pd.Series(
