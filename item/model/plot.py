@@ -3,6 +3,7 @@ from functools import reduce
 from itertools import chain
 from os.path import join
 from textwrap import indent
+from typing import Any, Dict, List
 
 import plotnine
 
@@ -60,13 +61,14 @@ class Plot:
     """
 
     # Selectors to subset the data
-    select = {}
+    select: Dict[str, Any] = {}
 
     # Aesthetic mapping for plotnine.aes
-    aes = {}
+    aes: Dict[str, Any] = {}
 
     # Sequence of plotnine terms
-    terms = []
+    # TODO more specific typing
+    terms: List[Any] = []
 
     def filter(self, data):
         """Override this method to filter or transform the selected data."""

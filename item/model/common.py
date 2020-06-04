@@ -1,6 +1,7 @@
 """Common code for data input."""
 from logging import DEBUG
 from os.path import join
+from typing import Dict
 
 import numpy as np
 import pandas as pd
@@ -11,7 +12,7 @@ from item.common import log, paths
 from item.model.dimensions import INDEX
 
 # Information about the models
-MODELS = {}
+MODELS: Dict[str, dict] = {}
 SCENARIOS = None
 
 

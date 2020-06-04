@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from os.path import join
+from typing import Dict
 
 import pandas as pd
 import yaml
@@ -7,7 +8,7 @@ import yaml
 from item.common import paths
 
 # Metadata on database dimensions
-INFO = {}
+INFO: Dict[str, dict] = {}
 
 # List of the index columns required to identify all data series
 INDEX = [

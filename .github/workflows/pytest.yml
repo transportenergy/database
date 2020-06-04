@@ -55,6 +55,11 @@ jobs:
     - name: Upload test coverage to Codecov.io
       uses: codecov/codecov-action@v1
 
+    - name: Check typing with mypy
+      run: |
+        pip install mypy
+        mypy .
+
     - name: Create diagnostics and upload to Google Cloud Storage
       run: |
         item historical diagnostics output/

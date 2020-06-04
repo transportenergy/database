@@ -4,6 +4,7 @@ import os
 from os import makedirs
 from os.path import join
 import pickle
+from typing import Dict
 
 import pandas as pd
 import pycountry
@@ -33,7 +34,7 @@ __all__ = [
 VERSIONS = [1, 2]
 
 # Information about the models
-MODELS = {}
+MODELS: Dict[str, dict] = {}
 
 
 def coverage(models):

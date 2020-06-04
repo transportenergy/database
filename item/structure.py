@@ -350,9 +350,9 @@ def make_template(output_path: Path = None, verbose: bool = True):
     #   'variable' column) data frames.
     # - Drop the dummy dimensions.
     # - Use '---' in empty cells for clarity.
-    index = {"Full dimensionality": specs_full, "Template (reduced)": specs}
+    index_data = {"Full dimensionality": specs_full, "Template (reduced)": specs}
     index = (
-        pd.concat(index, axis=1)
+        pd.concat(index_data, axis=1)
         .drop(columns=common_dims + list(map(str.title, common_dims)), axis=1, level=1)
         .replace("", "---")
     )

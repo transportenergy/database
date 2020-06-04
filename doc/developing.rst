@@ -28,7 +28,7 @@ Style guide
 
 - Run the following tools on all new and modified code::
 
-      isort -rc . && black . && flake8
+      isort -rc . && black . && mypy . && flake8
 
   The continuous integration workflow checks that these have been applied; PRs will fail unless they are.
 

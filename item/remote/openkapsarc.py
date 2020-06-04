@@ -2,6 +2,7 @@ import logging
 import sys
 from datetime import datetime
 from json import JSONDecodeError
+from typing import Tuple, Type
 
 import pandas as pd
 import requests
@@ -18,7 +19,7 @@ requests_cache.install_cache("item")
 try:
     import simplejson
 
-    JSONDecodeErrors = (JSONDecodeError, simplejson.JSONDecodeError)
+    JSONDecodeErrors: Tuple[Type, ...] = (JSONDecodeError, simplejson.JSONDecodeError)
 except ImportError:
     JSONDecodeErrors = (JSONDecodeError,)
 
