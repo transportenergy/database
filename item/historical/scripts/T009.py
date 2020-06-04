@@ -4,10 +4,9 @@ FETCH = True
 
 COMMON_DIMS = dict(
     mode="Road",
-    service="Freight",
     source="United Nations Economic Commission for Europe",
     variable="Stock",
-    unit="10^3 vehicle"
+    unit="10^3 vehicle",
 )
 
 
@@ -19,7 +18,7 @@ COLUMNS = dict(
         date="Year",
         fuel_type_name="Fuel",
         type_of_vehicle_name="Vehicle Type",
-    )
+    ),
 )
 
 

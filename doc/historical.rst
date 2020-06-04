@@ -12,20 +12,15 @@ These are listed in :file:`sources.yaml`, loaded as :data:`.SOURCES`, from the `
 
 Input data is retrieved using via OpenKAPSARC and SDMX APIs, according to the type supported by each data source. See :mod:`item.remote`.
 
+
 Processing
 ==========
 
-Current
--------
-
-Input data sets are cleaned and transformed by IPython notebooks in the :file:`item/historical/scripts` directory, as listed in :data:`.SCRIPTS`.
-
-In general, the notebook name corresponds to the input data set which it handles, e.g. :file:`T001.ipynb`.
-
-Planned
--------
 The general function :func:`~historical.process` applies common cleaning steps to each dataset, while loading and making use of dataset-specific checks, processing steps, and configuration from a submodule like :mod:`.T001`, as listed in :data:`.MODULES`.
-See the documentation of :func:`~historical.process` for a detailed description of the tests.
+See the documentation of :func:`~historical.process` for a detailed description of the steps.
+
+*Previously*, input data sets were cleaned and transformed by IPython notebooks in the :file:`item/historical/scripts` directory, as listed in :data:`.SCRIPTS`.
+The notebook name corresponds to the input data set which it handles, e.g. :file:`T001.ipynb`.
 
 
 Diagnostics
@@ -65,6 +60,11 @@ Code reference
 
    .. autodata:: item.historical.SOURCES
       :annotation: ← contents of sources.yaml
+
+.. currentmodule:: item.historical.diagnostic
+
+.. automodule:: item.historical.diagnostic
+   :members:
 
 .. currentmodule:: item.historical.scripts.util.managers.dataframe
 
@@ -116,3 +116,28 @@ T003
    .. literalinclude:: ../item/data/historical/sources.yaml
       :language: yaml
       :lines: 32-40
+
+
+T009
+----
+
+.. currentmodule:: item.historical.scripts.T009
+
+.. automodule:: item.historical.scripts.T009
+   :members:
+
+   .. literalinclude:: ../item/data/historical/sources.yaml
+      :language: yaml
+      :lines: 75-80
+
+
+Quality diagnostics
+===================
+
+A003
+----
+
+.. currentmodule:: item.historical.diagnostic.A003
+
+.. automodule:: item.historical.diagnostic.A003
+   :members:

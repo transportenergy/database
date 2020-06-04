@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -99,3 +100,10 @@ def test_A003():
     activity = process(3)
     stock = process(9)
     result = A003.compute(activity, stock)
+
+    # Number of unique values computed
+    assert len(result) == 925
+
+    # A specific value is present and as expected
+    obs = result.query("`ISO Code` == 'USA' and Year == 2015")["Value"].squeeze()
+    assert np.isclose(obs, 0.02098, rtol=1e-3)

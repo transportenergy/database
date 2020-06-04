@@ -89,9 +89,11 @@ def process(df):
     return (
         # Compute partial sums that exclude pipelines
         # Select only the subset of variables, then group by Country and Year
-        df[df["Variable"].isin(PARTIAL)].groupby(["Country", "Year"])
+        df[df["Variable"].isin(PARTIAL)]
+        .groupby(["Country", "Year"])
         # Sum only the groups with all three variables
-        .sum(min_count=len(PARTIAL)).dropna()
+        .sum(min_count=len(PARTIAL))
+        .dropna()
         # Assign other dimensions
         .assign(
             mode="Inland ex. pipeline",
