@@ -1,8 +1,7 @@
+import json
 import logging
 import sys
 from datetime import datetime
-from json import JSONDecodeError
-from typing import Tuple, Type
 
 import pandas as pd
 import requests
@@ -15,13 +14,6 @@ log.setLevel(logging.INFO)
 log.addHandler(logging.StreamHandler(sys.stdout))
 
 requests_cache.install_cache("item")
-
-try:
-    import simplejson
-
-    JSONDecodeErrors: Tuple[Type, ...] = (JSONDecodeError, simplejson.JSONDecodeError)
-except ImportError:
-    JSONDecodeErrors = (JSONDecodeError,)
 
 
 class APIError(Exception):
@@ -100,22 +92,12 @@ class OpenKAPSARC:
             # Response in JSON
             try:
                 return r.json()
-            except JSONDecodeErrors:
+            except json.JSONDecodeErrors:
                 log.error(r.content)
                 raise
         else:
             log.debug(r.headers["content-type"])
             return r
-
-    # _auto_endpoint = [
-    #     'datasets'
-    # ]
-    #
-    # def __getattr__(self, name):
-    #     if name in self._auto_endpoint:
-    #         return partial(self.endpoint, name)
-    #     else:
-    #         raise AttributeError(name)
 
     def datasets(self, dataset_id=None, *args, params={}, kw=None, **kwargs):
         if kw:
