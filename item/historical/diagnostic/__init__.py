@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from . import fetch_source, source_str
+from item.historical import fetch_source, source_str
 
 # Jinja2 template for diagnostics index page
 INDEX_TEMPLATE = """<html><body>
