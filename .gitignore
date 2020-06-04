@@ -20,6 +20,7 @@ ipython_config.py
 .pytest_cache
 __pycache__
 build
+coverage.xml
 dist
 htmlcov/
 

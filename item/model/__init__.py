@@ -100,7 +100,7 @@ def get_model_info(name, version):
             raise ValueError("model '{}' not present in database version {}"
                              .format(name, version))
     except KeyError:
-        raise ValueError('unknown model: {}'.format(name))
+        raise ValueError(f"Model {repr(name)} not among {MODELS.keys()}")
 
 
 def get_model_names(version=VERSIONS[-1]):
@@ -302,7 +302,7 @@ def load_model_scenarios(name, version):
         return yaml.safe_load(f)[version]
 
 
-def make_regions_csv(out_file, models, compare):
+def make_regions_csv(out_file, models=None, compare=None):
     """Produce a CSV *out_file* with a country→region map for *models*.
 
     The table is created by parsing the regions.yaml files in the iTEM model
@@ -315,7 +315,7 @@ def make_regions_csv(out_file, models, compare):
     """
     version = VERSIONS[-1]  # Version 2 only
 
-    models = models if len(models) else get_model_names(version)
+    models = models or get_model_names(version)
 
     def _load(name):
         def _invert(data):
@@ -333,12 +333,12 @@ def make_regions_csv(out_file, models, compare):
         error = None
         try:
             name = pycountry.countries.get(alpha_3=row.name).name
-        except KeyError:
+        except AttributeError:
             try:
                 name = pycountry.historic_countries.get(
                     alpha_3=row.name).name
                 error = 'historical'
-            except KeyError:
+            except AttributeError:
                 name = ''
                 error = 'nonexistent'
             finally:
