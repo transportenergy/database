@@ -1,10 +1,11 @@
-import pint
+from iam_units import registry
 
 
+# TODO Add an argument to control the format of the output units
 def convert_units(df, units_from, units_to, cols=("Value", "Unit")):
     """Convert units of *df*.
 
-    Uses a vector :class:`pint.Quantity` to convert an entire column of values
+    Uses a vector :class:`registry.Quantity` to convert an entire column of values
     efficiently.
 
     Parameters
@@ -21,10 +22,9 @@ def convert_units(df, units_from, units_to, cols=("Value", "Unit")):
     -------
     pandas.DataFrame
     """
-    ureg = pint.get_application_registry()
 
     # Create a vector pint.Quantity; convert units
-    qty = ureg.Quantity(df[cols[0]].values, units_from).to(units_to)
+    qty = registry.Quantity(df[cols[0]].values, units_from).to(units_to)
 
     # Assign magnitude and unit columns in output DataFrame
     df[cols[0]] = qty.magnitude
