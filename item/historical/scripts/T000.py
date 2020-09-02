@@ -14,7 +14,7 @@ COMMON_DIMS = dict(
     # The dataset does not provide any data on the following columns, so we
     # add the default value of "All" in both cases
     technology="All",
-    fuel="All"
+    fuel="All",
 )
 
 #: Columns to drop from the raw data.
@@ -30,7 +30,7 @@ COLUMNS = dict(
         "Reference Period Code",
         "Reference Period",
         "Flag Codes",
-        "Flags"
+        "Flags",
     ],
     # Column containing country name for determining ISO 3166 alpha-3 codes and
     # iTEM regions. Commented, because this is the default value.
@@ -73,7 +73,9 @@ def process(df):
     # 1. Drop null values.
     # 2. Convert to the preferred iTEM units.
     df = df.dropna().pipe(convert_units, "Mpassenger km/year", "Gpassenger km/year")
-    df = df.replace(to_replace=df[ColumnName.UNIT.value][0], value="10^9 passenger-km / yr")
+    df = df.replace(
+        to_replace=df[ColumnName.UNIT.value][0], value="10^9 passenger-km / yr"
+    )
 
     return df
 
