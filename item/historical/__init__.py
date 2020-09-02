@@ -8,14 +8,14 @@ import yaml
 
 from item.common import paths
 from item.remote import OpenKAPSARC, get_sdmx
-from .scripts import T001
+from .scripts import T000, T001
 from .scripts.util.managers.dataframe import ColumnName
 
 
 #: List of data processing Jupyter/IPython notebooks.
 SCRIPTS = [
-    "T000",
     # Converted to a submodule, below.
+    # 'T000',
     # 'T001',
     "T002",
     "T003",
@@ -27,7 +27,7 @@ SCRIPTS = [
 ]
 
 #: Submodules usable with :func:`process`.
-MODULES = {1: T001}
+MODULES = {0: T000, 1: T001}
 
 #: Path for output from :func:`process`.
 OUTPUT_PATH = paths["data"] / "historical" / "output"
@@ -175,7 +175,7 @@ def process(id):
     df = pd.read_csv(path)
 
     # Get the module for this data set
-    dataset_module = MODULES[1]
+    dataset_module = MODULES[id]
 
     try:
         # Check that the input data is of the form expected by process()
