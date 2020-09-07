@@ -15,6 +15,7 @@ COMMON_DIMS = dict(
     # add the default value of "All" in both cases
     technology="All",
     fuel="All",
+    unit="10^9 passenger-km / yr",
 )
 
 #: Columns to drop from the raw data.
@@ -73,9 +74,6 @@ def process(df):
     # 1. Drop null values.
     # 2. Convert to the preferred iTEM units.
     df = df.dropna().pipe(convert_units, "Mpassenger km/year", "Gpassenger km/year")
-    df = df.replace(
-        to_replace=df[ColumnName.UNIT.value][0], value="10^9 passenger-km / yr"
-    )
 
     return df
 
