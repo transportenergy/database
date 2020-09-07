@@ -199,7 +199,7 @@ def process(id):
         print(f"No columns to drop for {id_str}")
     else:
         df.drop(columns=drop_cols, inplace=True)
-        print("Drop {len(drop_cols)} extra column(s)")
+        print(f"Drop {len(drop_cols)} extra column(s)")
 
     # Call the dataset-specific process() function; returns a modified df
     df = dataset_module.process(df)
