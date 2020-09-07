@@ -103,5 +103,5 @@ def mode_and_vehicle_type(variable_name):
 
     return pd.Series(
         [vehicle_type, mode],
-        index=[ColumnName.ISO_CODE.VEHICLE_TYPE.value, ColumnName.MODE.value],
+        index=[ColumnName.VEHICLE_TYPE.value, ColumnName.MODE.value],
     )
