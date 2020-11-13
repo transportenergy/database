@@ -9,10 +9,6 @@ What's new?
    :depth: 1
 
 
-Next release
-============
-
-
 v2020.11.13
 ===========
 
