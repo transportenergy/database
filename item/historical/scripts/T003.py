@@ -39,17 +39,17 @@ COLUMNS = dict(
 
 #: Mapping from Variable to mode and vehicle_type dimensions.
 VARIABLE_MAP = {
-    "Pipelines transport": dict(mode="Pipeline", vehicle_type="Pipeline",),
-    "Rail freight transport": dict(mode="Rail", vehicle_type="All",),
-    "Road freight transport": dict(mode="Road", vehicle_type="All",),
+    "Pipelines transport": dict(mode="Pipeline", vehicle_type="Pipeline"),
+    "Rail freight transport": dict(mode="Rail", vehicle_type="All"),
+    "Road freight transport": dict(mode="Road", vehicle_type="All"),
     "Road freight transport for hire and reward": dict(
-        mode="Road", vehicle_type="For Hire and Reward",
+        mode="Road", vehicle_type="For Hire and Reward"
     ),
     "Road freight transport on own account": dict(
-        mode="Road", vehicle_type="For Own Account",
+        mode="Road", vehicle_type="For Own Account"
     ),
-    "Inland waterways freight transport": dict(mode="Shipping", vehicle_type="Inland",),
-    "Total inland freight transport": dict(mode="Inland", vehicle_type="All",),
+    "Inland waterways freight transport": dict(mode="Shipping", vehicle_type="Inland"),
+    "Total inland freight transport": dict(mode="Inland", vehicle_type="All"),
 }
 
 #: Variables to include in a partial sum.
