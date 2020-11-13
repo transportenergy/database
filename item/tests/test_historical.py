@@ -86,7 +86,7 @@ def test_run_notebook(dataset_id, tmp_path):
     assert errors == []
 
 
-@pytest.mark.parametrize("dataset_id, N_areas", [(0, 56), (1, 40), (2, 54), (3, 56)])
+@pytest.mark.parametrize("dataset_id, N_areas", [(0, 57), (1, 37), (2, 53), (3, 57)])
 def test_coverage(dataset_id, N_areas):
     """Test the historical.diagnostics.coverage method."""
     df = pd.read_csv(fetch_source(dataset_id, use_cache=True))
