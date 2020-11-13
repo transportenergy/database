@@ -38,6 +38,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.coverage",
     "sphinx.ext.doctest",
+    "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
     # 'sphinx.ext.linkcode',
     "sphinx.ext.napoleon",
@@ -177,6 +178,15 @@ epub_exclude_files = ["search.html"]
 
 
 # -- Extension configuration -------------------------------------------------
+
+# -- Options for sphinx.ext.extlinks ---------------------------------------------------
+
+extlinks = {
+    "issue": ("https://github.com/transportenergy/database/issues/%s", "#"),
+    "pull": ("https://github.com/transportenergy/database/pull/%s", "PR #"),
+    "gh-user": ("https://github.com/%s", "@"),
+}
+
 
 # -- Options for intersphinx extension ---------------------------------------
 
