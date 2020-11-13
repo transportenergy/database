@@ -28,6 +28,7 @@ This documentation, built automatically from the `transportenergy/database GitHu
    remote
    cli
    metadata
+   whatsnew
    developing
 
 

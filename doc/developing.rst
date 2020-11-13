@@ -39,3 +39,61 @@ Style guide
 - Clear all cell output, execution counts, etc. from IPython notebooks committed to the repository.
 
 .. _Numpy docstring format: https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard
+
+
+Preparing a new release
+=======================
+
+Before releasing, check:
+
+- https://github.com/transportenergy/actions?query=workflow:pytest+branch:master to ensure that the push and scheduled builds are passing.
+- https://readthedocs.org/projects/transportenergy/builds/ to ensure that the docs build
+  is passing.
+
+Address any failures before releasing.
+
+
+1. Edit :file:`doc/whatsnew.rst` to replace "Next release" with the version number and date.
+   Make a commit with a message like "Mark vX.Y.Z in whatsnew.rst".
+
+2. Tag the version, e.g.::
+
+    $ git tag v2030.10.4b4
+
+   :mod:`item` uses a versioning scheme of **[year].[month].[day]**.
+   For instance, the version released on October 4, 2030 will have the version ``2030.10.4``.
+   Note that:
+
+   - There are no leading zeroes.
+   - If two versions are to be released in a single day—for instance, to fix a bug only spotted after release—a fourth version part can be added, e.g. ``2030.10.4.1``.
+
+3. Test-build and check the source and binary packages::
+
+    $ rm -rf build dist
+    $ python setup.py bdist_wheel sdist
+    $ twine check dist/*
+
+   Address any warnings or errors that appear.
+   If needed, make a new commit and go back to step (2).
+
+4. Upload the packages to the TEST instance of PyPI::
+
+    $ twine upload -r testpypi dist/*
+
+5. Check at https://test.pypi.org/project/transport-energy/ that:
+
+   - The package can be downloaded, installed and run.
+   - The README is rendered correctly.
+   - Links to the documentation go to the correct version.
+
+   If not, modify the code and go back to step (2).
+
+6. Upload to PyPI::
+
+    $ twine upload dist/*
+
+7. Push the commit(s) and tag to GitHub::
+
+    $ git push --tags
+
+8. Edit :file:`doc/whatsnew.rst` to add a new heading for the next release.
