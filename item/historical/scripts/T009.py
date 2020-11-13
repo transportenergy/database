@@ -1,8 +1,11 @@
 """Data cleaning code and configuration for T009."""
+from functools import lru_cache
+
 #: Fetch directly from the source, or cache.
 FETCH = True
 
 COMMON_DIMS = dict(
+    fuel="All",
     mode="Road",
     source="United Nations Economic Commission for Europe",
     variable="Stock",
@@ -12,22 +15,36 @@ COMMON_DIMS = dict(
 
 COLUMNS = dict(
     drop=["frequency"],
-    country_name="country_name",
     rename=dict(
-        value="Value",
+        country_name="Country",
         date="Year",
-        fuel_type_name="Fuel",
         type_of_vehicle_name="Vehicle Type",
+        value="Value",
     ),
 )
+
+
+@lru_cache
+def service(value):
+    """Determine 'service' dimension based on a vehicle type."""
+    if value in [
+        "Light goods road vehicles",
+        "Lorries (vehicle wt over 3500 kg)",
+        "Road tractors",
+    ]:
+        return "Freight"
+    elif value in ["Motor coaches, buses and trolleybuses", "Passenger cars"]:
+        return "Passenger"
+    else:
+        raise ValueError(value)
 
 
 def process(df):
     df = df.rename(columns=COLUMNS["rename"])
 
     # Strip "- " prefix from Fuel strings
-    df["Fuel"] = df["Fuel"].str.lstrip("- ")
+    df["Technology"] = df["fuel_type_name"].str.lstrip("- ").replace({"Total": "All"})
 
-    # TODO fill "Technology" dimension based on "Fuel" dimension
+    df["Service"] = df["Vehicle Type"].apply(service)
 
     return df
