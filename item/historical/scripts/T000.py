@@ -80,11 +80,22 @@ def process(df):
 
 @lru_cache()
 def mode_and_vehicle_type(variable_name):
-    # Determining the mode and vehicle type
+    """Determine 'mode' and 'vehicle type' from 'variable'.
+
+    The rules implemented are:
+
+    ============================================= ===== ============
+    Variable                                      Mode  Vehicle type
+    ============================================= ===== ============
+    Rail passenger transport                      Rail  All
+    Road passenger transport by buses and coaches Road  Bus
+    Road passenger transport by passenger cars    Road  LDV
+    Total inland passenger transport              All   All
+    ============================================= ===== ============
+    """
     if "Rail" in variable_name:
         mode = "Rail"
         vehicle_type = "All"
-
     elif "Road" in variable_name:
         mode = "Road"
 
@@ -94,7 +105,6 @@ def mode_and_vehicle_type(variable_name):
             vehicle_type = "LDV"
         else:
             vehicle_type = "All"
-
     else:
         mode = "All"
         vehicle_type = "All"
