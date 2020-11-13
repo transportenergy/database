@@ -66,20 +66,20 @@ def cache_results(id_str, df):
 
     The files written are:
 
-    - :file:`{id_str}_cleaned_PF.csv`, in long or 'programming-friendly'
-      format, i.e. with a 'Year' column.
-    - :file:`{id_str}_cleaned_UF.csv`, in wide or 'user-friendly' format, with
-      one column per year.
+    - :file:`{id_str}-clean.csv`, in long or 'programming-friendly' format, i.e. with a
+      a 'Year' column.
+    - :file:`{id_str}-clean-wide.csv`, in wide or 'user-friendly' format, with one
+      column per year.
     """
     OUTPUT_PATH.mkdir(exist_ok=True)
 
     # Long format ('programming friendly view')
-    path = OUTPUT_PATH / f"{id_str}_cleaned_PF.csv"
+    path = OUTPUT_PATH / f"{id_str}-clean.csv"
     df.to_csv(path, index=False)
-    print(f"Write {path}")
+    log.write(f"Write {path}")
 
     # Pivot to wide format ('user friendly view') and write to CSV
-    path = OUTPUT_PATH / f"{id_str}_cleaned_UF.csv"
+    path = OUTPUT_PATH / f"{id_str}-clean-wide.csv"
 
     # - Set all columns but 'Value' as the index → pd.Series with MultiIndex.
     # - 'Unstack' the 'Year' dimension to columns, i.e. wide format.
@@ -88,7 +88,7 @@ def cache_results(id_str, df):
     df.set_index([ev.value for ev in ColumnName if ev != ColumnName.VALUE]).unstack(
         ColumnName.YEAR.value
     ).reset_index().to_csv(path, index=False)
-    print(f"Write {path}")
+    log.write(f"Write {path}")
 
 
 def fetch_source(id, use_cache=True):
@@ -193,7 +193,7 @@ def process(id):
         dataset_module.check(df)
     except AttributeError:
         # Optional check() function does not exist
-        print("No pre-processing checks to perform")
+        log.info("No pre-processing checks to perform")
     except AssertionError as e:
         # An 'assert' statement in check() failed
         msg = "Input data is invalid"
@@ -209,14 +209,14 @@ def process(id):
         drop_cols = columns["drop"]
     except KeyError:
         # No variable COLUMNS in dataset_module, or no key 'drop'
-        print(f"No columns to drop for {id_str}")
+        log.info(f"No columns to drop for {id_str}")
     else:
         df.drop(columns=drop_cols, inplace=True)
-        print(f"Drop {len(drop_cols)} extra column(s)")
+        log.info(f"Drop {len(drop_cols)} extra column(s)")
 
     # Call the dataset-specific process() function; returns a modified df
     df = dataset_module.process(df)
-    print(f"{len(df)} observations")
+    log.info(f"{len(df)} observations")
 
     # Assign ISO 3166 alpha-3 codes and iTEM regions from a country name column
     country_col = columns["country_name"]
