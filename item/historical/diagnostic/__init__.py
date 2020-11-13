@@ -3,7 +3,12 @@ from pathlib import Path
 
 import pandas as pd
 
-from . import fetch_source, source_str
+from item.historical import fetch_source, source_str
+
+from . import A003
+
+# Quality checks
+QUALITY = [A003.compute]
 
 # Jinja2 template for diagnostics index page
 INDEX_TEMPLATE = """<html><body>
@@ -75,13 +80,16 @@ def coverage(df, area="COUNTRY", measure="VARIABLE", period="TIME_PERIOD"):
 def run_all(output_path):
     """Run all diagnostics."""
     from zipfile import ZIP_DEFLATED, ZipFile
+
     from jinja2 import Template
 
     output_path = Path(output_path)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    groups = {"Coverage": []}
-    source_data_paths = []
+    data_files = []
+
+    # Coverage
+    groups = {"Coverage": [], "Quality": []}
 
     for source_id in [0, 1, 2, 3]:
         # Output filename
@@ -89,17 +97,31 @@ def run_all(output_path):
         groups["Coverage"].append(filename)
 
         # Read source data
-        source_data_paths.append(fetch_source(source_id, use_cache=True))
-        data = pd.read_csv(source_data_paths[-1])
+        data_files.append(fetch_source(source_id, use_cache=True))
+        data = pd.read_csv(data_files[-1])
 
         # Generate coverage and write to file
+        # TODO this doesn't allow for column names other than the defaults to
+        #      coverage(), above; generalize
         (output_path / filename).write_text(coverage(data))
 
-    # Archive cached source data
+    # Quality
+    from item.historical import process
+
+    for check in QUALITY:
+        # Output filename
+        filename = f"{check.__name__.split('.')[-1]}.csv"
+        groups["Quality"].append(filename)
+
+        data_files.append(output_path / filename)
+        # TODO this is specific to A003; generalize
+        check(process(3), process(9)).to_csv(data_files[-1])
+
+    # Archive data files
     zf = ZipFile(
         output_path / "data.zip", mode="w", compression=ZIP_DEFLATED, compresslevel=9
     )
-    for path in source_data_paths:
+    for path in data_files:
         zf.write(filename=path, arcname=path.name)
 
     groups["Cached raw source data"] = ["data.zip"]

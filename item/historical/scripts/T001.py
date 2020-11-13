@@ -9,8 +9,8 @@ This module:
 """
 import logging
 
-from item.utils import convert_units
 from item.historical.util import dropna_logged
+from item.utils import convert_units
 
 log = logging.getLogger(__name__)
 
@@ -89,7 +89,11 @@ def check(df):
 
 
 def process(df):
-    """Process data set T001."""
+    """Process data set T001.
+
+    - Drop null values.
+    - Convert from Mt km / year to Gt km / year.
+    """
     # Drop rows with nulls in "Value"; log corresponding values in "Country"
     df = dropna_logged(df, "Value", ["Country"])
 
@@ -100,7 +104,7 @@ def process(df):
     df = df.dropna().pipe(convert_units, "Mt km / year", "Gt km / year")
 
     # Correct #32
-    corrected = df.query("Country == 'China' and Year > 1985 and Year < 2002")
+    corrected = df.query("Country == 'China' and Year > 1985 and Year < 2002").copy()
     corrected["Value"] *= 100.0
     df.update(corrected)
 

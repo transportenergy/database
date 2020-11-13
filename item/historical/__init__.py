@@ -1,7 +1,7 @@
-from copy import copy
-from functools import lru_cache
 import logging
 import os
+from copy import deepcopy
+from functools import lru_cache
 
 import pandas as pd
 import pycountry
@@ -9,7 +9,8 @@ import yaml
 
 from item.common import paths
 from item.remote import OpenKAPSARC, get_sdmx
-from .scripts import T000, T001
+
+from .scripts import T000, T001, T003, T009
 from .scripts.util.managers.dataframe import ColumnName
 
 log = logging.getLogger(__name__)
@@ -21,7 +22,7 @@ SCRIPTS = [
     # 'T000',
     # 'T001',
     "T002",
-    "T003",
+    # "T003",
     "T004",
     "T005",
     "T006",
@@ -30,7 +31,7 @@ SCRIPTS = [
 ]
 
 #: Submodules usable with :func:`process`.
-MODULES = {0: T000, 1: T001}
+MODULES = {0: T000, 1: T001, 3: T003, 9: T009}
 
 #: Path for output from :func:`process`.
 OUTPUT_PATH = paths["data"] / "historical" / "output"
@@ -56,8 +57,7 @@ with open(paths["data"] / "model" / "regions.yaml") as file:
 
 with open(paths["data"] / "historical" / "sources.yaml") as f:
     #: The current version of the file is always accessible at
-    #: https://github.com/transportenergy/metadata/blob/master/historical/
-    #: sources.yaml
+    #: https://github.com/transportenergy/metadata/blob/master/historical/sources.yaml
     SOURCES = yaml.safe_load(f)
 
 
@@ -66,20 +66,20 @@ def cache_results(id_str, df):
 
     The files written are:
 
-    - :file:`{id_str}_cleaned_PF.csv`, in long or 'programming-friendly'
-      format, i.e. with a 'Year' column.
-    - :file:`{id_str}_cleaned_UF.csv`, in wide or 'user-friendly' format, with
-      one column per year.
+    - :file:`{id_str}-clean.csv`, in long or 'programming-friendly' format, i.e. with a
+      a 'Year' column.
+    - :file:`{id_str}-clean-wide.csv`, in wide or 'user-friendly' format, with one
+      column per year.
     """
     OUTPUT_PATH.mkdir(exist_ok=True)
 
     # Long format ('programming friendly view')
-    path = OUTPUT_PATH / f"{id_str}_cleaned_PF.csv"
+    path = OUTPUT_PATH / f"{id_str}-clean.csv"
     df.to_csv(path, index=False)
-    print(f"Write {path}")
+    log.info(f"Write {path}")
 
     # Pivot to wide format ('user friendly view') and write to CSV
-    path = OUTPUT_PATH / f"{id_str}_cleaned_UF.csv"
+    path = OUTPUT_PATH / f"{id_str}-clean-wide.csv"
 
     # - Set all columns but 'Value' as the index → pd.Series with MultiIndex.
     # - 'Unstack' the 'Year' dimension to columns, i.e. wide format.
@@ -88,7 +88,7 @@ def cache_results(id_str, df):
     df.set_index([ev.value for ev in ColumnName if ev != ColumnName.VALUE]).unstack(
         ColumnName.YEAR.value
     ).reset_index().to_csv(path, index=False)
-    print(f"Write {path}")
+    log.info(f"Write {path}")
 
 
 def fetch_source(id, use_cache=True):
@@ -105,7 +105,7 @@ def fetch_source(id, use_cache=True):
     """
     # Retrieve source information from sources.yaml
     id = source_str(id)
-    source_info = copy(SOURCES[id])
+    source_info = deepcopy(SOURCES[id])
 
     # Path for cached data. NB OpenKAPSARC does its own caching
     cache_path = paths["historical input"] / f"{id}.csv"
@@ -172,20 +172,28 @@ def process(id):
     9. Output data to two files. See :meth:`cache_results`.
 
     """
-    # Load the data from a common location, based on the dataset ID
     id_str = source_str(id)
-    path = paths["data"] / "historical" / "input" / f"{id_str}_input.csv"
-    df = pd.read_csv(path)
 
     # Get the module for this data set
     dataset_module = MODULES[id]
+
+    if getattr(dataset_module, "FETCH", False):
+        # Fetch directly from source
+        path = fetch_source(id)
+    else:
+        # Load the data from version stored in the transportenergy/metadata repo
+        # TODO remove this option; always fetch from source or cache
+        path = paths["historical input"] / f"{id_str}_input.csv"
+
+    # Read the data
+    df = pd.read_csv(path)
 
     try:
         # Check that the input data is of the form expected by process()
         dataset_module.check(df)
     except AttributeError:
         # Optional check() function does not exist
-        print("No pre-processing checks to perform")
+        log.info("No pre-processing checks to perform")
     except AssertionError as e:
         # An 'assert' statement in check() failed
         msg = "Input data is invalid"
@@ -201,20 +209,20 @@ def process(id):
         drop_cols = columns["drop"]
     except KeyError:
         # No variable COLUMNS in dataset_module, or no key 'drop'
-        print(f"No columns to drop for {id_str}")
+        log.info(f"No columns to drop for {id_str}")
     else:
         df.drop(columns=drop_cols, inplace=True)
-        print(f"Drop {len(drop_cols)} extra column(s)")
+        log.info(f"Drop {len(drop_cols)} extra column(s)")
 
     # Call the dataset-specific process() function; returns a modified df
     df = dataset_module.process(df)
-    print(f"{len(df)} observations")
+    log.info(f"{len(df)} observations")
 
     # Assign ISO 3166 alpha-3 codes and iTEM regions from a country name column
     country_col = columns["country_name"]
     # Use pandas.Series.apply() to apply the same function to each entry in
     # the column. Join these to the existing data frame as additional columns.
-    df = pd.concat([df, df[country_col].apply(iso_and_region)], axis=1)
+    df = df.combine_first(df[country_col].apply(iso_and_region))
 
     # Values to assign across all observations: the dataset ID
     assign_values = {ColumnName.ID.value: id_str}
@@ -257,7 +265,10 @@ def iso_and_region(name):
 
     # Use pycountry's built-in, case-insensitive lookup on all fields including
     # name, official_name, and common_name
-    alpha_3 = pycountry.countries.lookup(name).alpha_3
+    try:
+        alpha_3 = pycountry.countries.lookup(name).alpha_3
+    except LookupError:
+        alpha_3 = ""
 
     # Look up the region, construct a Series, and return
     return pd.Series(

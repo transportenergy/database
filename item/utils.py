@@ -22,7 +22,6 @@ def convert_units(df, units_from, units_to, cols=("Value", "Unit")):
     -------
     pandas.DataFrame
     """
-
     # Create a vector pint.Quantity; convert units
     qty = registry.Quantity(df[cols[0]].values, units_from).to(units_to)
 

@@ -1,12 +1,13 @@
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import pytest
 
 import item
 from item.common import paths
 from item.historical import SCRIPTS, fetch_source, input_file, process, source_str
-from item.historical.diagnostic import coverage
+from item.historical.diagnostic import A003, coverage
 from item.historical.util import run_notebook
 
 
@@ -69,9 +70,14 @@ def test_input_file(item_tmp_dir):
     assert input_file(1) == paths["historical input"] / "T001_foo.csv"
 
 
-@pytest.mark.parametrize("dataset_id", [0, 1])
+@pytest.mark.parametrize("dataset_id", [0, 1, 3, 9])
 def test_process(dataset_id):
     """Test common interface for processing scripts."""
+    # Always use the path from within the repo
+    paths["historical input"] = Path(item.__file__).parent.joinpath(
+        "data", "historical", "input"
+    )
+
     process(dataset_id)
 
 
@@ -92,3 +98,17 @@ def test_coverage(dataset_id, N_areas):
     df = pd.read_csv(fetch_source(dataset_id, use_cache=True))
     result = coverage(df)
     assert result.startswith(f"{N_areas} areas: ")
+
+
+def test_A003():
+    """Test historical.diagnostic.A003."""
+    activity = process(3)
+    stock = process(9)
+    result = A003.compute(activity, stock)
+
+    # Number of unique values computed
+    assert len(result) == 929
+
+    # A specific value is present and as expected
+    obs = result.query("`ISO Code` == 'USA' and Year == 2015")["Value"].squeeze()
+    assert np.isclose(obs, 0.02098, rtol=1e-3)

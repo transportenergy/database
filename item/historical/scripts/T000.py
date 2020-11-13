@@ -3,10 +3,10 @@ from functools import lru_cache
 
 import pandas as pd
 
-from item.utils import convert_units
 from item.historical.util import dropna_logged
-from .util.managers.dataframe import ColumnName
+from item.utils import convert_units
 
+from .util.managers.dataframe import ColumnName
 
 #: Dimensions and attributes which do not vary across this data set.
 COMMON_DIMS = dict(
