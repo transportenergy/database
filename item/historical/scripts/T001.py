@@ -69,10 +69,9 @@ def check(df):
 
     # Detect #32
     # Data for CHN, including one year before and after the error
-    obs = (
-        df.query("COUNTRY == 'CHN' and Year >= 1985 and Year <= 2002")
-        .set_index("Year")["Value"]
-    )
+    obs = df.query("COUNTRY == 'CHN' and Year >= 1985 and Year <= 2002").set_index(
+        "Year"
+    )["Value"]
     # Delete the erroneous data
     empty = obs.copy()
     empty.iloc[1:-1] = None
