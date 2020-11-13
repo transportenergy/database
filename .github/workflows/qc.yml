@@ -22,7 +22,7 @@ jobs:
     - name: Cache Python packages
       uses: actions/cache@v2
       with:
-        path: $HOME/.cache/pip
+        path: ~/.cache/pip
         key: ubuntu-latest
 
     - name: Upgrade pip, wheel
@@ -59,7 +59,7 @@ jobs:
     - name: Cache Python packages
       uses: actions/cache@v2
       with:
-        path: $HOME/.cache/pip
+        path: ~/.cache/pip
         key: ubuntu-latest
 
     - name: Upgrade pip, wheel

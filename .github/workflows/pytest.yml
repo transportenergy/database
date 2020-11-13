@@ -24,8 +24,8 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          $HOME/.cache/pip
-          $HOME/.cache/rclone*.zip
+          ~/.cache/pip
+          ~/.cache/rclone*.zip
         key: ubuntu-latest
 
     - name: Install rclone for Google Cloud Storage uploads
