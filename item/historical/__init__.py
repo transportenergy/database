@@ -1,6 +1,6 @@
 import logging
 import os
-from copy import copy
+from copy import deepcopy
 from functools import lru_cache
 
 import pandas as pd
@@ -76,7 +76,7 @@ def cache_results(id_str, df):
     # Long format ('programming friendly view')
     path = OUTPUT_PATH / f"{id_str}-clean.csv"
     df.to_csv(path, index=False)
-    log.write(f"Write {path}")
+    log.info(f"Write {path}")
 
     # Pivot to wide format ('user friendly view') and write to CSV
     path = OUTPUT_PATH / f"{id_str}-clean-wide.csv"
@@ -88,7 +88,7 @@ def cache_results(id_str, df):
     df.set_index([ev.value for ev in ColumnName if ev != ColumnName.VALUE]).unstack(
         ColumnName.YEAR.value
     ).reset_index().to_csv(path, index=False)
-    log.write(f"Write {path}")
+    log.info(f"Write {path}")
 
 
 def fetch_source(id, use_cache=True):
@@ -105,7 +105,7 @@ def fetch_source(id, use_cache=True):
     """
     # Retrieve source information from sources.yaml
     id = source_str(id)
-    source_info = copy(SOURCES[id])
+    source_info = deepcopy(SOURCES[id])
 
     # Path for cached data. NB OpenKAPSARC does its own caching
     cache_path = paths["historical input"] / f"{id}.csv"
