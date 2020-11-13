@@ -1,4 +1,4 @@
-name: QC
+name: Code quality
 
 on:
   push:
@@ -37,6 +37,11 @@ jobs:
       run: |
         pip install flake8
         flake8 --count --max-complexity=15 --show-source --statistics
+
+    - name: Sort imports with isort
+      run: |
+        pip install isort
+        isort --check-only .
 
     - name: Build package
       run: |
