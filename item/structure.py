@@ -123,42 +123,44 @@ def collapse(row: pd.Series) -> pd.Series:
     - 'measure' column gets 'lca_scope', 'pollutant', and/or 'fleet'.
     - 'mode' column gets 'type', 'vehicle', and/or 'operator'.
     """
+    data = row.to_dict()
+
     # Combine 3 concepts with 'measure' ("Variable")
-    lca_scope = row.pop("lca_scope")
+    lca_scope = data.pop("lca_scope", "")
     if len(lca_scope):
-        row["measure"] += " (" + lca_scope + ")"
+        data["measure"] += " (" + lca_scope + ")"
 
-    pollutant = row.pop("pollutant")
+    pollutant = data.pop("pollutant", "")
     if len(pollutant):
-        row["measure"] = pollutant + " " + row["measure"]
+        data["measure"] = pollutant + " " + data["measure"]
 
-    fleet = row.pop("fleet")
+    fleet = data.pop("fleet", "")
     if len(fleet):
-        if row["measure"] == "Energy intensity" and fleet == "all":
+        if data["measure"] == "Energy intensity" and fleet == "all":
             fleet = ""
         else:
             fleet = " (" + fleet + " vehicles)"
-        row["measure"] += fleet
+        data["measure"] += fleet
 
     # Combine 4 concepts with 'mode'
-    type = row.pop("type")
+    type = data.pop("type", "")
     if len(type):
-        if row["mode"] in ["Road", "Rail"]:
-            row["mode"] = type + " " + row["mode"]
-        elif row["mode"] == "All":
-            row["mode"] = row["mode"] + " " + type
+        if data["mode"] in ["Road", "Rail"]:
+            data["mode"] = type + " " + data["mode"]
+        elif data["mode"] == "All":
+            data["mode"] = data["mode"] + " " + type
 
-    vehicle = row.pop("vehicle")
+    vehicle = data.pop("vehicle", "")
     if len(vehicle) and vehicle != "All":
-        row["mode"] = vehicle
+        data["mode"] = vehicle
 
-    operator = row.pop("operator")
-    automation = row.pop("automation")
-    if len(operator) and len(automation) and row["mode"] == "LDV":
+    operator = data.pop("operator", "")
+    automation = data.pop("automation", "")
+    if len(operator) and len(automation) and data["mode"] == "LDV":
         automation = "" if automation == "Human" else " AV"
-        row["mode"] += " ({}{})".format(operator.lower(), automation)
+        data["mode"] += " ({}{})".format(operator.lower(), automation)
 
-    return row
+    return pd.Series(data)
 
 
 def name_for_id(concept_schemes: Dict, ids: List) -> Dict[str, Dict[str, str]]:
