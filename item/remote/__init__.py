@@ -2,5 +2,4 @@
 from .openkapsarc import OpenKAPSARC
 from .sdmx import get_sdmx
 
-
 __all__ = ["OpenKAPSARC", "get_sdmx"]

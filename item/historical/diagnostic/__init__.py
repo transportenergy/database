@@ -4,6 +4,7 @@ from pathlib import Path
 import pandas as pd
 
 from item.historical import fetch_source, source_str
+
 from . import A003
 
 # Quality checks
@@ -79,6 +80,7 @@ def coverage(df, area="COUNTRY", measure="VARIABLE", period="TIME_PERIOD"):
 def run_all(output_path):
     """Run all diagnostics."""
     from zipfile import ZIP_DEFLATED, ZipFile
+
     from jinja2 import Template
 
     output_path = Path(output_path)

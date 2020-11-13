@@ -1,9 +1,9 @@
 import errno
-from importlib import import_module
 import os
+import pickle
+from importlib import import_module
 from os import makedirs
 from os.path import join
-import pickle
 from typing import Dict
 
 import pandas as pd
@@ -11,10 +11,9 @@ import pycountry
 import xarray as xr
 import yaml
 
-from item.common import paths, log
-from item.model.common import as_xarray, concat_versions, tidy, select, to_wide
+from item.common import log, paths
+from item.model.common import as_xarray, concat_versions, select, tidy, to_wide
 from item.model.dimensions import INDEX, load_template
-
 
 __all__ = [
     "concat_versions",

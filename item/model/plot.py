@@ -26,7 +26,7 @@ def min_max(data, dims):
 
 def plot_all_item1():
     """Produce all plots for the iTEM1 database."""
-    from plotnine import aes, geom_bar, facet_grid, labs
+    from plotnine import aes, facet_grid, geom_bar, labs
 
     from item.model import load_model_data, squash_scenarios
     from item.model.dimensions import ALL, PAX
