@@ -18,6 +18,7 @@ Both the Python and R tools will operate on data stored in the following way; se
 
 Installation
 ============
+
 Use `pip <https://pip.pypa.io/en/stable/>`_.
 From source (for instance, to develop the code locally)::
 
@@ -49,3 +50,20 @@ The command-line option ``--local-data`` must be defined in order for these test
     $ py.test --local-data=../../data/model/database item
     ================ test session starts ================
     …
+
+
+.. _usage-cite:
+
+Cite the data or code
+=====================
+
+If you use or reference data from either iTEM database, or use the code, in preparation of any scientific publication, please cite the appropriate reference.
+
+- Automatically-generated DOIs via Zenodo, either:
+
+  - `10.5281/zenodo.4271788 <https://doi.org/10.5281/zenodo.4271788>`_, which represents *all versions* of the software, and always resolves to the latest version, or
+  - the DOI for a *specific version*. For instance, `10.5281/zenodo.4271789 <https://doi.org/10.5281/zenodo.4271789>`_ is the DOI for :mod:`item` version 2020.11.13.
+
+- DOI `10.5281/zenodo.4121180 <https://doi.org/10.5281/zenodo.4121180>`_ for the 2020-04-15 version of the historical database, which includes a snapshot of the data and a PDF document describing some of the data cleaning steps.
+
+The Zenodo pages provide downloadable citations in BibTeX and many other formats, for use in the reference management software of your choice.
