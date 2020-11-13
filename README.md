@@ -4,6 +4,8 @@ Tools for the iTEM databases
 [![Build Status](https://travis-ci.org/transportenergy/database.svg?branch=master)](https://travis-ci.org/transportenergy/database)
 ![Codecov](https://img.shields.io/codecov/c/gh/transportenergy/database.svg)
 [![Documentation Status](https://readthedocs.org/projects/transportenergy/badge/?version=latest)](https://transportenergy.readthedocs.io/en/latest/?badge=latest)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4271789.svg)](https://doi.org/10.5281/zenodo.4271789)
+
 
 This repository contains tools for two databases maintained by [iTEM](https://transportenergy.org), the **International Transport Energy Modeling** consortium:
 
@@ -24,7 +26,7 @@ Copyright © 2017–2020, [iTEM contributors](https://github.com/transportenergy
 Licensed under the GNU General Public License, version 3.
 The full text of the license is available in the file `LICENSE`.
 
-See the online documentation for [citation of this software](https://transportenergy.readthedocs.io) in scientific publications that use the software *or* the resulting database.
+See the online documentation for [citation of this software](https://transportenergy.readthedocs.io/#citation) in scientific publications that use the software *or* the resulting database.
 
 Related repositories
 --------------------
