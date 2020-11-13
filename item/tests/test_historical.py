@@ -73,6 +73,11 @@ def test_input_file(item_tmp_dir):
 @pytest.mark.parametrize("dataset_id", [0, 1, 3, 9])
 def test_process(dataset_id):
     """Test common interface for processing scripts."""
+    # Always use the path from within the repo
+    paths["historical input"] = Path(item.__file__).parent.joinpath(
+        "data", "historical", "input"
+    )
+
     process(dataset_id)
 
 
