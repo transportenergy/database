@@ -10,6 +10,7 @@ This module:
 import logging
 
 from item.utils import convert_units
+from item.historical.util import dropna_logged
 
 log = logging.getLogger(__name__)
 
@@ -89,22 +90,8 @@ def check(df):
 
 def process(df):
     """Process data set T001."""
-    # Getting a generic idea of what countries are missing values and dropping
-    # NaN values
-    #
-    # Rule: Erase all value with NaN
-
-    list_of_countries_with_missing_values = list(
-        set(df[df["Value"].isnull()]["Country"])
-    )
-    print(
-        ">> Number of countries missing values: {}".format(
-            len(list_of_countries_with_missing_values)
-        )
-    )
-    print(">> Countries missing values:")
-    print(list_of_countries_with_missing_values)
-    print(">> Number of rows to erase: {}".format(len(df[df["Value"].isnull()])))
+    # Drop rows with nulls in "Value"; log corresponding values in "Country"
+    df = dropna_logged(df, "Value", ["Country"])
 
     # 1. Drop null values.
     # 2. Convert to the preferred iTEM units.

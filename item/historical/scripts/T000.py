@@ -1,8 +1,12 @@
 """Data cleaning code and configuration for T000."""
-from item.utils import convert_units
-from .util.managers.dataframe import ColumnName
 from functools import lru_cache
+
 import pandas as pd
+
+from item.utils import convert_units
+from item.historical.util import dropna_logged
+from .util.managers.dataframe import ColumnName
+
 
 #: Dimensions and attributes which do not vary across this data set.
 COMMON_DIMS = dict(
@@ -47,26 +51,8 @@ def check(df):
 
 def process(df):
     """Process data set T000."""
-    # TODO The code below for identifying missing values is repeated in other
-    # cleaning scripts. We should consider moving this code into the
-    # 'item.historical import process' so that it applies to all scripts.
-
-    # Getting a generic idea of what countries are missing values and dropping
-    # NaN values
-    #
-    # Rule: Erase all value with NaN
-
-    list_of_countries_with_missing_values = list(
-        set(df[df["Value"].isnull()]["Country"])
-    )
-    print(
-        ">> Number of countries missing values: {}".format(
-            len(list_of_countries_with_missing_values)
-        )
-    )
-    print(">> Countries missing values:")
-    print(list_of_countries_with_missing_values)
-    print(">> Number of rows to erase: {}".format(len(df[df["Value"].isnull()])))
+    # Drop rows with nulls in "Value"; log corresponding values in "Country"
+    df = dropna_logged(df, "Value", ["Country"])
 
     # Assigning mode and vehicle type based on the variable name
     df = pd.concat([df, df["Variable"].apply(mode_and_vehicle_type)], axis=1)
