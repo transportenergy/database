@@ -157,7 +157,7 @@ def generate():
 
 
 def list_pairs(in_file, out_file):
-    """ Helper function for preparing the quantities list.
+    """Helper function for preparing the quantities list.
 
     Writes a file *out_file* with all unique combinations of variables between
     successive dimesions in *in_file*; that is, all combinations of:

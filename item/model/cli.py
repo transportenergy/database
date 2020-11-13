@@ -15,9 +15,7 @@ def add(fn, *params):
     )
 
 
-add(
-    process_raw, Argument(["version"], type=int), Argument(["models"], nargs=-1),
-)
+add(process_raw, Argument(["version"], type=int), Argument(["models"], nargs=-1))
 
 add(
     list_pairs,

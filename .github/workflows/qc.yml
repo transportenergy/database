@@ -1,4 +1,4 @@
-name: lint
+name: QC
 
 on:
   push:
@@ -8,12 +8,15 @@ on:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
-
     continue-on-error: true
+    name: black, flake8, twine
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: true
+
     - uses: actions/setup-python@v2
 
     - name: Cache Python packages
@@ -30,8 +33,6 @@ jobs:
         pip install black
         black --check .
 
-    # NOTE mypy is in pytest.yml because it relies on installed dependencies
-
     - name: Lint with flake8
       run: |
         pip install flake8
@@ -43,7 +44,34 @@ jobs:
         python3 setup.py bdist_wheel sdist
         twine check dist/*
 
-    - name: Build documentation using Sphinx
+  mypy-sphinx:
+    continue-on-error: true
+    name: mypy, sphinx docs
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - uses: actions/setup-python@v2
+
+    - name: Cache Python packages
+      uses: actions/cache@v2
+      with:
+        path: $HOME/.cache/pip
+        key: ubuntu-latest
+
+    - name: Upgrade pip, wheel
+      run: python -m pip install --upgrade pip wheel
+
+    - name: Install the Python package and dependencies
+      run: pip install .[doc,hist,tests]
+
+    - name: Check typing with mypy
       run: |
-        pip install .[doc]
-        make --directory=doc html
+        pip install mypy
+        mypy .
+
+    - name: Build documentation using Sphinx
+      run: make --directory=doc html

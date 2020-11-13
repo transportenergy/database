@@ -79,6 +79,19 @@ Code reference
 Specific data sets
 ==================
 
+T000
+----
+
+.. currentmodule:: item.historical.scripts.T000
+
+.. automodule:: item.historical.scripts.T000
+   :members:
+
+   .. literalinclude:: ../item/data/historical/sources.yaml
+      :language: yaml
+      :lines: 1-10
+
+
 T001
 ----
 
@@ -86,3 +99,7 @@ T001
 
 .. automodule:: item.historical.scripts.T001
    :members:
+
+   .. literalinclude:: ../item/data/historical/sources.yaml
+      :language: yaml
+      :lines: 12-20

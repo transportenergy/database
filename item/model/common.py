@@ -177,9 +177,7 @@ def tidy(df):
 
 
 def select(data, *args, **kwargs):
-    """Select from *data*.
-
-    """
+    """Select from *data*."""
     # Process arguments
     if len(args) > 1:
         raise ValueError(
