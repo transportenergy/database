@@ -387,7 +387,7 @@ def make_regions_yaml(in_file, country, region, out_file):
     result = {}
 
     for region, group in data.groupby(region):
-        result[region] = dict(description="", countries=list(group[country]),)
+        result[region] = dict(description="", countries=list(group[country]))
 
     with open(out_file, "w") as f:
         yaml.dump(result, f, default_flow_style=False)
