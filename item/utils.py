@@ -27,7 +27,4 @@ def convert_units(df, units_from, units_to, cols=("Value", "Unit")):
     qty = registry.Quantity(df[cols[0]].values, units_from).to(units_to)
 
     # Assign magnitude and unit columns in output DataFrame
-    df[cols[0]] = qty.magnitude
-    df[cols[1]] = f"{qty.units:~}"
-
-    return df
+    return df.assign(**{cols[0]: qty.magnitude, cols[1]: f"{qty.units:~}"})
