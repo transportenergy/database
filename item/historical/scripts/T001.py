@@ -113,4 +113,9 @@ def process(df):
     #    location
     df = df.dropna().pipe(convert_units, "Mt km / year", "Gt km / year")
 
+    # Correct #32
+    corrected = df.query("Country == 'China' and Year > 1985 and Year < 2002")
+    corrected["Value"] *= 100.0
+    df.update(corrected)
+
     return df
