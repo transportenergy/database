@@ -1,5 +1,6 @@
 from copy import copy
 from functools import lru_cache
+import logging
 import os
 
 import pandas as pd
@@ -10,6 +11,8 @@ from item.common import paths
 from item.remote import OpenKAPSARC, get_sdmx
 from .scripts import T000, T001
 from .scripts.util.managers.dataframe import ColumnName
+
+log = logging.getLogger(__name__)
 
 
 #: List of data processing Jupyter/IPython notebooks.
@@ -185,7 +188,9 @@ def process(id):
         print("No pre-processing checks to perform")
     except AssertionError as e:
         # An 'assert' statement in check() failed
-        print(f"Input data is invalid: {e}")
+        msg = "Input data is invalid"
+        log.error(f"{msg}: {e}")
+        raise RuntimeError(msg)
 
     # Information about columns. If not defined, use defaults.
     columns = dict(country_name="Country")
