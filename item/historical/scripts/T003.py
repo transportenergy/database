@@ -8,7 +8,7 @@ from functools import lru_cache
 
 import pandas as pd
 
-from item.historical.util import dropna_verbose
+from item.historical.util import dropna_logged
 from item.utils import convert_units
 
 
@@ -69,7 +69,7 @@ def check(df):
 def process(df):
     df = (
         # Remove rows with null values
-        df.pipe(dropna_verbose)
+        df.pipe(dropna_logged, "Value", ["Country"])
         # Set service dimension; overridden below
         .assign(Service="Freight")
         # Convert units
