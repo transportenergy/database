@@ -50,3 +50,10 @@ The goals for these tools are that:
   models.
 - The tools are well-tested and yield reproducible results.
 - The tools are fully documented.
+
+License
+=======
+
+Copyright © 2017–2020 iTEM contributors
+
+The software is licensed under the `GNU General Public License, version 3 <http://www.gnu.org/licenses/gpl-3.0.en.html>`_.
