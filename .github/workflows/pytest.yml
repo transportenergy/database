@@ -1,6 +1,3 @@
-# TODO add OK_API_KEY secret
-# TODO add Slack notification
-
 name: Test suite & diagnostics
 
 on:
@@ -13,12 +10,26 @@ jobs:
   pytest:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        include:
+        - python-version: "3.7"
+          run-diagnostics: false
+        - python-version: "3.8"
+          run-diagnostics: false
+        - python-version: "3.9"
+          run-diagnostics: true
+
+    name: py${{ matrix.python-version }}
+
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: true
 
     - uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
 
     - name: Cache Python packages
       uses: actions/cache@v2
@@ -26,9 +37,10 @@ jobs:
         path: |
           ~/.cache/pip
           ~/.cache/rclone*.zip
-        key: ubuntu-latest
+        key: ubuntu-latest-${{ matrix.python-version }}
 
     - name: Install rclone for Google Cloud Storage uploads
+      if: ${{ matrix.run-diagnostics }}
       env:
         service_account_json: ${{ secrets.GCS_SERVICE_ACCOUNT_0 }}
       run: |
@@ -56,8 +68,11 @@ jobs:
       uses: codecov/codecov-action@v1
 
     - name: Create diagnostics and upload to Google Cloud Storage
+      if: ${{ matrix.run-diagnostics }}
       run: |
         item historical diagnostics output/
         rclone --config=ci/rclone.conf --progress \
           copy output \
           gcs:historical-data-ci.transportenergy.org/$GITHUB_RUN_NUMBER/
+
+    # TODO add Slack notification
