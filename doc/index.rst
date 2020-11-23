@@ -3,11 +3,12 @@ International Transport Energy Modeling (iTEM) toolkit
 
 `iTEM`_ maintains two databases:
 
-1. A **model database** of transport energy projections assembled as part of
-   the `iTEM workshops`_, of which there have been four so far.
+1. A **historical database** to form a common, public, “best available” baseline for model calibration and projections.
+   The historical database is under continuous development.
 
-2. A **historical database** to form a common, public, “best available”
-   baseline for model calibration and projections.
+2. A **model database** of transport energy projections assembled as part of the iTEM model intercomparison projects (MIPs) linked to `iTEM workshops`_.
+   To meet the intellectual property concerns of workshop participants, the model database is currently not public, and only available on request; however, the tools used to prepare it are public.
+   These tools are developed periodically, during sequential MIPs.
 
 This documentation, built automatically from the `transportenergy/database GitHub repository <https://github.com/transportenergy/database>`_, describes the Python and R code for maintaining these databases.
 
