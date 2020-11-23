@@ -11,6 +11,7 @@ from item.historical.diagnostic import A003, coverage
 from item.historical.util import run_notebook
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize(
     "source_id",
     [
