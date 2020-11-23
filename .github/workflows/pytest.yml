@@ -20,6 +20,8 @@ jobs:
         - python-version: "3.9"
           run-diagnostics: true
 
+      fail-fast: false
+
     name: py${{ matrix.python-version }}
 
     steps:
