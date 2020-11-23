@@ -1,7 +1,9 @@
 Historical & statistical data (:mod:`item.historical`)
 ******************************************************
 
-This module contains the code that implements the `iTEM Open Data project <https://transportenergy.org/data/historical/>`_, the broader aims of which are described on the main iTEM website.
+This module contains the code that implements the `iTEM Open Data project <https://transportenergy.org/open-data/>`_, the broader aims of which are described on the main iTEM website.
+
+See also the :doc:`glossary`, which gives precise terminology used on this page.
 
 .. contents::
    :local:

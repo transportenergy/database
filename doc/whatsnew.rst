@@ -11,6 +11,7 @@ What's new?
 Next release
 ============
 
+- Add the :doc:`glossary` page.
 - Correct an error in the input data for :mod:`.T001` (:issue:`32`, :pull:`40`).
 
 
