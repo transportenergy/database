@@ -37,7 +37,7 @@ jobs:
         curl -O https://downloads.rclone.org/rclone-current-linux-amd64.zip
         popd
         unzip $HOME/.cache/rclone-current-linux-amd64.zip
-        echo "::add-path::$(ls -d rclone-v*)"
+        ls -d rclone-v* > $GITHUB_PATH
         echo "$service_account_json" >ci/item-historical-database.json
 
     - name: Upgrade pip, wheel
