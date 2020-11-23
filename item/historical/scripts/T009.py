@@ -24,7 +24,7 @@ COLUMNS = dict(
 )
 
 
-@lru_cache
+@lru_cache()
 def service(value):
     """Determine 'service' dimension based on a vehicle type."""
     if value in [
