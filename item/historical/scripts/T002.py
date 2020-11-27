@@ -28,7 +28,7 @@ COLUMNS = dict(
         "Reference Period Code",
         "Reference Period",
         "Flag Codes",
-        "Flags"
+        "Flags",
     ],
     # Column containing country name for determining ISO 3166 alpha-3 codes and
     # iTEM regions. Commented, because this is the default value.
@@ -61,14 +61,14 @@ def process(df):
     # TODO Find a way on dealing with the "Variable" columns case in a better way
     # When the value for the "Variable" column is not unique, the code breaks.
     del df["Variable"]
-    df.rename({'Var 2': ColumnName.VARIABLE.value}, axis=1, inplace=True)
+    df.rename({"Var 2": ColumnName.VARIABLE.value}, axis=1, inplace=True)
 
     # Assign the 'Unit' column
     df = pd.concat([df, df["Unit"].apply(unit)], axis=1)
 
     # TODO same as in 'Variable' column
     del df["Unit"]
-    df.rename({'Unit 2': ColumnName.UNIT.value}, axis=1, inplace=True)
+    df.rename({"Unit 2": ColumnName.UNIT.value}, axis=1, inplace=True)
 
     # 1. Drop null values.
     # 2. Convert to the preferred iTEM units.
