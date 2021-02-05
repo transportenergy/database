@@ -2,3 +2,5 @@
 
 Created during the tutorial on 2021-02-05.
 """
+
+FOO = 3.5
