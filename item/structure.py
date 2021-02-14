@@ -88,7 +88,6 @@ def read_concepts_yaml(path: Path) -> Dict[str, ConceptScheme]:
 
     See Also
     --------
-    :ref:`concepts-yaml`
     read_items
     """
     data = yaml.safe_load(open(path))
@@ -110,7 +109,6 @@ def read_measures_yaml(path: Path) -> ConceptScheme:
 
     See Also
     --------
-    :ref:`measures-yaml`
     read_items
     """
     data = yaml.safe_load(open(path))

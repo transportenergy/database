@@ -12,34 +12,13 @@ To make use of these files:
 .. contents::
    :local:
 
+.. _structure-xml:
 
-.. _concepts-yaml:
+SDMX metadata (:file:`structure.xml`)
+=====================================
 
-Concept schemes (:file:`concepts.yaml`)
-=======================================
-
-iTEM uses the :mod:`sdmx` notion of a "concept scheme": a (possibly) hierarchical list of distinct concepts.
-Per the :ref:`SDMX 'information model' <sdmx:im-base-classes>`, each of these :class:`.Concepts` has an `id` and optionally a `name`, a `description`, and one or more annotations.
-
-The concepts in :file:`concepts.yaml` are all measured using *discrete, unordered codes*: for instance, the 'lca_scope' of a particular data observation might be 'ttw', 'wtt', or one of the other values.
-
-In contrast, the :ref:`measures <measures-yaml>` below are measured in *continuous, quantiative* values.
-
-.. literalinclude:: ../item/data/concepts.yaml
-   :language: yaml
-
-
-.. _measures-yaml:
-
-Measures (:file:`measures.yaml`)
-================================
-
-'measure' is another :ref:`Concept Scheme <concepts-yaml>`.
-Each measure also has an annotation specifying `units`; see :func:`add_unit`.
-
-.. literalinclude:: ../item/data/measures.yaml
-   :language: yaml
-
+.. literalinclude:: ../item/data/structure.xml
+   :language: xml
 
 .. _spec-yaml:
 
