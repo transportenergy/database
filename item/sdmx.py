@@ -1,7 +1,5 @@
 from datetime import datetime
-from pathlib import Path
 
-import sdmx
 import sdmx.model as m
 import sdmx.message as msg
 from sdmx.model import Code, Concept
@@ -10,7 +8,8 @@ from sdmx.model import Code, Concept
 VERSION = "0.1"
 
 
-def generate():
+def generate() -> msg.StructureMessage:
+    """Return the SDMX data structures for iTEM data."""
     sm = msg.StructureMessage(prepared=datetime.now())
 
     item = m.Agency(
@@ -71,8 +70,7 @@ def generate():
 
     sm.structure[dsd0.id] = dsd0
 
-    with open(Path(__file__).parent / "data" / "structure.xml", "wb") as f:
-        f.write(sdmx.to_xml(sm, pretty_print=True))
+    return sm
 
 
 CONCEPTS = (

@@ -1,4 +1,5 @@
 """Command-line interface for the iTEM databases."""
+from pathlib import Path
 from textwrap import indent
 
 import click
@@ -6,7 +7,6 @@ import click
 from item.historical.cli import historical
 from item.model.cli import model
 from item.remote.cli import remote
-from item.structure import make_template
 
 
 @click.group(help=__doc__)
@@ -90,7 +90,22 @@ def mkdirs(path, dry_run):
 @main.command()
 def template():
     """Generate the MIP submission template."""
+    from item.structure import make_template
+
     make_template()
+
+
+@main.command("update-dsd")
+def update_dsd():
+    """Generate the iTEM SDMX data structures.
+
+    The file item/data/structure.xml is updated.
+    """
+    import sdmx
+    from item.sdmx import generate
+
+    with open(Path(__file__).parent / "data" / "structure.xml", "wb") as f:
+        f.write(sdmx.to_xml(generate(), pretty_print=True))
 
 
 main.add_command(model)
