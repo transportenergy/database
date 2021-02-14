@@ -4,7 +4,9 @@ import sdmx.model as m
 import sdmx.message as msg
 from sdmx.model import Code, Concept
 
-
+#: Current version of all data structures.
+#:
+#: .. todo: Allow a different version for each particular structure, e.g. code list.
 VERSION = "0.1"
 
 
@@ -35,9 +37,21 @@ def generate() -> msg.StructureMessage:
     sm.organisation_scheme[as_.id] = as_
     sm.header = msg.Header(sender=item)
 
-    cs = m.ConceptScheme(id="TRANSPORT", **ma_args)
-    cs.extend(CONCEPTS)
-    sm.concept_scheme[cs.id] = cs
+    cs0 = m.ConceptScheme(
+        id="TRANSPORT",
+        **ma_args,
+        description="Concepts used as dimensions or attributes for transport data.",
+    )
+    cs0.extend(CS_TRANSPORT)
+    sm.concept_scheme[cs0.id] = cs0
+
+    cs1 = m.ConceptScheme(
+        id="TRANSPORT_MEASURES",
+        **ma_args,
+        description="Concepts used as measures in transport data.",
+    )
+    cs1.extend(CS_TRANSPORT_MEASURES)
+    sm.concept_scheme[cs1.id] = cs1
 
     for id, codes in CODELISTS.items():
         cl = m.Codelist(id=f"CL_{id}", **ma_args)
@@ -56,24 +70,43 @@ def generate() -> msg.StructureMessage:
             "are valid for the relevant measure(s)."
         ),
     )
-    for order, dim in enumerate(
+    for order, concept_id in enumerate(
         (
             "TYPE MODE VEHICLE FUEL TECHNOLOGY AUTOMATION OPERATOR POLLUTANT LCA_SCOPE "
             "FLEET"
         ).split()
     ):
         d = m.Dimension(
-            id=dim, name=cs[dim].name, concept_identity=cs[dim], order=order
+            id=concept_id,
+            name=cs0[concept_id].name,
+            concept_identity=cs0[concept_id],
+            order=order,
         )
+        try:
+            d.local_representation = m.Representation(
+                enumerated=sm.codelist[f"CL_{concept_id}"]
+            )
+        except KeyError:
+            # No codelist for this concept
+            pass
         dsd0.dimensions.append(d)
-    dsd0.dimensions.append(m.MeasureDimension(id="VARIABLE", name="Measure"))
+
+    # Also add the measure dimension
+    dsd0.dimensions.append(
+        m.MeasureDimension(
+            id="VARIABLE",
+            name="Measure",
+            description="Reference to a concept from CL_TRANSPORT_MEASURES.",
+        )
+    )
 
     sm.structure[dsd0.id] = dsd0
 
     return sm
 
 
-CONCEPTS = (
+#: Concepts for the ``iTEM:TRANSPORT`` concept scheme.
+CS_TRANSPORT = (
     # Used as dimensions
     Concept(id="TYPE", name="Objects being transported, e.g. passengers or freight"),
     Concept(id="MODE", name="Mode or medium of transport"),
@@ -98,7 +131,10 @@ CONCEPTS = (
         id="FLEET",
         description="Part of a fleet of transport vehicles, e.g. new versus used.",
     ),
-    # Used as measures
+)
+
+#: Concepts for the ``iTEM:TRANSPORT_MEASURES`` concept scheme.
+CS_TRANSPORT_MEASURES = (
     Concept(
         id="ACTIVITY",
         name="Transport activity",
@@ -163,6 +199,7 @@ CL_TYPE = (
     Code(id="F", name="Freight"),
 )
 
+#: Codes for various code lists.
 CODELISTS = {
     "LCA_SCOPE": CL_LCA_SCOPE,
     "MODE": CL_MODE,
