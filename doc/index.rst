@@ -25,8 +25,8 @@ This documentation, built automatically from the `transportenergy/database GitHu
    model
    historical
    structure
+   ci
    remote
-   cli
    metadata
    glossary
    whatsnew
@@ -56,7 +56,7 @@ The goals for these tools are that:
 License
 =======
 
-Copyright © 2017–2020 iTEM contributors
+Copyright © 2017–2021 iTEM contributors
 
 The software is licensed under the `GNU General Public License, version 3 <http://www.gnu.org/licenses/gpl-3.0.en.html>`_.
 

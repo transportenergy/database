@@ -1,9 +1,6 @@
 Usage
 *****
 
-The following instructions are not language-specific.
-Both the Python and R tools will operate on data stored in the following way; see the language-specific sections below for more details.
-
 1. Install the Python package, or clone the repository and install the code in both languages.
 
 2. Create 1 or more separate directory to contain the input and output files.
@@ -13,7 +10,7 @@ Both the Python and R tools will operate on data stored in the following way; se
 3. Copy the file ``item_config_example.yaml`` to ``item_config.yaml`` in any working directory where you intend to use this code.
    Edit the file (see the inline comments) to point to the directories created in #2 above.
 
-4. Use the tools through the :doc:`cli`.
+4. Use the tools through the :ref:`cli`.
 
 
 Installation
@@ -28,18 +25,20 @@ From source (for instance, to develop the code locally)::
 
     $ git clone --recurse-submodules git@github.com:transportenergy/database.git
     $ cd database
-    $ pip install --editable .[doc,hist,tests]
+    $ pip install --editable .[tests]
 
 Or, without cloning the repository::
 
-    $ pip install --editable git://github.com/transportenergy/database#egg=item@subdirectory=python [doc,hist,tests]
+    $ pip install --editable git://github.com/transportenergy/database#egg=item[tests]
 
 
-Usage
-=====
+Code against the API
+====================
 
-From Python scripts, import the :mod:`item` module or submodules and call specific functions described elsewhere in this documentation.
+From **Python** code, import the :mod:`item` module or submodules and call specific functions described elsewhere in this documentation.
 For instance::
+
+.. code-block:: python
 
     from item import historical, model, structure
 
@@ -53,6 +52,44 @@ For instance::
     # Display metadata (information about a model's data)
     model.load_model_regions("itf", version=2)
 
+From **R** code, use `reticulate <https://rstudio.github.io/reticulate/>`_ package to access the Python API:
+
+.. code-block:: R
+
+    item <- reticulate::import("item")
+
+    # Display metadata (information about a model's data)
+    item$model$load_model_regions("itf", version=2)
+
+
+.. _cli:
+
+Use the command-line interface
+==============================
+
+The ``item`` executable installed with the package provides a command-line interface (CLI) that can be used to perform some tasks without writing code.
+The CLI provides its own help with the ``--help`` option::
+
+    $ item --help
+    Usage: item [OPTIONS] COMMAND [ARGS]...
+
+      Command-line interface for the iTEM databases.
+
+    Options:
+      --path <KEY> <PATH>  Override data paths (multiple allowed).
+      --help               Show this message and exit.
+
+    Commands:
+      debug       Show debugging information, including paths.
+      help        Show extended help for the command-line tool.
+      historical  Manipulate the historical database.
+      mkdirs      Create a directory tree for the database.
+      model       Manipulate the model database.
+      remote      Access remote data sources.
+      template    Generate the MIP submission template.
+
+Use e.g. ``item historical --help`` to get help specific to one (sub)command.
+
 
 Run tests
 =========
@@ -63,6 +100,8 @@ The command-line option ``--local-data`` can be used to point to local data file
     $ py.test --local-data=../../data/model/database item
     ================ test session starts ================
     …
+
+See the page :doc:`ci` for further details.
 
 
 .. _usage-cite:

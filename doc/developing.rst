@@ -23,8 +23,10 @@ Repository organization
     - ``item_config_example.yaml`` — an example configuration file.
 
 
-Style guide
-===========
+.. _code-style:
+
+Code style
+==========
 
 - Run the following tools on all new and modified code::
 
