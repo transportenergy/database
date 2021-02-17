@@ -1,7 +1,7 @@
 from datetime import datetime
 
-import sdmx.model as m
 import sdmx.message as msg
+import sdmx.model as m
 from sdmx.model import Code, Concept
 
 #: Current version of all data structures.

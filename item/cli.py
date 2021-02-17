@@ -102,6 +102,7 @@ def update_dsd():
     The file item/data/structure.xml is updated.
     """
     import sdmx
+
     from item.sdmx import generate
 
     with open(Path(__file__).parent / "data" / "structure.xml", "wb") as f:
