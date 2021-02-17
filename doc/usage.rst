@@ -52,6 +52,8 @@ For instance::
     # Display metadata (information about a model's data)
     model.load_model_regions("itf", version=2)
 
+.. _reticulate:
+
 From **R** code, use `reticulate <https://rstudio.github.io/reticulate/>`_ package to access the Python API:
 
 .. code-block:: R
