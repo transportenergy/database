@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  gcs_bucket: gcs:data.transportenergy.org/historical/ci/
+  gcs_url: https://storage.googleapis.com/data.transportenergy.org/historical/ci/
+
 jobs:
   pytest:
     runs-on: ubuntu-latest
@@ -19,8 +23,6 @@ jobs:
           run-diagnostics: false
         - python-version: "3.9"
           run-diagnostics: true
-
-      fail-fast: false
 
     name: py${{ matrix.python-version }}
 
@@ -41,25 +43,11 @@ jobs:
           ~/.cache/rclone*.zip
         key: ubuntu-latest-${{ matrix.python-version }}
 
-    - name: Install rclone for Google Cloud Storage uploads
-      if: ${{ matrix.run-diagnostics }}
-      env:
-        service_account_json: ${{ secrets.GCS_SERVICE_ACCOUNT_0 }}
-      run: |
-        mkdir -p $HOME/.cache
-        pushd $HOME/.cache
-        curl -O https://downloads.rclone.org/rclone-current-linux-amd64.zip
-        popd
-        unzip $HOME/.cache/rclone-current-linux-amd64.zip
-        ls -d rclone-v* > $GITHUB_PATH
-        echo "$service_account_json" >ci/item-historical-database.json
-
     - name: Upgrade pip, wheel
       run: python -m pip install --upgrade pip wheel
 
     - name: Install the Python package and dependencies
-      # TODO make this work without editable by adjusting path config
-      run: pip install --editable .[doc,hist,tests]
+      run: pip install --editable .[tests]
 
     - name: Run pytest
       env:
@@ -69,12 +57,33 @@ jobs:
     - name: Upload test coverage to Codecov.io
       uses: codecov/codecov-action@v1
 
+    - name: Install rclone
+      if: ${{ matrix.run-diagnostics }}
+      env:
+        service_account_json: ${{ secrets.GCS_SERVICE_ACCOUNT_1 }}
+      run: |
+        mkdir -p $HOME/.cache
+        pushd $HOME/.cache
+        curl -O https://downloads.rclone.org/rclone-current-linux-amd64.zip
+        popd
+        unzip $HOME/.cache/rclone-current-linux-amd64.zip
+        ls -d rclone-v* > $GITHUB_PATH
+        echo "$service_account_json" >ci/service-account-key.json
+
     - name: Create diagnostics and upload to Google Cloud Storage
       if: ${{ matrix.run-diagnostics }}
+      env:
+        RCLONE_CONFIG: ci/rclone.conf
       run: |
         item historical diagnostics output/
-        rclone --config=ci/rclone.conf --progress \
-          copy output \
-          gcs:historical-data-ci.transportenergy.org/$GITHUB_RUN_NUMBER/
+        rclone --progress copy output ${{ env.gcs_bucket }}${{ github.run_number }}/
 
-    # TODO add Slack notification
+    - uses: LouisBrunner/checks-action@v1.1.1
+      if: ${{ matrix.run-diagnostics }}
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        name: Upload historical database & diagnostics
+        conclusion: success
+        details_url: ${{ env.gcs_url }}${{ github.run_number }}/index.html
+        output: |
+          {"summary": "${{ env.gcs_url }}${{ github.run_number }}/index.html"}

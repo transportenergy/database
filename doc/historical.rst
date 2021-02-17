@@ -25,6 +25,8 @@ See the documentation of :func:`~historical.process` for a detailed description 
 The notebook name corresponds to the input data set which it handles, e.g. :file:`T001.ipynb`.
 
 
+.. _diagnostics:
+
 Diagnostics
 ===========
 
