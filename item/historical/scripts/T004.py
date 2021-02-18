@@ -3,7 +3,19 @@
 Notes:
 
 - The input data is does not express the units, which are single vehicles.
-- Created during the tutorial on 2021-02-05.
+
+.. todo::
+   - The input data have labels like "- LPG" in the "Fuel type" column, with the hyphen
+     possibly indicating a hierarchical code list. Find a reference to this code list.
+   - The code currently uses some inconsistent labels, such as:
+
+     - "Liquid-Bio" (no spaces) vs. "Liquid - Fossil" (spaces).
+     - "Natural Gas Vehicle" vs. "Conventional" (word "Vehicle" is omitted).
+
+     Fix these after :pull:`62` is merged by using code lists for these dimensions.
+   - Add code to fetch this source automatically. It does not have a clearly-defined
+     API.
+   - Capture and preserve the metadata provided by the UNECE data interface.
 
 """
 from functools import lru_cache

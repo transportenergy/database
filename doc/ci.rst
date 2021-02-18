@@ -28,7 +28,7 @@ pytest
    The *coverage*—details of which statements of the code are executed at least once during the tests, and which are missing—is uploaded to Codecov.
 
 Upload historical database and diagnostics
-   The :doc:`cli` command ``item historical diagnostics`` is run to completely regenerate the historical database and diagnostic calculations based on it.
+   The :ref:`cli` command ``item historical diagnostics`` is run to completely regenerate the historical database and diagnostic calculations based on it.
    The results are uploaded to Google Cloud Storage, and a link to the :file:`index.html` is published to the pull request on GitHub.
 
    The file contains the following sections:
