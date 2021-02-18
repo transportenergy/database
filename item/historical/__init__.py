@@ -8,7 +8,7 @@ import pycountry
 import yaml
 
 from item.common import paths
-from item.historical.scripts import T000, T001, T003, T009
+from item.historical.scripts import T000, T001, T003, T004, T009
 from item.historical.scripts.util.managers.dataframe import ColumnName
 from item.remote import OpenKAPSARC, get_sdmx
 
@@ -22,7 +22,6 @@ SCRIPTS = [
     # 'T001',
     "T002",
     # "T003",
-    "T004",
     "T005",
     "T006",
     "T007",
@@ -30,7 +29,13 @@ SCRIPTS = [
 ]
 
 #: Submodules usable with :func:`process`.
-MODULES = {0: T000, 1: T001, 3: T003, 9: T009}
+MODULES = {
+    0: T000,
+    1: T001,
+    3: T003,
+    4: T004,
+    9: T009,
+}
 
 #: Path for output from :func:`process`.
 OUTPUT_PATH = paths["data"] / "historical" / "output"
@@ -43,6 +48,7 @@ COUNTRY_NAME = {
     "Bosnia-Herzegovina": "Bosnia and Herzegovina",
     "Korea": "Korea, Republic of",
     "Serbia, Republic of": "Serbia",
+    "The former Yugoslav Republic of Macedonia": "North Macedonia",
 }
 
 
@@ -77,16 +83,28 @@ def cache_results(id_str, df):
     df.to_csv(path, index=False)
     log.info(f"Write {path}")
 
-    # Pivot to wide format ('user friendly view') and write to CSV
+    # Pivot to wide format ('user friendly view')
+
+    # Columns for wide format
+    columns = [col.value for col in ColumnName if col != ColumnName.VALUE]
+
+    duplicates = df.duplicated(subset=columns, keep=False)
+    if duplicates.any():
+        log.warning("Processing produced non-unique keys; no -wide output")
+        log.info("(Use log level DEBUG for details)")
+        log.debug(df[duplicates])
+        return
+
+    # Write wide format
     path = OUTPUT_PATH / f"{id_str}-clean-wide.csv"
 
     # - Set all columns but 'Value' as the index → pd.Series with MultiIndex.
     # - 'Unstack' the 'Year' dimension to columns, i.e. wide format.
     # - Return the index to columns in the dataframe.
     # - Write to file.
-    df.set_index([ev.value for ev in ColumnName if ev != ColumnName.VALUE]).unstack(
-        ColumnName.YEAR.value
-    ).reset_index().to_csv(path, index=False)
+    df.set_index(columns).unstack(ColumnName.YEAR.value).reset_index().to_csv(
+        path, index=False
+    )
     log.info(f"Write {path}")
 
 
@@ -196,7 +214,7 @@ def process(id):
         path = paths["historical input"] / f"{id_str}_input.csv"
 
     # Read the data
-    df = pd.read_csv(path)
+    df = pd.read_csv(path, sep=getattr(dataset_module, "CSV_SEP", ","))
 
     try:
         # Check that the input data is of the form expected by process()
