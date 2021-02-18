@@ -70,8 +70,15 @@ jobs:
         ls -d rclone-v* > $GITHUB_PATH
         echo "$service_account_json" >ci/service-account-key.json
 
+    - env:
+        event_json: ${{ toJSON(github.event) }}
+      run: |
+        echo "${{ github.head_ref }}"
+        echo "${{ github.repository }}"
+        echo "$event_json"
+
     - name: Create diagnostics and upload to Google Cloud Storage
-      if: ${{ matrix.run-diagnostics }}
+      if: ${{ startsWith(github.head_ref, 'transportenergy/') && matrix.run-diagnostics }}
       env:
         RCLONE_CONFIG: ci/rclone.conf
       run: |
@@ -79,7 +86,7 @@ jobs:
         rclone --progress copy output ${{ env.gcs_bucket }}${{ github.run_number }}/
 
     - uses: LouisBrunner/checks-action@v1.1.1
-      if: ${{ matrix.run-diagnostics }}
+      if: ${{ startsWith(github.head_ref, 'transportenergy/') && matrix.run-diagnostics }}
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         name: Upload historical database & diagnostics
