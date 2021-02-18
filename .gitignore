@@ -39,3 +39,8 @@ R/*.Rcheck
 
 # Access keys for CI deployment
 ci/*.json
+
+# Editors
+/**/.idea
+*.eggs
+

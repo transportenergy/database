@@ -8,10 +8,9 @@ import pycountry
 import yaml
 
 from item.common import paths
+from item.historical.scripts import T000, T001, T003, T009
+from item.historical.scripts.util.managers.dataframe import ColumnName
 from item.remote import OpenKAPSARC, get_sdmx
-
-from .scripts import T000, T001, T003, T009
-from .scripts.util.managers.dataframe import ColumnName
 
 log = logging.getLogger(__name__)
 
@@ -170,6 +169,17 @@ def process(id):
        :data:`COMMON_DIMS` :class:`dict`.
     8. Order columns according to :class:`.ColumnName`.
     9. Output data to two files. See :meth:`cache_results`.
+
+    Parameters
+    ----------
+    id : int
+        Data source id, as listed in :data:`.MODULES`. E.g. ``0`` imports data from
+        from file :file:`T000.csv`.
+
+    Returns
+    -------
+    DataFrame : :class:`pandas.DataFrame`
+        Apart from generating :meth:`cache_results`, returns dataset as a DataFrame.
 
     """
     id_str = source_str(id)
