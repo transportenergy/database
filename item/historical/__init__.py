@@ -170,21 +170,19 @@ def process(id):
     Performs the following common processing steps:
 
     1. Load the data from cache.
-    2. Load a module defining dataset-specific processing steps. This module
-       is in a file named e.g. :file:`T001.py`.
-    3. Call the dataset's (optional) :meth:`check` method. This method receives
-       the input data frame as an argument, and can make one or more assertions
-       to ensure the data is in the expected format.
-    4. Drop columns in the dataset's (optional) :data:`COLUMNS['drop']`
-       :class:`list`.
-    5. Call the dataset-specific (required) :meth:`process` method. This method
-       receives the data frame from step (4), and performs any additional
-       processing.
-    6. Assign ISO 3166 alpha-3 codes and the iTEM region based on a column
-       containing country names; either :data:`COLUMNS['country_name']` or the
-       default, 'Country'. See :meth:`iso_and_region`.
-    7. Assign common dimensions from the dataset's (optional)
-       :data:`COMMON_DIMS` :class:`dict`.
+    2. Load a module defining dataset-specific processing steps. This module is in a
+       file named e.g. :file:`T001.py`.
+    3. Call the dataset's (optional) :meth:`check` method. This method receives the
+       input data frame as an argument, and can make one or more assertions to ensure
+       the data is in the expected format.
+    4. Drop columns in the dataset's (optional) :data:`COLUMNS['drop']` :class:`list`.
+    5. Call the dataset-specific (required) :meth:`process` method. This method receives
+       the data frame from step (4), and performs any additional processing.
+    6. Assign ISO 3166 alpha-3 codes and the iTEM region based on a column containing
+       country names; either :data:`COLUMNS['country_name']` or the default, 'Country'.
+       See :meth:`iso_and_region`.
+    7. Assign common dimensions from the dataset's (optional) :data:`COMMON_DIMS`
+       :class:`dict`.
     8. Order columns according to :class:`.ColumnName`.
     9. Output data to two files. See :meth:`cache_results`.
 
