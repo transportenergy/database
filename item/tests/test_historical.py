@@ -108,7 +108,8 @@ def test_A003():
     result = A003.compute(activity, stock)
 
     # Number of unique values computed
-    assert len(result) == 929
+    # TODO make this more flexible/robust to changes in the upstream data
+    assert 954 <= len(result)
 
     # A specific value is present and as expected
     obs = result.query("`ISO Code` == 'USA' and Year == 2015")["Value"].squeeze()
