@@ -22,7 +22,7 @@ from functools import lru_cache
 
 import pandas as pd
 
-from .util.managers.dataframe import ColumnName
+from item.structure import column_name
 
 #: Separator character for :func:`pandas.read_csv`.
 CSV_SEP = ";"
@@ -46,7 +46,7 @@ COLUMNS = dict(
 MAP = {
     "Type of vehicle": {
         # Columns to which the values should be assigned
-        "_columns": (ColumnName.SERVICE.value, ColumnName.VEHICLE_TYPE.value),
+        "_columns": (column_name("TYPE"), column_name("VEHICLE")),
         # Key is the value appearing in the variable column; values are a tuple for the
         # two columns
         "New lorries (vehicle wt over 3500 kg)": ("Freight", "Heavy Truck"),
@@ -56,7 +56,7 @@ MAP = {
         "New light goods vehicles": ("Freight", "Light Truck"),
     },
     "Fuel type": {
-        "_columns": (ColumnName.TECHNOLOGY.value, ColumnName.FUEL.value),
+        "_columns": (column_name("TECHNOLOGY"), column_name("FUEL")),
         "- LPG": ("Natural Gas Vehicle", "Natural Gas"),
         "- Compressed natural gas (CNG)": ("Natural Gas Vehicle", "Natural Gas"),
         "- Liquefied natural gas (LNG)": ("Natural Gas Vehicle", "Natural Gas"),
@@ -80,7 +80,7 @@ MAP = {
 
 
 def process(df):
-    df = df.rename(columns={"Date": ColumnName.YEAR.value})
+    df = df.rename(columns={"Date": column_name("YEAR")})
 
     # U
     return pd.concat(
