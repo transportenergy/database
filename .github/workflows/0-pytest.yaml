@@ -7,9 +7,15 @@ on:
     branches: [ master ]
 
 env:
+  # Location of RCLONE configuration file
+  RCLONE_CONFIG: ci/rclone.conf
+  # Path & URL fragments for uploaded historical data & diagnostics
   gcs_bucket: gcs:data.transportenergy.org/historical/ci/
   gcs_url: https://storage.googleapis.com/data.transportenergy.org/historical/ci/
-  RCLONE_CONFIG: ci/rclone.conf
+  # True if the event is a pull request and the incoming branch is within the
+  # transportenergy/database repo (as opposed to a fork). Only under this
+  # condition is the GCS_SERVICE_ACCOUNT_* secret available.
+  pr_from_main_repo: github.event_name == 'pull_request' && startsWith(github.event.pull_request.head.label, 'transportenergy:')
 
 jobs:
   pytest:
@@ -59,7 +65,7 @@ jobs:
       uses: codecov/codecov-action@v1
 
     - name: Install rclone
-      if: ${{ startsWith(github.event.head.label, 'transportenergy:') && matrix.run-diagnostics }}
+      if: env.pr_from_main_repo && matrix.run-diagnostics
       env:
         service_account_json: ${{ secrets.GCS_SERVICE_ACCOUNT_1 }}
       run: |
@@ -72,15 +78,13 @@ jobs:
         echo "$service_account_json" >ci/service-account-key.json
 
     - name: Create diagnostics and upload to Google Cloud Storage
-      # Only on PRs from the main repo
-      if: ${{ startsWith(github.event.head.label, 'transportenergy:') && matrix.run-diagnostics }}
+      if: env.pr_from_main_repo && matrix.run-diagnostics
       run: |
         item historical diagnostics output/
         rclone --progress copy output ${{ env.gcs_bucket }}${{ github.run_number }}/
 
     - uses: LouisBrunner/checks-action@v1.1.1
-      # Only on PRs from the main repo
-      if: ${{ startsWith(github.event.head.label, 'transportenergy:') && matrix.run-diagnostics }}
+      if: env.pr_from_main_repo && matrix.run-diagnostics
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         name: Upload historical database & diagnostics
