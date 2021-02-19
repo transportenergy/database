@@ -99,6 +99,9 @@ def generate() -> msg.StructureMessage:
             id="VARIABLE",
             name="Measure",
             description="Reference to a concept from CL_TRANSPORT_MEASURES.",
+            local_representation=m.Representation(
+                enumerated=sm.concept_scheme["TRANSPORT_MEASURE"]
+            ),
         )
     )
 
