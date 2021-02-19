@@ -49,7 +49,12 @@ def generate() -> msg.StructureMessage:
 
     for id, codes in CODELISTS.items():
         cl = m.Codelist(id=f"CL_{id}", **ma_args)
-        cl.extend(codes)
+        # Add each code and any children
+        # TODO Move this upstream
+        for c in codes:
+            cl.append(c)
+            cl.extend(c.child)
+
         sm.codelist[cl.id] = cl
 
     dsd0 = m.DataStructureDefinition(
@@ -193,6 +198,41 @@ CONCEPT_SCHEMES = [
     ),
 ]
 
+CL_AUTOMATION = (
+    Code(id="HUMAN", name="Human", description="Vehicle operated by a human driver."),
+    Code(
+        id="AV", name="Automated", description="Fully-automated (self-driving) vehicle."
+    ),
+)
+
+CL_FLEET = (
+    Code(id="ALL", description="All vehicles in use in the reporting period."),
+    Code(id="NEW", description="Only newly-sold vehicles in the reporting period."),
+    Code(
+        id="USED",
+        description=(
+            "Only used vehicles that were not manufactured in the reporting period."
+        ),
+    ),
+)
+
+CL_FUEL = (
+    Code(id="ALL", description="All fuels."),
+    Code(
+        id="LIQUID",
+        name="All liquid",
+        child=[
+            Code(id="DIESEL"),
+            Code(id="GASOLINE"),
+            Code(id="BIOFUEL", name="Liquid biofuel"),
+            Code(id="SYNTHETIC", description="a.k.a. synfuels, electrofuels."),
+        ],
+    ),
+    Code(id="NG", name="Natural gas"),
+    Code(id="HYDROGEN"),
+    Code(id="ELECTRICITY"),
+)
+
 CL_LCA_SCOPE = (
     Code(id="TTW", name="Tank-to-wheels"),
     Code(id="WTT", name="Well-to-tank"),
@@ -227,15 +267,66 @@ CL_OPERATOR = (
     ),
 )
 
+CL_POLLUTANT = (
+    Code(
+        id="GHG",
+        name="GHG",
+        description=(
+            "Greenhouse gases. Where used for totals, all GHGs are conveted to an "
+            "equivalence basis."
+        ),
+        child=[
+            Code(id="CO2", name="CO₂", description="Carbon dioxide."),
+        ],
+    ),
+    Code(
+        id="AQ",
+        description="Air quality-related pollutant species.",
+        child=[
+            Code(id="BC", name="BC", description="Black carbon."),
+            Code(
+                id="NOX",
+                name="NOx",
+                description=(
+                    "Air quality-related nitrogen oxides, i.e. NO, NO₂, and N₂O."
+                ),
+            ),
+            Code(
+                id="PM25",
+                name="PM2.5",
+                description="Particulate matter smaller than 2.5 μm.",
+            ),
+            Code(id="SO2", name="SO₂", description="Sulfur dioxide."),
+        ],
+    ),
+)
+
 CL_TYPE = (
     Code(id="P", name="Passenger"),
     Code(id="F", name="Freight"),
 )
 
+CL_VEHICLE = (
+    Code(id="ALL", description="All vehicle types."),
+    Code(
+        id="LDV",
+        description="Light-duty road vehicle, including cars, SUVs, and light trucks.",
+    ),
+    Code(id="BUS"),
+    Code(id="TRUCK"),
+    Code(id="2W+3W", description="Two- and three-wheeled road vehicles."),
+)
+
+
 #: Codes for various code lists.
 CODELISTS = {
+    "AUTOMATION": CL_AUTOMATION,
+    "FLEET": CL_FLEET,
+    "FUEL": CL_FUEL,
     "LCA_SCOPE": CL_LCA_SCOPE,
     "MODE": CL_MODE,
     "OPERATOR": CL_OPERATOR,
+    "POLLUTANT": CL_POLLUTANT,
     "TYPE": CL_TYPE,
+    "VEHICLE": CL_VEHICLE,
 }
