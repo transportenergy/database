@@ -1,4 +1,13 @@
-from item.structure import make_template
+from item.structure import column_name, make_template
+
+
+def test_column_name(caplog):
+    # Correctly retrieves the name of a Concept from the data structures
+    assert column_name("VEHICLE") == "Vehicle type"
+
+    # Warning is logged for deprecated IDs
+    assert column_name("YEAR") == "Year"
+    assert "Deprecated dimension id: 'YEAR'" in caplog.messages
 
 
 def test_make_template(tmp_path):
