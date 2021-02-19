@@ -5,46 +5,10 @@ from typing import Dict, List
 import pandas as pd
 import yaml
 from pandas.core.computation.ops import UndefinedVariableError
-from sdmx.model import Annotation, Concept, ConceptScheme
+from sdmx.model import Concept, ConceptScheme
 
 from item.common import paths
-
-
-def read_items(root: Dict, klass=Concept):
-    """Recursively read items and children."""
-    result = []
-
-    # Iterate over keys and children
-    for item_id, contents in root.items():
-        if item_id.startswith("_"):
-            # This child is an attribute value like _name
-            continue
-
-        # No children, _name, _description, etc.
-        contents = contents or {}
-
-        # Create an object
-        item = klass(
-            id=item_id,
-            name=contents.get("_name", item_id.title()),
-            description=contents.get("_description", {}),
-        )
-
-        unit = contents.get("_unit", None)
-        if unit:
-            item.annotations.append(
-                Annotation(id="unit", type="py:dict", text=repr(unit))
-            )
-
-        # Append to the result
-        result.append(item)
-
-        # Parse children recursively
-        for child in read_items(contents, klass):
-            item.append_child(child)
-            result.append(child)
-
-    return result
+from item.sdmx import generate
 
 
 def common_dim_dummies():
@@ -68,8 +32,7 @@ def common_dim_dummies():
 def add_unit(key: Dict, concept: Concept) -> None:
     """Add units to a key."""
     # Retrieve the unit information, stored by read_items()
-    anno = list(filter(lambda a: a.id == "unit", concept.annotations))
-    assert len(anno) == 1
+    anno = list(filter(lambda a: a.id == "preferred_unit", concept.annotations))[0]
     unit = eval(anno[0].text.localized_default(None))
 
     if isinstance(unit, str):
@@ -81,38 +44,6 @@ def add_unit(key: Dict, concept: Concept) -> None:
             if dim in key and key[dim] == value:
                 key["unit"] = unit
                 return
-
-
-def read_concepts_yaml(path: Path) -> Dict[str, ConceptScheme]:
-    """Read concepts from file.
-
-    See Also
-    --------
-    read_items
-    """
-    data = yaml.safe_load(open(path))
-
-    concept_schemes = []
-
-    for id, cs_data in data.items():
-        concept_schemes.append(ConceptScheme(id=id, items=read_items(cs_data, Concept)))
-
-    # Add common dimensions
-    concept_schemes.extend(common_dim_dummies())
-
-    # Reorganize as a dict
-    return {cs.id: cs for cs in concept_schemes}
-
-
-def read_measures_yaml(path: Path) -> ConceptScheme:
-    """Read measures from file.
-
-    See Also
-    --------
-    read_items
-    """
-    data = yaml.safe_load(open(path))
-    return ConceptScheme(id="measure", items=read_items(data))
 
 
 def collapse(row: pd.Series) -> pd.Series:
@@ -184,25 +115,21 @@ def name_for_id(concept_schemes: Dict, ids: List) -> Dict[str, Dict[str, str]]:
 def make_template(output_path: Path = None, verbose: bool = True):
     """Generate a data template.
 
-    Outputs files containing all keys specified in the :ref:`spec-yaml`. The
-    file is produced in two formats:
+    Outputs files containing all keys specified in the :ref:`spec-yaml`. The file is
+    produced in two formats:
 
     - :file:`template.csv`: comma-separated values.
     - :file:`template.xlsx`: Microsoft Excel.
 
-    An 'index' file is also created (:file:`index.csv`, :file:`index.xlsx`).
-    This file maps between 'Full dimensionality' keys (i.e. with all conceptual
-    dimensions), and the 'Template (reduced)' columns appearing in
-    :file:`template.csv`.
+    An 'index' file is also created (:file:`index.csv`, :file:`index.xlsx`). This file
+    maps between 'Full dimensionality' keys (i.e. with all conceptual dimensions), and
+    the 'Template (reduced)' columns appearing in :file:`template.csv`.
     """
-    # TODO Use SDMX constraints to filter on concepts that are parents of other
-    #      concepts
+    # TODO Use SDMX constraints to filter on concepts that are parents of other concepts
 
-    # Concepts (used as dimensions) and possible values
-    cs = read_concepts_yaml(paths["data"] / "concepts.yaml")
-
-    # Measures, annotated by their units
-    cs["measure"] = read_measures_yaml(paths["data"] / "measures.yaml")
+    sm = generate()
+    cs_measure = sm.concept_scheme["TRANSPORT_MEASURE"]
+    dsd = sm.structure["HISTORICAL"]
 
     # Common dimensions applied to all keys
     common_dims = ["model", "scenario", "region", "year"]
