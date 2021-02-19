@@ -20,8 +20,15 @@ def update_object(obj, properties):
         setattr(obj, name, value)
 
 
+@lru_cache()
 def generate() -> msg.StructureMessage:
-    """Return the SDMX data structures for iTEM data."""
+    """Return the SDMX data structures for iTEM data.
+
+    .. todo::
+       - Add ``REF_AREA`` and ``TIME_PERIOD`` dimensions with reference to
+         ``SDMX/CROSS_DOMAIN_CONCEPTS``.
+       - Add ``MODEL`` and ``SCENARIO`` dimensions to the DSD.
+    """
     sm = msg.StructureMessage(prepared=datetime.now())
 
     item = m.Agency(
