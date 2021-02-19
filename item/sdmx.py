@@ -7,7 +7,7 @@ from sdmx.model import Annotation, Code, Concept, ConceptScheme
 
 #: Current version of all data structures.
 #:
-#: .. todo: Allow a different version for each particular structure, e.g. code list.
+#: .. todo:: Allow a different version for each particular structure, e.g. code list.
 VERSION = "0.1"
 
 

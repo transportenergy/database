@@ -46,7 +46,7 @@ COLUMNS = dict(
 MAP = {
     "Type of vehicle": {
         # Columns to which the values should be assigned
-        "_columns": (column_name("TYPE"), column_name("VEHICLE")),
+        "_columns": (column_name("SERVICE"), column_name("VEHICLE")),
         # Key is the value appearing in the variable column; values are a tuple for the
         # two columns
         "New lorries (vehicle wt over 3500 kg)": ("Freight", "Heavy Truck"),
