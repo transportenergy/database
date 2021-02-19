@@ -1,4 +1,5 @@
 from datetime import datetime
+from functools import lru_cache
 
 import sdmx.message as msg
 import sdmx.model as m
