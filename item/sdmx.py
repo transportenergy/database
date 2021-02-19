@@ -126,7 +126,9 @@ CONCEPTS = {
             id="TYPE", name="Objects being transported, e.g. passengers or freight"
         ),
         Concept(id="MODE", name="Mode or medium of transport"),
-        Concept(id="VEHICLE", name="Type of transport vehicle"),
+        Concept(
+            id="VEHICLE", name="Vehicle type", description="Type of transport vehicle"
+        ),
         Concept(id="FUEL", name="Fuel or energy carrier for transport"),
         Concept(
             id="TECHNOLOGY",
