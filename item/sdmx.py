@@ -273,6 +273,7 @@ CONCEPT_SCHEMES = [
 ]
 
 CL_AUTOMATION = (
+    Code(id="_Z", name="Not applicable"),
     Code(id="HUMAN", name="Human", description="Vehicle operated by a human driver."),
     Code(
         id="AV", name="Automated", description="Fully-automated (self-driving) vehicle."
@@ -280,6 +281,7 @@ CL_AUTOMATION = (
 )
 
 CL_FLEET = (
+    Code(id="_Z", name="Not applicable"),
     Code(id="ALL", description="All vehicles in use in the reporting period."),
     Code(id="NEW", description="Only newly-sold vehicles in the reporting period."),
     Code(
@@ -291,6 +293,7 @@ CL_FLEET = (
 )
 
 CL_FUEL = (
+    Code(id="_Z", name="Not applicable"),
     Code(id="ALL", description="All fuels."),
     Code(
         id="LIQUID",
@@ -308,12 +311,14 @@ CL_FUEL = (
 )
 
 CL_LCA_SCOPE = (
+    Code(id="_Z", name="Not applicable"),
     Code(id="TTW", name="Tank-to-wheels"),
     Code(id="WTT", name="Well-to-tank"),
     Code(id="WTW", name="Well-to-wheels"),
 )
 
 CL_MODE = (
+    Code(id="_Z", name="Not applicable"),
     Code(id="ALL", name="All", description="All transport modes."),
     Code(id="AIR", name="Aviation"),
     Code(id="LAND", name="Land transport"),
@@ -323,6 +328,7 @@ CL_MODE = (
 )
 
 CL_OPERATOR = (
+    Code(id="_Z", name="Not applicable"),
     Code(
         id="OWN",
         name="Own-supplied",
@@ -342,6 +348,7 @@ CL_OPERATOR = (
 )
 
 CL_POLLUTANT = (
+    Code(id="_Z", name="Not applicable"),
     Code(
         id="GHG",
         name="GHG",
@@ -376,11 +383,13 @@ CL_POLLUTANT = (
 )
 
 CL_SERVICE = (
+    Code(id="_Z", name="Not applicable"),
     Code(id="P", name="Passenger"),
     Code(id="F", name="Freight"),
 )
 
 CL_VEHICLE = (
+    Code(id="_Z", name="Not applicable"),
     Code(id="ALL", description="All vehicle types."),
     Code(
         id="LDV",
