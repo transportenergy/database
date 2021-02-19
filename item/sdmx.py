@@ -2,12 +2,17 @@ from datetime import datetime
 
 import sdmx.message as msg
 import sdmx.model as m
-from sdmx.model import Code, Concept, ConceptScheme
+from sdmx.model import Annotation, Code, Concept, ConceptScheme
 
 #: Current version of all data structures.
 #:
 #: .. todo: Allow a different version for each particular structure, e.g. code list.
 VERSION = "0.1"
+
+
+def _units(mapping):
+    """Generate an annotation with preferred units."""
+    return dict(annotations=[Annotation(id="preferred_unit", text=repr(mapping))])
 
 
 def update_object(obj, properties):
@@ -157,27 +162,79 @@ CONCEPTS = {
                 "Amount of travel or transport by a person, vehicle, or collection of "
                 "these."
             ),
+            **_units(
+                {
+                    "TYPE == passenger": "10⁹ passenger-km / yr",
+                    "TYPE == freight": "10⁹ tonne-km / yr",
+                    # TODO distinguish "10⁹ vehicle-km / yr"
+                }
+            ),
         ),
-        Concept(id="ENERGY", name="Energy"),
-        Concept(id="ENERGY_INTENSITY", name="Energy intensity of activity"),
+        Concept(id="ENERGY", name="Energy", **_units("PJ / yr")),
         Concept(
-            id="EMISSION", name="Emission", description="Mass of a pollutant emitted."
+            id="ENERGY_INTENSITY",
+            name="Energy intensity of activity",
+            **_units("MJ / vehicle-km"),
         ),
-        Concept(id="GDP", name="Gross Domestic Product"),
+        Concept(
+            id="EMISSION",
+            name="Emission",
+            description="Mass of a pollutant emitted.",
+            **_units(
+                {
+                    "POLLUTANT == CO2": "10⁶ t CO₂ / yr",
+                    "POLLUTANT == GHG": "10⁶ t CO₂e / yr",
+                    "POLLUTANT == BC": "1O³ t BC / yr",
+                    "POLLUTANT == PM25": "1O³ t PM2.5 / yr",
+                }
+            ),
+        ),
+        Concept(
+            id="GDP", name="Gross Domestic Product", **_units("10⁹ USD(2005) / year")
+        ),
         Concept(
             id="LOAD_FACTOR",
             name="Load factor",
             description="Amount of activity provided per vehicle",
+            **_units(
+                {
+                    "TYPE == PASSENGER": "passenger / vehicle",
+                    "TYPE == FREIGHT": "tonne / vehicle",
+                }
+            ),
         ),
-        Concept(id="POPULATION", name="Population", description="i.e. of people."),
         Concept(
-            id="PRICE", name="Price", description="Market or fixed price for commodity."
+            id="POPULATION",
+            name="Population",
+            description="i.e. of people.",
+            **_units("10⁶ persons"),
         ),
         Concept(
-            id="SALES", name="Sales", description="New sales of vehicles in a period."
+            id="PRICE",
+            name="Price",
+            description="Market or fixed price for commodity.",
+            **_units(
+                {
+                    "POLLUTANT == CO2": "USD(2005) / t CO₂",
+                    "POLLUTANT == GHG": "USD(2005) / t CO₂e",
+                    "FUEL == GASOLINE": "USD(2005) / litre",
+                    "FUEL == DIESEL": "USD(2005) / litre",
+                    "FUEL == NG": "USD(2005) / litre",
+                    "FUEL == ELECTRICITY": "USD(2005) / kW-h",
+                }
+            ),
         ),
         Concept(
-            id="STOCK", name="Stock", description="Quantity of transport vehicles."
+            id="SALES",
+            name="Sales",
+            description="New sales of vehicles in a period.",
+            **_units("10⁶ vehicle / yr"),
+        ),
+        Concept(
+            id="STOCK",
+            name="Stock",
+            description="Quantity of transport vehicles.",
+            **_units("10⁶ vehicle"),
         ),
     ),
 }
