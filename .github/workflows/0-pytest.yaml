@@ -9,6 +9,7 @@ on:
 env:
   gcs_bucket: gcs:data.transportenergy.org/historical/ci/
   gcs_url: https://storage.googleapis.com/data.transportenergy.org/historical/ci/
+  RCLONE_CONFIG: ci/rclone.conf
 
 jobs:
   pytest:
@@ -58,7 +59,7 @@ jobs:
       uses: codecov/codecov-action@v1
 
     - name: Install rclone
-      if: ${{ matrix.run-diagnostics }}
+      if: ${{ startsWith(github.event.head.label, 'transportenergy:') && matrix.run-diagnostics }}
       env:
         service_account_json: ${{ secrets.GCS_SERVICE_ACCOUNT_1 }}
       run: |
@@ -70,23 +71,16 @@ jobs:
         ls -d rclone-v* > $GITHUB_PATH
         echo "$service_account_json" >ci/service-account-key.json
 
-    - env:
-        event_json: ${{ toJSON(github.event) }}
-      run: |
-        echo "${{ github.head_ref }}"
-        echo "${{ github.repository }}"
-        echo "$event_json"
-
     - name: Create diagnostics and upload to Google Cloud Storage
-      if: ${{ startsWith(github.head_ref, 'transportenergy/') && matrix.run-diagnostics }}
-      env:
-        RCLONE_CONFIG: ci/rclone.conf
+      # Only on PRs from the main repo
+      if: ${{ startsWith(github.event.head.label, 'transportenergy:') && matrix.run-diagnostics }}
       run: |
         item historical diagnostics output/
         rclone --progress copy output ${{ env.gcs_bucket }}${{ github.run_number }}/
 
     - uses: LouisBrunner/checks-action@v1.1.1
-      if: ${{ startsWith(github.head_ref, 'transportenergy/') && matrix.run-diagnostics }}
+      # Only on PRs from the main repo
+      if: ${{ startsWith(github.event.head.label, 'transportenergy:') && matrix.run-diagnostics }}
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         name: Upload historical database & diagnostics
