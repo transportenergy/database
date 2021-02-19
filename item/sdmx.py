@@ -2,12 +2,17 @@ from datetime import datetime
 
 import sdmx.message as msg
 import sdmx.model as m
-from sdmx.model import Code, Concept
+from sdmx.model import Code, Concept, ConceptScheme
 
 #: Current version of all data structures.
 #:
 #: .. todo: Allow a different version for each particular structure, e.g. code list.
 VERSION = "0.1"
+
+
+def update_object(obj, properties):
+    for name, value in properties.items():
+        setattr(obj, name, value)
 
 
 def generate() -> msg.StructureMessage:
@@ -37,21 +42,10 @@ def generate() -> msg.StructureMessage:
     sm.organisation_scheme[as_.id] = as_
     sm.header = msg.Header(sender=item)
 
-    cs0 = m.ConceptScheme(
-        id="TRANSPORT",
-        **ma_args,
-        description="Concepts used as dimensions or attributes for transport data.",
-    )
-    cs0.extend(CS_TRANSPORT)
-    sm.concept_scheme[cs0.id] = cs0
-
-    cs1 = m.ConceptScheme(
-        id="TRANSPORT_MEASURES",
-        **ma_args,
-        description="Concepts used as measures in transport data.",
-    )
-    cs1.extend(CS_TRANSPORT_MEASURES)
-    sm.concept_scheme[cs1.id] = cs1
+    for cs in CONCEPT_SCHEMES:
+        update_object(cs, ma_args)
+        cs.extend(CONCEPTS[cs.id])
+        sm.concept_scheme[cs.id] = cs
 
     for id, codes in CODELISTS.items():
         cl = m.Codelist(id=f"CL_{id}", **ma_args)
@@ -76,11 +70,9 @@ def generate() -> msg.StructureMessage:
             "FLEET"
         ).split()
     ):
+        concept = sm.concept_scheme["TRANSPORT"][concept_id]
         d = m.Dimension(
-            id=concept_id,
-            name=cs0[concept_id].name,
-            concept_identity=cs0[concept_id],
-            order=order,
+            id=concept_id, name=concept.name, concept_identity=concept, order=order
         )
         try:
             d.local_representation = m.Representation(
@@ -105,60 +97,101 @@ def generate() -> msg.StructureMessage:
     return sm
 
 
-#: Concepts for the ``iTEM:TRANSPORT`` concept scheme.
-CS_TRANSPORT = (
-    # Used as dimensions
-    Concept(id="TYPE", name="Objects being transported, e.g. passengers or freight"),
-    Concept(id="MODE", name="Mode or medium of transport"),
-    Concept(id="VEHICLE", name="Type of transport vehicle"),
-    Concept(id="FUEL", name="Fuel or energy carrier for transport"),
-    Concept(
-        id="TECHNOLOGY",
-        name="Powertrain technology",
-        description="Energy conversion technology used to power a motorized vehicle",
-    ),
-    Concept(
-        id="AUTOMATION", name="Degree of automation in operation of transport vehicles"
-    ),
-    Concept(id="OPERATOR", name="Entity operating a transport vehicle"),
-    Concept(id="POLLUTANT", name="Species of environmental pollutant"),
-    Concept(
-        id="LCA_SCOPE",
-        name="LCA scope",
-        description="Scope of analysis covered by a transport life-cycle measure",
-    ),
-    Concept(
-        id="FLEET",
-        description="Part of a fleet of transport vehicles, e.g. new versus used.",
-    ),
-)
-
-#: Concepts for the ``iTEM:TRANSPORT_MEASURES`` concept scheme.
-CS_TRANSPORT_MEASURES = (
-    Concept(
-        id="ACTIVITY",
-        name="Transport activity",
-        description=(
-            "Amount of travel or transport by a person, vehicle, or collection of "
-            "these."
+CONCEPTS = {
+    #: Concepts for the ``iTEM:TRANSPORT`` concept scheme.
+    "TRANSPORT": (
+        # Used as dimensions
+        Concept(
+            id="TYPE", name="Objects being transported, e.g. passengers or freight"
+        ),
+        Concept(id="MODE", name="Mode or medium of transport"),
+        Concept(id="VEHICLE", name="Type of transport vehicle"),
+        Concept(id="FUEL", name="Fuel or energy carrier for transport"),
+        Concept(
+            id="TECHNOLOGY",
+            name="Powertrain technology",
+            description=(
+                "Energy conversion technology used to power a motorized vehicle"
+            ),
+        ),
+        Concept(
+            id="AUTOMATION",
+            name="Degree of automation in operation of transport vehicles",
+        ),
+        Concept(id="OPERATOR", name="Entity operating a transport vehicle"),
+        Concept(id="POLLUTANT", name="Species of environmental pollutant"),
+        Concept(
+            id="LCA_SCOPE",
+            name="LCA scope",
+            description="Scope of analysis covered by a transport life-cycle measure",
+        ),
+        Concept(
+            id="FLEET",
+            description="Part of a fleet of transport vehicles, e.g. new versus used.",
         ),
     ),
-    Concept(id="ENERGY", name="Energy"),
-    Concept(id="ENERGY_INTENSITY", name="Energy intensity of activity"),
-    Concept(id="EMISSION", name="Emission", description="Mass of a pollutant emitted."),
-    Concept(id="GDP", name="Gross Domestic Product"),
-    Concept(
-        id="LOAD_FACTOR",
-        name="Load factor",
-        description="Amount of activity provided per vehicle",
+    "MODELING": (
+        Concept(
+            id="MODEL",
+            name="Model",
+            description="Name or other identifier of a model used to generate data.",
+        ),
+        Concept(
+            id="SCENARIO",
+            name="Scenario",
+            description=(
+                "Name or other identifier of a specific configuration of a model."
+            ),
+        ),
     ),
-    Concept(id="POPULATION", name="Population", description="i.e. of people."),
-    Concept(
-        id="PRICE", name="Price", description="Market or fixed price for commodity."
+    "TRANSPORT_MEASURE": (
+        Concept(
+            id="ACTIVITY",
+            name="Transport activity",
+            description=(
+                "Amount of travel or transport by a person, vehicle, or collection of "
+                "these."
+            ),
+        ),
+        Concept(id="ENERGY", name="Energy"),
+        Concept(id="ENERGY_INTENSITY", name="Energy intensity of activity"),
+        Concept(
+            id="EMISSION", name="Emission", description="Mass of a pollutant emitted."
+        ),
+        Concept(id="GDP", name="Gross Domestic Product"),
+        Concept(
+            id="LOAD_FACTOR",
+            name="Load factor",
+            description="Amount of activity provided per vehicle",
+        ),
+        Concept(id="POPULATION", name="Population", description="i.e. of people."),
+        Concept(
+            id="PRICE", name="Price", description="Market or fixed price for commodity."
+        ),
+        Concept(
+            id="SALES", name="Sales", description="New sales of vehicles in a period."
+        ),
+        Concept(
+            id="STOCK", name="Stock", description="Quantity of transport vehicles."
+        ),
     ),
-    Concept(id="SALES", name="Sales", description="New sales of vehicles in a period."),
-    Concept(id="STOCK", name="Stock", description="Quantity of transport vehicles."),
-)
+}
+
+#: Concept schemes.
+CONCEPT_SCHEMES = [
+    ConceptScheme(
+        id="TRANSPORT",
+        description="Concepts used as dimensions or attributes for transport data.",
+    ),
+    ConceptScheme(
+        id="MODELING",
+        description="Concepts related to model-based research & assessment.",
+    ),
+    ConceptScheme(
+        id="TRANSPORT_MEASURE",
+        description="Concepts used as measures in transport data.",
+    ),
+]
 
 CL_LCA_SCOPE = (
     Code(id="TTW", name="Tank-to-wheels"),
