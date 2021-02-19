@@ -121,6 +121,17 @@ T003
       :language: yaml
       :lines: 32-40
 
+T004
+----
+
+.. currentmodule:: item.historical.scripts.T004
+
+.. automodule:: item.historical.scripts.T004
+   :members:
+
+   .. literalinclude:: ../item/data/historical/sources.yaml
+      :language: yaml
+      :lines: 42-45
 
 T009
 ----

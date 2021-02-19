@@ -8,7 +8,7 @@ import pycountry
 import yaml
 
 from item.common import paths
-from item.historical.scripts import T000, T001, T003, T009
+from item.historical.scripts import T000, T001, T003, T004, T009
 from item.historical.scripts.util.managers.dataframe import ColumnName
 from item.remote import OpenKAPSARC, get_sdmx
 
@@ -22,7 +22,6 @@ SCRIPTS = [
     # 'T001',
     "T002",
     # "T003",
-    "T004",
     "T005",
     "T006",
     "T007",
@@ -30,7 +29,13 @@ SCRIPTS = [
 ]
 
 #: Submodules usable with :func:`process`.
-MODULES = {0: T000, 1: T001, 3: T003, 9: T009}
+MODULES = {
+    0: T000,
+    1: T001,
+    3: T003,
+    4: T004,
+    9: T009,
+}
 
 #: Path for output from :func:`process`.
 OUTPUT_PATH = paths["data"] / "historical" / "output"
@@ -43,6 +48,7 @@ COUNTRY_NAME = {
     "Bosnia-Herzegovina": "Bosnia and Herzegovina",
     "Korea": "Korea, Republic of",
     "Serbia, Republic of": "Serbia",
+    "The former Yugoslav Republic of Macedonia": "North Macedonia",
 }
 
 
@@ -77,16 +83,28 @@ def cache_results(id_str, df):
     df.to_csv(path, index=False)
     log.info(f"Write {path}")
 
-    # Pivot to wide format ('user friendly view') and write to CSV
+    # Pivot to wide format ('user friendly view')
+
+    # Columns for wide format
+    columns = [col.value for col in ColumnName if col != ColumnName.VALUE]
+
+    duplicates = df.duplicated(subset=columns, keep=False)
+    if duplicates.any():
+        log.warning("Processing produced non-unique keys; no -wide output")
+        log.info("(Use log level DEBUG for details)")
+        log.debug(df[duplicates])
+        return
+
+    # Write wide format
     path = OUTPUT_PATH / f"{id_str}-clean-wide.csv"
 
     # - Set all columns but 'Value' as the index → pd.Series with MultiIndex.
     # - 'Unstack' the 'Year' dimension to columns, i.e. wide format.
     # - Return the index to columns in the dataframe.
     # - Write to file.
-    df.set_index([ev.value for ev in ColumnName if ev != ColumnName.VALUE]).unstack(
-        ColumnName.YEAR.value
-    ).reset_index().to_csv(path, index=False)
+    df.set_index(columns).unstack(ColumnName.YEAR.value).reset_index().to_csv(
+        path, index=False
+    )
     log.info(f"Write {path}")
 
 
@@ -152,21 +170,19 @@ def process(id):
     Performs the following common processing steps:
 
     1. Load the data from cache.
-    2. Load a module defining dataset-specific processing steps. This module
-       is in a file named e.g. :file:`T001.py`.
-    3. Call the dataset's (optional) :meth:`check` method. This method receives
-       the input data frame as an argument, and can make one or more assertions
-       to ensure the data is in the expected format.
-    4. Drop columns in the dataset's (optional) :data:`COLUMNS['drop']`
-       :class:`list`.
-    5. Call the dataset-specific (required) :meth:`process` method. This method
-       receives the data frame from step (4), and performs any additional
-       processing.
-    6. Assign ISO 3166 alpha-3 codes and the iTEM region based on a column
-       containing country names; either :data:`COLUMNS['country_name']` or the
-       default, 'Country'. See :meth:`iso_and_region`.
-    7. Assign common dimensions from the dataset's (optional)
-       :data:`COMMON_DIMS` :class:`dict`.
+    2. Load a module defining dataset-specific processing steps. This module is in a
+       file named e.g. :file:`T001.py`.
+    3. Call the dataset's (optional) :meth:`check` method. This method receives the
+       input data frame as an argument, and can make one or more assertions to ensure
+       the data is in the expected format.
+    4. Drop columns in the dataset's (optional) :data:`COLUMNS['drop']` :class:`list`.
+    5. Call the dataset-specific (required) :meth:`process` method. This method receives
+       the data frame from step (4), and performs any additional processing.
+    6. Assign ISO 3166 alpha-3 codes and the iTEM region based on a column containing
+       country names; either :data:`COLUMNS['country_name']` or the default, 'Country'.
+       See :meth:`iso_and_region`.
+    7. Assign common dimensions from the dataset's (optional) :data:`COMMON_DIMS`
+       :class:`dict`.
     8. Order columns according to :class:`.ColumnName`.
     9. Output data to two files. See :meth:`cache_results`.
 
@@ -196,7 +212,7 @@ def process(id):
         path = paths["historical input"] / f"{id_str}_input.csv"
 
     # Read the data
-    df = pd.read_csv(path)
+    df = pd.read_csv(path, sep=getattr(dataset_module, "CSV_SEP", ","))
 
     try:
         # Check that the input data is of the form expected by process()

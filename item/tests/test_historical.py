@@ -71,7 +71,7 @@ def test_input_file(item_tmp_dir):
     assert input_file(1) == paths["historical input"] / "T001_foo.csv"
 
 
-@pytest.mark.parametrize("dataset_id", [0, 1, 3, 9])
+@pytest.mark.parametrize("dataset_id", [0, 1, 3, 4, 9])
 def test_process(dataset_id):
     """Test common interface for processing scripts."""
     # Always use the path from within the repo
@@ -108,7 +108,8 @@ def test_A003():
     result = A003.compute(activity, stock)
 
     # Number of unique values computed
-    assert len(result) == 929
+    # TODO make this more flexible/robust to changes in the upstream data
+    assert 954 <= len(result)
 
     # A specific value is present and as expected
     obs = result.query("`ISO Code` == 'USA' and Year == 2015")["Value"].squeeze()

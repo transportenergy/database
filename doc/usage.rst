@@ -54,7 +54,7 @@ For instance::
 
 .. _reticulate:
 
-From **R** code, use `reticulate <https://rstudio.github.io/reticulate/>`_ package to access the Python API:
+From **R** code, use the `reticulate <https://rstudio.github.io/reticulate/>`__ package to access the Python API:
 
 .. code-block:: R
 
