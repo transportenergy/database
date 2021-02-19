@@ -84,8 +84,8 @@ def generate() -> msg.StructureMessage:
     )
     for order, concept_id in enumerate(
         (
-            "TYPE MODE VEHICLE FUEL TECHNOLOGY AUTOMATION OPERATOR POLLUTANT LCA_SCOPE "
-            "FLEET"
+            "SERVICE MODE VEHICLE FUEL TECHNOLOGY AUTOMATION OPERATOR POLLUTANT "
+            "LCA_SCOPE FLEET"
         ).split()
     ):
         concept = sm.concept_scheme["TRANSPORT"][concept_id]
@@ -123,7 +123,11 @@ CONCEPTS = {
     "TRANSPORT": (
         # Used as dimensions
         Concept(
-            id="TYPE", name="Objects being transported, e.g. passengers or freight"
+            id="SERVICE",
+            name="Service",
+            description=(
+                "Type of transport service e.g. transport of passengers or of freight."
+            ),
         ),
         Concept(id="MODE", name="Mode or medium of transport"),
         Concept(
@@ -177,8 +181,8 @@ CONCEPTS = {
             ),
             **_units(
                 {
-                    "TYPE == passenger": "10⁹ passenger-km / yr",
-                    "TYPE == freight": "10⁹ tonne-km / yr",
+                    "SERVICE == passenger": "10⁹ passenger-km / yr",
+                    "SERVICE == freight": "10⁹ tonne-km / yr",
                     # TODO distinguish "10⁹ vehicle-km / yr"
                 }
             ),
@@ -211,8 +215,8 @@ CONCEPTS = {
             description="Amount of activity provided per vehicle",
             **_units(
                 {
-                    "TYPE == PASSENGER": "passenger / vehicle",
-                    "TYPE == FREIGHT": "tonne / vehicle",
+                    "SERVICE == PASSENGER": "passenger / vehicle",
+                    "SERVICE == FREIGHT": "tonne / vehicle",
                 }
             ),
         ),
@@ -371,7 +375,7 @@ CL_POLLUTANT = (
     ),
 )
 
-CL_TYPE = (
+CL_SERVICE = (
     Code(id="P", name="Passenger"),
     Code(id="F", name="Freight"),
 )
@@ -397,6 +401,6 @@ CODELISTS = {
     "MODE": CL_MODE,
     "OPERATOR": CL_OPERATOR,
     "POLLUTANT": CL_POLLUTANT,
-    "TYPE": CL_TYPE,
+    "SERVICE": CL_SERVICE,
     "VEHICLE": CL_VEHICLE,
 }
