@@ -3,6 +3,7 @@ from functools import lru_cache
 
 import sdmx.message as msg
 import sdmx.model as m
+from sdmx import Client
 from sdmx.model import Annotation, Code, Concept, ConceptScheme
 
 #: Current version of all data structures.
@@ -22,12 +23,18 @@ def update_object(obj, properties):
 
 
 @lru_cache()
+def get_cdc():
+    """Retrieve the ``CROSS_DOMAIN_CONCEPTS`` from the SDMX Global Registry."""
+    id = "CROSS_DOMAIN_CONCEPTS"
+    msg = Client("SGR").conceptscheme(id)
+    return msg.concept_scheme[id]
+
+
+@lru_cache()
 def generate() -> msg.StructureMessage:
     """Return the SDMX data structures for iTEM data.
 
     .. todo::
-       - Add ``REF_AREA`` and ``TIME_PERIOD`` dimensions with reference to
-         ``SDMX/CROSS_DOMAIN_CONCEPTS``.
        - Add ``MODEL`` and ``SCENARIO`` dimensions to the DSD.
     """
     sm = msg.StructureMessage(prepared=datetime.now())
@@ -82,23 +89,40 @@ def generate() -> msg.StructureMessage:
             "are valid for the relevant measure(s)."
         ),
     )
+
+    # Retrieve the CROSS_DOMAIN_CONCEPTS scheme from the SDMX Global Registry
+    cdc = get_cdc()
+
+    # Add dimensions to the HISTORICAL data structure
     for order, concept_id in enumerate(
         (
             "SERVICE MODE VEHICLE FUEL TECHNOLOGY AUTOMATION OPERATOR POLLUTANT "
-            "LCA_SCOPE FLEET"
+            "LCA_SCOPE FLEET REF_AREA TIME_PERIOD"
         ).split()
     ):
-        concept = sm.concept_scheme["TRANSPORT"][concept_id]
+        # Local the corresponding concept in one of three concept schemes
+        concept = None
+        for cs in (sm.concept_scheme["TRANSPORT"], sm.concept_scheme["MODELING"], cdc):
+            try:
+                concept = cs[concept_id]
+            except KeyError:
+                continue
+        if concept is None:
+            raise KeyError(concept_id)
+
+        # Create the dimension, referring to the concept
         d = m.Dimension(
             id=concept_id, name=concept.name, concept_identity=concept, order=order
         )
+
         try:
+            # The dimension is represented by the corresponding code list, if any
             d.local_representation = m.Representation(
                 enumerated=sm.codelist[f"CL_{concept_id}"]
             )
         except KeyError:
-            # No codelist for this concept
-            pass
+            pass  # No codelist for this concept
+
         dsd0.dimensions.append(d)
 
     # Also add the measure dimension
