@@ -94,9 +94,15 @@ def generate() -> msg.StructureMessage:
         update_object(dsd, ma_args)
 
         # Pop an annotation and use it to produce a list of dimension IDs (see below)
-        dims_annotation = dsd.annotations.pop(-1)
-        assert "_dimensions" == dims_annotation.id
-        dims = dims_annotation.text.localized_default().split()
+        try:
+            dims_annotation = dsd.annotations.pop(-1)
+            assert "_dimensions" == dims_annotation.id
+            dims = dims_annotation.text.localized_default().split()
+        except IndexError:
+            dims = []
+
+        # Add common dimensions
+        dims = dims + ["REF_AREA", "TIME_PERIOD"]
 
         # Add dimensions to the data structure
         for order, concept_id in enumerate(dims):
@@ -439,6 +445,8 @@ CODELISTS = {
 
 #: Main iTEM data structures.
 DATA_STRUCTURES = (
+    DataStructureDefinition(id="GDP"),
+    DataStructureDefinition(id="POPULATION"),
     DataStructureDefinition(
         id="HISTORICAL",
         description=(
@@ -451,7 +459,7 @@ DATA_STRUCTURES = (
         ),
         **_dims(
             "VARIABLE SERVICE MODE VEHICLE FUEL TECHNOLOGY AUTOMATION OPERATOR "
-            "POLLUTANT LCA_SCOPE FLEET REF_AREA TIME_PERIOD"
+            "POLLUTANT LCA_SCOPE FLEET"
         ),
     ),
     DataStructureDefinition(
@@ -466,7 +474,7 @@ DATA_STRUCTURES = (
         ),
         **_dims(
             "MODEL SCENARIO VARIABLE SERVICE MODE VEHICLE FUEL TECHNOLOGY AUTOMATION "
-            "OPERATOR POLLUTANT LCA_SCOPE FLEET REF_AREA TIME_PERIOD"
+            "OPERATOR POLLUTANT LCA_SCOPE FLEET"
         ),
     ),
 )
