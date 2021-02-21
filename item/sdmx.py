@@ -10,10 +10,7 @@ from sdmx.model import (
     Code,
     Concept,
     ConceptScheme,
-    ConstraintRole,
-    ConstraintRoleType,
     ContentConstraint,
-    DataKeySet,
     DataStructureDefinition,
 )
 
@@ -160,8 +157,7 @@ def generate() -> msg.StructureMessage:
 
     for c in CONSTRAINTS:
         # Look up the object that is constrained
-        content_id = _pop_anno(c, "_content")
-        dsd = sm.structure[content_id]
+        dsd = sm.structure[c.id]
 
         # Update the constraint with a reference to the DSD
         c.content.add(dsd)
@@ -170,14 +166,17 @@ def generate() -> msg.StructureMessage:
         dck = _pop_anno(c, "_data_content_keys")
 
         # Convert into SDMX objects
-        for dim_id, value in dck.items():
+        c.data_content_keys = m.DataKeySet(included=True, keys=[])
+        for dim_id, values in dck.items():
             dim = dsd.dimensions.get(dim_id)
-            c.data_content_keys.keys.append(
-                m.DataKey(
-                    key_value={dim: m.ComponentValue(value_for=dim, value=value)},
-                    included=True,
+
+            for value in values:
+                c.data_content_keys.keys.append(
+                    m.DataKey(
+                        key_value={dim: m.ComponentValue(value_for=dim, value=value)},
+                        included=True,
+                    )
                 )
-            )
 
         # Add the Constraints to the StructureMessage
         sm.constraint[c.id] = c
@@ -487,7 +486,11 @@ CODELISTS = {
 DATA_STRUCTURES = (
     DataStructureDefinition(id="GDP"),
     DataStructureDefinition(id="POPULATION"),
+    DataStructureDefinition(id="PRICE_FUEL", **_annotate(_dimensions="FUEL")),
     DataStructureDefinition(id="PRICE_POLLUTANT", **_annotate(_dimensions="POLLUTANT")),
+    DataStructureDefinition(
+        id="LOAD_FACTOR", **_annotate(_dimensions="SERVICE MODE VEHICLE")
+    ),
     DataStructureDefinition(
         id="HISTORICAL",
         description=(
@@ -524,14 +527,19 @@ DATA_STRUCTURES = (
     ),
 )
 
+_allowable = m.ConstraintRole(role=m.ConstraintRoleType.allowable)
+
+
 #: Constraints applying to DSDs.
 CONSTRAINTS = (
     ContentConstraint(
+        id="PRICE_FUEL",
+        role=_allowable,
+        **_annotate(_data_content_keys={"FUEL": ["GASOLINE", "DIESEL", "ELECTRICITY"]}),
+    ),
+    ContentConstraint(
         id="PRICE_POLLUTANT",
-        role=ConstraintRole(role=ConstraintRoleType.allowable),
-        data_content_keys=DataKeySet(included=True, keys=[]),
-        **_annotate(
-            _data_content_keys={"POLLUTANT": "GHG"}, _content="PRICE_POLLUTANT"
-        ),
+        role=_allowable,
+        **_annotate(_data_content_keys={"POLLUTANT": ["GHG"]}),
     ),
 )
