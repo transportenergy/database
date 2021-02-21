@@ -1,15 +1,21 @@
+from collections import ChainMap
 from datetime import datetime
 from functools import lru_cache
 
 import sdmx.message as msg
 import sdmx.model as m
 from sdmx import Client
-from sdmx.model import Annotation, Code, Concept, ConceptScheme
+from sdmx.model import Annotation, Code, Concept, ConceptScheme, DataStructureDefinition
 
 #: Current version of all data structures.
 #:
 #: .. todo:: Allow a different version for each particular structure, e.g. code list.
 VERSION = "0.1"
+
+
+def _dims(text):
+    """Generate an annotation with dimensions."""
+    return dict(annotations=[Annotation(id="_dimensions", text=text)])
 
 
 def _units(mapping):
@@ -32,11 +38,7 @@ def get_cdc():
 
 @lru_cache()
 def generate() -> msg.StructureMessage:
-    """Return the SDMX data structures for iTEM data.
-
-    .. todo::
-       - Add ``MODEL`` and ``SCENARIO`` dimensions to the DSD.
-    """
+    """Return the SDMX data structures for iTEM data."""
     sm = msg.StructureMessage(prepared=datetime.now())
 
     item = m.Agency(
@@ -77,67 +79,64 @@ def generate() -> msg.StructureMessage:
 
         sm.codelist[cl.id] = cl
 
-    dsd0 = m.DataStructureDefinition(
-        id="HISTORICAL",
-        **ma_args,
-        description=(
-            "Structure of the 'unified' iTEM historical transport data. This DSD has "
-            "all possible dimensions, regardless of whether a particular measure "
-            "(represented in the 'VARIABLE' dimension) is relevant for that measure. "
-            "In the future, the historical data will be provided via multiple data "
-            "flows, each with a distinct structure that reflects the dimensions that "
-            "are valid for the relevant measure(s)."
-        ),
-    )
-
     # Retrieve the CROSS_DOMAIN_CONCEPTS scheme from the SDMX Global Registry
     cdc = get_cdc()
 
-    # Add dimensions to the HISTORICAL data structure
-    for order, concept_id in enumerate(
-        (
-            "SERVICE MODE VEHICLE FUEL TECHNOLOGY AUTOMATION OPERATOR POLLUTANT "
-            "LCA_SCOPE FLEET REF_AREA TIME_PERIOD"
-        ).split()
-    ):
-        # Local the corresponding concept in one of three concept schemes
-        concept = None
-        for cs in (sm.concept_scheme["TRANSPORT"], sm.concept_scheme["MODELING"], cdc):
-            try:
-                concept = cs[concept_id]
-            except KeyError:
-                continue
-        if concept is None:
-            raise KeyError(concept_id)
-
-        # Create the dimension, referring to the concept
-        d = m.Dimension(
-            id=concept_id, name=concept.name, concept_identity=concept, order=order
-        )
-
-        try:
-            # The dimension is represented by the corresponding code list, if any
-            d.local_representation = m.Representation(
-                enumerated=sm.codelist[f"CL_{concept_id}"]
-            )
-        except KeyError:
-            pass  # No codelist for this concept
-
-        dsd0.dimensions.append(d)
-
-    # Also add the measure dimension
-    dsd0.dimensions.append(
-        m.MeasureDimension(
-            id="VARIABLE",
-            name="Measure",
-            description="Reference to a concept from CL_TRANSPORT_MEASURES.",
-            local_representation=m.Representation(
-                enumerated=sm.concept_scheme["TRANSPORT_MEASURE"]
-            ),
-        )
+    # Concepts for each dimension of each DSD
+    dsd_concepts = ChainMap(
+        sm.concept_scheme["TRANSPORT"],
+        sm.concept_scheme["MODELING"],
+        cdc,
     )
 
-    sm.structure[dsd0.id] = dsd0
+    for dsd in DATA_STRUCTURES:
+        # Set the maintainer etc.
+        update_object(dsd, ma_args)
+
+        # Pop an annotation and use it to produce a list of dimension IDs (see below)
+        dims_annotation = dsd.annotations.pop(-1)
+        assert "_dimensions" == dims_annotation.id
+        dims = dims_annotation.text.localized_default().split()
+
+        # Add dimensions to the data structure
+        for order, concept_id in enumerate(dims):
+            # Locate the corresponding concept in one of three concept schemes
+            concept = dsd_concepts.get(concept_id)
+
+            if concept_id == "VARIABLE":
+                d = m.MeasureDimension(
+                    id="VARIABLE",
+                    name="Measure",
+                    description="Reference to a concept from CL_TRANSPORT_MEASURES.",
+                    local_representation=m.Representation(
+                        enumerated=sm.concept_scheme["TRANSPORT_MEASURE"]
+                    ),
+                )
+            elif concept is None:
+                raise KeyError(concept_id)
+            else:
+                # Create the dimension, referring to the concept
+                d = m.Dimension(
+                    id=concept_id,
+                    name=concept.name,
+                    concept_identity=concept,
+                    order=order,
+                )
+
+                try:
+                    # The dimension is represented by the corresponding code list, if
+                    # any
+                    d.local_representation = m.Representation(
+                        enumerated=sm.codelist[f"CL_{concept_id}"]
+                    )
+                except KeyError:
+                    pass  # No iTEM codelist for this concept
+
+            # Append this dimension
+            dsd.dimensions.append(d)
+
+        # Add the DSD to the StructureMessage
+        sm.structure[dsd.id] = dsd
 
     return sm
 
@@ -437,3 +436,37 @@ CODELISTS = {
     "SERVICE": CL_SERVICE,
     "VEHICLE": CL_VEHICLE,
 }
+
+#: Main iTEM data structures.
+DATA_STRUCTURES = (
+    DataStructureDefinition(
+        id="HISTORICAL",
+        description=(
+            "Structure of the 'unified' iTEM historical transport data.\n\n"
+            "This DSD has all possible dimensions, regardless of whether a particular "
+            "measure (represented in the 'VARIABLE' dimension) is relevant for that "
+            "measure. In the future, multiple data flows will be specified, each with a"
+            "distinct structure that reflects the dimensions that are valid for the "
+            "relevant measure(s)."
+        ),
+        **_dims(
+            "VARIABLE SERVICE MODE VEHICLE FUEL TECHNOLOGY AUTOMATION OPERATOR "
+            "POLLUTANT LCA_SCOPE FLEET REF_AREA TIME_PERIOD"
+        ),
+    ),
+    DataStructureDefinition(
+        id="MODEL",
+        description=(
+            "Structure of for iTEM model intercomparison data.\n\n"
+            "This DSD has all possible dimensions, regardless of whether a particular "
+            "measure (represented in the 'VARIABLE' dimension) is relevant for that "
+            "measure. In the future, multiple data flows will be specified, each with a"
+            "distinct structure that reflects the dimensions that are valid for the "
+            "relevant measure(s)."
+        ),
+        **_dims(
+            "MODEL SCENARIO VARIABLE SERVICE MODE VEHICLE FUEL TECHNOLOGY AUTOMATION "
+            "OPERATOR POLLUTANT LCA_SCOPE FLEET REF_AREA TIME_PERIOD"
+        ),
+    ),
+)
