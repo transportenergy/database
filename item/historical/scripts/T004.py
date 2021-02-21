@@ -45,8 +45,8 @@ COLUMNS = dict(
 #: Mapping between existing values and values to be assigned.
 MAP = {
     "Type of vehicle": {
-        # Columns to which the values should be assigned
-        "_columns": (column_name("SERVICE"), column_name("VEHICLE")),
+        # Dimensions to which the values should be assigned
+        "_dims": ("SERVICE", "VEHICLE"),
         # Key is the value appearing in the variable column; values are a tuple for the
         # two columns
         "New lorries (vehicle wt over 3500 kg)": ("Freight", "Heavy Truck"),
@@ -56,7 +56,7 @@ MAP = {
         "New light goods vehicles": ("Freight", "Light Truck"),
     },
     "Fuel type": {
-        "_columns": (column_name("TECHNOLOGY"), column_name("FUEL")),
+        "_dims": ("TECHNOLOGY", "FUEL"),
         "- LPG": ("Natural Gas Vehicle", "Natural Gas"),
         "- Compressed natural gas (CNG)": ("Natural Gas Vehicle", "Natural Gas"),
         "- Liquefied natural gas (LNG)": ("Natural Gas Vehicle", "Natural Gas"),
@@ -96,4 +96,6 @@ def process(df):
 @lru_cache()
 def map_column(value, column):
     """Apply mapping to `value` in `column`."""
-    return pd.Series(MAP[column][value], index=MAP[column]["_columns"])
+    return pd.Series(
+        MAP[column][value], index=list(map(column_name, MAP[column]["_dims"]))
+    )
