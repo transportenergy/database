@@ -482,8 +482,37 @@ CODELISTS = {
     "VEHICLE": CL_VEHICLE,
 }
 
+
 #: Main iTEM data structures.
 DATA_STRUCTURES = (
+    DataStructureDefinition(
+        id="ACTIVITY",
+        description="Activity in terms of quantity of service provided.",
+        **_annotate(_dimensions="SERVICE MODE VEHICLE TECHNOLOGY AUTOMATION OPERATOR"),
+    ),
+    DataStructureDefinition(
+        id="ACTIVITY_VEHICLE",
+        description="Activity of transport vehicles.",
+        **_annotate(_dimensions="SERVICE MODE VEHICLE TECHNOLOGY AUTOMATION OPERATOR"),
+    ),
+    DataStructureDefinition(
+        id="EMISSIONS",
+        **_annotate(
+            _dimensions="SERVICE MODE VEHICLE TECHNOLOGY FUEL POLLUTANT LCA_SCOPE"
+        ),
+    ),
+    DataStructureDefinition(
+        id="ENERGY",
+        description=(
+            "Observations measure the total energy consumed by the vehicles per year "
+            "during the TIME_PERIOD."
+        ),
+        **_annotate(_dimensions="SERVICE MODE VEHICLE TECHNOLOGY FLEET"),
+    ),
+    DataStructureDefinition(
+        id="ENERGY_INTENSITY",
+        **_annotate(_dimensions="SERVICE MODE VEHICLE TECHNOLOGY FLEET"),
+    ),
     DataStructureDefinition(id="GDP"),
     DataStructureDefinition(id="POPULATION"),
     DataStructureDefinition(id="PRICE_FUEL", **_annotate(_dimensions="FUEL")),
@@ -550,7 +579,65 @@ _allowable = m.ConstraintRole(role=m.ConstraintRoleType.allowable)
 
 
 #: Constraints applying to DSDs.
+#:
+#: .. todo:: Add the following general constraints from the former :file:`spec.yaml`:
+#:
+#:    General
+#:
+#:    - Vehicle types are only relevant for road modes
+#:      ``mode != 'road' and vehicle != 'all'``
+#:    - Vehicle types for freight only
+#:      ``type == 'passenger' and vehicle == 'truck'``
+#:    - Vehicle types for passengers only
+#:      ``type == 'freight' and vehicle in ['ldv', 'bus', '2w+3w']``
+#:    - Air freight is (largely) provided as a byproduct of passenger service; most
+#:      models do not include it separately
+#:      ``type == 'freight' and mode == 'air'``
+#:    - Assume hybrid and fuel cell technologies not used for air, rail, water, or small
+#:      road vehicles
+#:      ``mode in ['air', 'rail', 'water'] and technology in ['hybrid', 'fc']``
+#:      ``vehicle == '2w+3w' and technology in ['hybrid', 'fc']``
+#:    - Combustion powertrains do not take electricity as an input
+#:      ``technology == 'combustion' and fuel == 'electricity'``
+#:    - Fuel cell powertrains take only hydrogen as an input
+#:      ``technology == 'fc' and fuel != 'hydrogen'``
+#:    - Electric powertrains take only electricity as an input
+#:      ``technology == 'electric' and fuel != 'electricity'``
+#:    - Shared and automated vehicles only relevant for LDVs
+#:      ``vehicle != ['ldv'] and automation == 'av'``
+#:      ``vehicle == '2w+3w' and operator == 'hire'``
+#:      ``vehicle not in ['ldv', '2w+3w'] and operator == 'own'``
+#:
+#:    Applying to ``ACTIVITY`` and ``ACTIVITY_VEH``:
+#:
+#:    - Omit sums by technology across modes
+#:      ``mode == 'all' and technology != 'all'``
+#:
+#:    Applying to ``EMISSIONS``:
+#:
+#:    - No use-phase emissions from electricity
+#:      ``lca_scope == 'ttw' and fuel == 'electricity'``
+#:    - Not concerned with e.g. HFC emissions from refrigerants, or CH₄ emissions at
+#:      service stations; typically assigned to non-transport sectors even in models
+#:      that include them.
+#:      ``lca_scope == 'wtt'``
+#:      ``lca_scope == 'wtw' and technology != 'all'``
+#:    - No totals across AQ species
+#:      ``pollutant == 'aq'``
+#:    - Only use-phase emissions of air quality pollutants
+#:      ``pollutant in ['bc', 'nox', 'pm25', 'so2'] and lca_scope != 'ttw'``
 CONSTRAINTS = (
+    ContentConstraint(
+        id="ENERGY_INTENSITY",
+        description=(
+            "The current item:ENERGY_INTENSITY data structure excludes the intensity of"
+            " transport service provided with used vehicles. This quantity can be "
+            "computed from the intensities for the entire FLEET and for new vehicles "
+            "only."
+        ),
+        role=_allowable,
+        **_annotate(_data_content_keys={"FLEET": ["ALL", "NEW"]}),
+    ),
     ContentConstraint(
         id="PRICE_FUEL",
         role=_allowable,
