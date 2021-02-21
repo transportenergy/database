@@ -489,7 +489,22 @@ DATA_STRUCTURES = (
     DataStructureDefinition(id="PRICE_FUEL", **_annotate(_dimensions="FUEL")),
     DataStructureDefinition(id="PRICE_POLLUTANT", **_annotate(_dimensions="POLLUTANT")),
     DataStructureDefinition(
-        id="LOAD_FACTOR", **_annotate(_dimensions="SERVICE MODE VEHICLE")
+        id="LOAD_FACTOR",
+        description=(
+            "The current version of this structure does not distinguish by powertrain "
+            "technology. Implicitly TECHNOLOGY is 'ALL', so the observations measure "
+            "the average load factor across all powertrain technologies."
+        ),
+        **_annotate(_dimensions="SERVICE MODE VEHICLE"),
+    ),
+    DataStructureDefinition(
+        id="STOCK",
+        description=(
+            "The current version of this structure does not distinguish by FLEET. "
+            "Implicitly FLEET is 'ALL', so the observations measure the total of new "
+            "and used vehicles."
+        ),
+        **_annotate(_dimensions="SERVICE MODE VEHICLE TECHNOLOGY"),
     ),
     DataStructureDefinition(
         id="HISTORICAL",
@@ -541,5 +556,14 @@ CONSTRAINTS = (
         id="PRICE_POLLUTANT",
         role=_allowable,
         **_annotate(_data_content_keys={"POLLUTANT": ["GHG"]}),
+    ),
+    ContentConstraint(
+        id="STOCK",
+        description=(
+            "The current iTEM:STOCK data structure is only specified for road transport"
+            " vehicles. It excludes e.g. stock of aircraft or ships."
+        ),
+        role=_allowable,
+        **_annotate(_data_content_keys={"MODE": ["ROAD"]}),
     ),
 )
