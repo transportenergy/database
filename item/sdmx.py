@@ -5,7 +5,17 @@ from functools import lru_cache
 import sdmx.message as msg
 import sdmx.model as m
 from sdmx import Client
-from sdmx.model import Annotation, Code, Concept, ConceptScheme, DataStructureDefinition
+from sdmx.model import (
+    Annotation,
+    Code,
+    Concept,
+    ConceptScheme,
+    ConstraintRole,
+    ConstraintRoleType,
+    ContentConstraint,
+    DataKeySet,
+    DataStructureDefinition,
+)
 
 #: Current version of all data structures.
 #:
@@ -13,14 +23,20 @@ from sdmx.model import Annotation, Code, Concept, ConceptScheme, DataStructureDe
 VERSION = "0.1"
 
 
-def _dims(text):
-    """Generate an annotation with dimensions."""
-    return dict(annotations=[Annotation(id="_dimensions", text=text)])
+def _annotate(**kwargs):
+    """Store `kwargs` as annotations on a :class:`AnnotableArtefact` for later use."""
+    return dict(annotations=[Annotation(id=k, text=repr(v)) for k, v in kwargs.items()])
 
 
-def _units(mapping):
-    """Generate an annotation with preferred units."""
-    return dict(annotations=[Annotation(id="preferred_unit", text=repr(mapping))])
+def _pop_anno(obj, id):
+    """Wrapper around :meth:`AnnotableArtefact.pop_annotation`.
+
+    Inverse of :func:`_annotate`.
+    """
+    try:
+        return eval(obj.pop_annotation(id=id).text.localized_default())
+    except KeyError:
+        return None
 
 
 def update_object(obj, properties):
@@ -95,10 +111,8 @@ def generate() -> msg.StructureMessage:
 
         # Pop an annotation and use it to produce a list of dimension IDs (see below)
         try:
-            dims_annotation = dsd.annotations.pop(-1)
-            assert "_dimensions" == dims_annotation.id
-            dims = dims_annotation.text.localized_default().split()
-        except IndexError:
+            dims = _pop_anno(dsd, "_dimensions").split()
+        except AttributeError:
             dims = []
 
         # Add common dimensions
@@ -143,6 +157,30 @@ def generate() -> msg.StructureMessage:
 
         # Add the DSD to the StructureMessage
         sm.structure[dsd.id] = dsd
+
+    for c in CONSTRAINTS:
+        # Look up the object that is constrained
+        content_id = _pop_anno(c, "_content")
+        dsd = sm.structure[content_id]
+
+        # Update the constraint with a reference to the DSD
+        c.content.add(dsd)
+
+        # Pop the dictionary of data content keys
+        dck = _pop_anno(c, "_data_content_keys")
+
+        # Convert into SDMX objects
+        for dim_id, value in dck.items():
+            dim = dsd.dimensions.get(dim_id)
+            c.data_content_keys.keys.append(
+                m.DataKey(
+                    key_value={dim: m.ComponentValue(value_for=dim, value=value)},
+                    included=True,
+                )
+            )
+
+        # Add the Constraints to the StructureMessage
+        sm.constraint[c.id] = c
 
     return sm
 
@@ -208,26 +246,26 @@ CONCEPTS = {
                 "Amount of travel or transport by a person, vehicle, or collection of "
                 "these."
             ),
-            **_units(
-                {
+            **_annotate(
+                preferred_units={
                     "SERVICE == passenger": "10⁹ passenger-km / yr",
                     "SERVICE == freight": "10⁹ tonne-km / yr",
                     # TODO distinguish "10⁹ vehicle-km / yr"
                 }
             ),
         ),
-        Concept(id="ENERGY", name="Energy", **_units("PJ / yr")),
+        Concept(id="ENERGY", name="Energy", **_annotate(preferred_units="PJ / yr")),
         Concept(
             id="ENERGY_INTENSITY",
             name="Energy intensity of activity",
-            **_units("MJ / vehicle-km"),
+            **_annotate(preferred_units="MJ / vehicle-km"),
         ),
         Concept(
             id="EMISSION",
             name="Emission",
             description="Mass of a pollutant emitted.",
-            **_units(
-                {
+            **_annotate(
+                preferred_units={
                     "POLLUTANT == CO2": "10⁶ t CO₂ / yr",
                     "POLLUTANT == GHG": "10⁶ t CO₂e / yr",
                     "POLLUTANT == BC": "1O³ t BC / yr",
@@ -236,14 +274,16 @@ CONCEPTS = {
             ),
         ),
         Concept(
-            id="GDP", name="Gross Domestic Product", **_units("10⁹ USD(2005) / year")
+            id="GDP",
+            name="Gross Domestic Product",
+            **_annotate(preferred_units="10⁹ USD(2005) / year"),
         ),
         Concept(
             id="LOAD_FACTOR",
             name="Load factor",
             description="Amount of activity provided per vehicle",
-            **_units(
-                {
+            **_annotate(
+                preferred_units={
                     "SERVICE == PASSENGER": "passenger / vehicle",
                     "SERVICE == FREIGHT": "tonne / vehicle",
                 }
@@ -253,14 +293,14 @@ CONCEPTS = {
             id="POPULATION",
             name="Population",
             description="i.e. of people.",
-            **_units("10⁶ persons"),
+            **_annotate(preferred_units="10⁶ persons"),
         ),
         Concept(
             id="PRICE",
             name="Price",
             description="Market or fixed price for commodity.",
-            **_units(
-                {
+            **_annotate(
+                preferred_units={
                     "POLLUTANT == CO2": "USD(2005) / t CO₂",
                     "POLLUTANT == GHG": "USD(2005) / t CO₂e",
                     "FUEL == GASOLINE": "USD(2005) / litre",
@@ -274,13 +314,13 @@ CONCEPTS = {
             id="SALES",
             name="Sales",
             description="New sales of vehicles in a period.",
-            **_units("10⁶ vehicle / yr"),
+            **_annotate(preferred_units="10⁶ vehicle / yr"),
         ),
         Concept(
             id="STOCK",
             name="Stock",
             description="Quantity of transport vehicles.",
-            **_units("10⁶ vehicle"),
+            **_annotate(preferred_units="10⁶ vehicle"),
         ),
     ),
 }
@@ -447,6 +487,7 @@ CODELISTS = {
 DATA_STRUCTURES = (
     DataStructureDefinition(id="GDP"),
     DataStructureDefinition(id="POPULATION"),
+    DataStructureDefinition(id="PRICE_POLLUTANT", **_annotate(_dimensions="POLLUTANT")),
     DataStructureDefinition(
         id="HISTORICAL",
         description=(
@@ -457,9 +498,11 @@ DATA_STRUCTURES = (
             "distinct structure that reflects the dimensions that are valid for the "
             "relevant measure(s)."
         ),
-        **_dims(
-            "VARIABLE SERVICE MODE VEHICLE FUEL TECHNOLOGY AUTOMATION OPERATOR "
-            "POLLUTANT LCA_SCOPE FLEET"
+        **_annotate(
+            _dimensions=(
+                "VARIABLE SERVICE MODE VEHICLE FUEL TECHNOLOGY AUTOMATION OPERATOR "
+                "POLLUTANT LCA_SCOPE FLEET"
+            )
         ),
     ),
     DataStructureDefinition(
@@ -472,9 +515,23 @@ DATA_STRUCTURES = (
             "distinct structure that reflects the dimensions that are valid for the "
             "relevant measure(s)."
         ),
-        **_dims(
-            "MODEL SCENARIO VARIABLE SERVICE MODE VEHICLE FUEL TECHNOLOGY AUTOMATION "
-            "OPERATOR POLLUTANT LCA_SCOPE FLEET"
+        **_annotate(
+            _dimensions=(
+                "MODEL SCENARIO VARIABLE SERVICE MODE VEHICLE FUEL TECHNOLOGY "
+                "AUTOMATION OPERATOR POLLUTANT LCA_SCOPE FLEET"
+            )
+        ),
+    ),
+)
+
+#: Constraints applying to DSDs.
+CONSTRAINTS = (
+    ContentConstraint(
+        id="PRICE_POLLUTANT",
+        role=ConstraintRole(role=ConstraintRoleType.allowable),
+        data_content_keys=DataKeySet(included=True, keys=[]),
+        **_annotate(
+            _data_content_keys={"POLLUTANT": "GHG"}, _content="PRICE_POLLUTANT"
         ),
     ),
 )
