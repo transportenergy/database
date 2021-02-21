@@ -498,6 +498,10 @@ DATA_STRUCTURES = (
         **_annotate(_dimensions="SERVICE MODE VEHICLE"),
     ),
     DataStructureDefinition(
+        id="SALES",
+        **_annotate(_dimensions="SERVICE MODE VEHICLE TECHNOLOGY FLEET"),
+    ),
+    DataStructureDefinition(
         id="STOCK",
         description=(
             "The current version of this structure does not distinguish by FLEET. "
@@ -556,6 +560,16 @@ CONSTRAINTS = (
         id="PRICE_POLLUTANT",
         role=_allowable,
         **_annotate(_data_content_keys={"POLLUTANT": ["GHG"]}),
+    ),
+    ContentConstraint(
+        id="SALES",
+        description=(
+            "The current iTEM:SALES data structure is only specified for new road "
+            " transport vehicles. It excludes e.g. sales of aircraft or ships; and "
+            "(re)sale of used road vehicles."
+        ),
+        role=_allowable,
+        **_annotate(_data_content_keys={"FLEET": ["NEW"], "MODE": ["ROAD"]}),
     ),
     ContentConstraint(
         id="STOCK",
