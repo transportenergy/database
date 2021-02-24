@@ -68,6 +68,25 @@ def check(df):
     assert df["PowerCode"].unique() == ["Millions"]
     assert df["Unit"].unique() == ["Tonnes-kilometres"]
 
+    # Detect #32
+    # Data for CHN, including one year before and after the error
+    obs = df.query("COUNTRY == 'CHN' and Year >= 1985 and Year <= 2002").set_index(
+        "Year"
+    )["Value"]
+    # Delete the erroneous data
+    empty = obs.copy()
+    empty.iloc[1:-1] = None
+
+    # Expected values: interpolated between the two correct values
+    expected = empty.interpolate("index")
+
+    # Ratio of interpolated and observed values is about 100 for the years containing
+    # the error.
+    # TODO if the data is corrected in the original, this assertion will fail;
+    #      then remove this code and the corresponding correction in process(), below.
+    assert ((expected / obs).iloc[1:-1] >= 95).all()
+    log.info("Confirmed 10² magnitude error in China 1990–2001")
+
 
 def process(df):
     """Process data set T001.
@@ -83,10 +102,5 @@ def process(df):
     #    TODO read the preferred units (here 'Gt km / year') from a common
     #    location
     df = df.dropna().pipe(convert_units, "Mt km / year", "Gt km / year")
-
-    # Correct #32
-    corrected = df.query("Country == 'China' and Year > 1985 and Year < 2002").copy()
-    corrected["Value"] *= 100.0
-    df.update(corrected)
 
     return df
