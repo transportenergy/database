@@ -35,7 +35,9 @@ def process(df):
     df = transform_df_to_PF_format(df)
 
     # Remove the ',' from the values in the 'Value' column
-    df["Value"] = df["Value"].apply(lambda x: x if type(x) != str else float(x.replace(",", "")))
+    df["Value"] = df["Value"].apply(
+        lambda x: x if type(x) != str else float(x.replace(",", ""))
+    )
 
     # Getting a generic idea of what countries are missing values and dropping
     # NaN values
