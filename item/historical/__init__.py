@@ -8,7 +8,7 @@ import pycountry
 import yaml
 
 from item.common import paths
-from item.historical.scripts import T000, T001, T003, T004, T009
+from item.historical.scripts import T000, T001, T003, T004, T009, T010
 from item.historical.scripts.util.managers.dataframe import ColumnName
 from item.remote import OpenKAPSARC, get_sdmx
 
@@ -35,6 +35,7 @@ MODULES = {
     3: T003,
     4: T004,
     9: T009,
+    10: T010,
 }
 
 #: Path for output from :func:`process`.
