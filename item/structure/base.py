@@ -7,9 +7,9 @@ from sdmx.model import (
     Code,
     Concept,
     ConceptScheme,
-    Contact,
     ConstraintRole,
     ConstraintRoleType,
+    Contact,
     ContentConstraint,
     DataStructureDefinition,
 )

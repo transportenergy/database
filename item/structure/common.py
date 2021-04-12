@@ -18,5 +18,5 @@ def column_name(id: str) -> str:
             generate()
             .structure["HISTORICAL"]
             .dimensions.get(id.upper())
-            .concept_identity.name.localized_default()
+            .concept_identity.name.localized_default()  # type: ignore [union-attr]
         )

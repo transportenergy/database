@@ -103,7 +103,7 @@ def update_dsd():
     """
     import sdmx
 
-    from item.sdmx import generate
+    from item.structure import generate
 
     with open(Path(__file__).parent / "data" / "structure.xml", "wb") as f:
         f.write(sdmx.to_xml(generate(), pretty_print=True))

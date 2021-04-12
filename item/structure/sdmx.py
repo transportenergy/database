@@ -2,11 +2,11 @@ import logging
 from collections import ChainMap
 from datetime import datetime
 from functools import lru_cache
-from typing import List
+from typing import List, cast
 
+import numpy as np
 import sdmx.message as msg
 import sdmx.model as m
-import numpy as np
 from sdmx import Client
 
 from item.structure import base
@@ -178,8 +178,8 @@ def prepare_dsd(dsd: m.DataStructureDefinition, sm: msg.StructureMessage):
     """Populate data structures within `dsd`."""
     # Concepts for each dimension of each DSD
     dsd_concepts = ChainMap(
-        sm.concept_scheme["TRANSPORT"],
-        sm.concept_scheme["MODELING"],
+        sm.concept_scheme["TRANSPORT"].items,
+        sm.concept_scheme["MODELING"].items,
         # Retrieve the CROSS_DOMAIN_CONCEPTS scheme from the SDMX Global Registry
         get_cdc(),
     )
@@ -200,7 +200,7 @@ def prepare_dsd(dsd: m.DataStructureDefinition, sm: msg.StructureMessage):
         concept = dsd_concepts.get(concept_id)
 
         if concept_id == "VARIABLE":
-            d = m.MeasureDimension(
+            d: m.DimensionComponent = m.MeasureDimension(
                 id="VARIABLE",
                 name="Variable",
                 description="Reference to a concept from CL_TRANSPORT_MEASURES.",
@@ -227,8 +227,10 @@ def prepare_dsd(dsd: m.DataStructureDefinition, sm: msg.StructureMessage):
         # Append this dimension
         dsd.dimensions.append(d)
 
-    # Add a primary measure: either the matching one
+    # Add a primary measure: either one with ID matching the DSD, or OBS_VALUE as backup
     concept = dsd_concepts.get(dsd.id) or dsd_concepts.get("OBS_VALUE")
+    assert concept is not None
+
     dsd.measures.append(
         m.PrimaryMeasure(id=concept.id, name=concept.name, concept_identity=concept)
     )
@@ -241,7 +243,7 @@ def cr_from(info: dict, dsd: m.DataStructureDefinition) -> m.CubeRegion:
     """Create a :class:`.CubeRegion` from a simple :class:`dict` of `info`."""
     cr = m.CubeRegion(included=info.pop("included", True))
     for dim_id, values in info.items():
-        dim = dsd.dimensions.get(dim_id)
+        dim = cast(m.Dimension, dsd.dimensions.get(dim_id))
 
         values = values.split()
         if values[0] == "!":

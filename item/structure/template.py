@@ -1,7 +1,7 @@
 import logging
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Mapping
 
 import numpy as np
 import pandas as pd
@@ -10,7 +10,7 @@ import sdmx.model as m
 
 from item.common import paths
 from item.structure import column_name
-from item.structure.sdmx import generate, merge_dsd
+from item.structure.sdmx import _get_anno, generate, merge_dsd
 
 log = logging.getLogger(__name__)
 
@@ -18,8 +18,7 @@ log = logging.getLogger(__name__)
 def add_unit(key: Dict, concept: m.Concept) -> None:
     """Add units to a key."""
     # Retrieve the unit information, stored by read_items()
-    anno = list(filter(lambda a: a.id == "preferred_unit", concept.annotations))[0]
-    unit = eval(anno[0].text.localized_default(None))
+    unit = _get_anno(concept, "preferred_unit")
 
     if isinstance(unit, str):
         key["unit"] = unit
@@ -75,7 +74,9 @@ def collapse(row: pd.Series) -> pd.Series:
     return pd.Series(data)
 
 
-def name_for_id(dsd: m.DataStructureDefinition, ids: List) -> Dict[str, Dict[str, str]]:
+def name_for_id(
+    dsd: m.DataStructureDefinition, ids: List[str]
+) -> Mapping[str, Dict[str, str]]:
     """Return a nested dict for use with :meth:`pandas.DataFrame.replace`.
 
     For the concept schemes `ids` (e.g. 'mode'), the
@@ -83,9 +84,13 @@ def name_for_id(dsd: m.DataStructureDefinition, ids: List) -> Dict[str, Dict[str
     :class:`.Concept` (e.g. 'air') is replaced with its
     :attr:`~.NameableArtefact.name` (e.g. 'Aviation').
     """
-    result = defaultdict(dict)
+    result: Mapping[str, Dict[str, str]] = defaultdict(dict)
     for id in ids:
-        codelist = dsd.dimensions.get(id).local_representation.enumerated
+        codelist = dsd.dimensions.get(
+            id
+        ).local_representation.enumerated  # type: ignore [union-attr]
+        assert codelist is not None
+
         for code in codelist:
             if code.id == "_Z":
                 name = ""
