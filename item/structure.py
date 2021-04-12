@@ -1,13 +1,13 @@
 import logging
+from collections import defaultdict
 from functools import lru_cache
-from itertools import product
 from pathlib import Path
 from typing import Dict, List
 
+import numpy as np
 import pandas as pd
-import yaml
-from pandas.core.computation.ops import UndefinedVariableError
-from sdmx.model import Concept, ConceptScheme
+import sdmx
+from sdmx import model
 
 from item.common import paths
 from item.sdmx import generate
@@ -19,10 +19,7 @@ log = logging.getLogger(__name__)
 def column_name(id: str) -> str:
     """Return a human-readable name for a dimension in the historical DSD."""
     try:
-        value = dict(
-            YEAR="Year",
-            ID="ID",
-        )[id]
+        value = dict(VARIABLE="Variable", YEAR="Year", ID="ID")[id]
         log.warning(f"Deprecated dimension id: {repr(id)}")
         return value
     except KeyError:
@@ -34,25 +31,7 @@ def column_name(id: str) -> str:
         )
 
 
-def common_dim_dummies():
-    """Yield ConceptSchemes for the common dimensions.
-
-    Each of these has only 1 item. Submitted datasets will have multiple values
-    along each of these dimensions.
-    """
-
-    c_all = Concept(id="[All]", name="[all model values]")
-    c_all = {c_all.id: c_all}
-    c_total = Concept(id="[All + World]", name="[Global total or average]")
-    c_total = {c_total.id: c_total}
-
-    yield ConceptScheme(id="model", name="Model", items=c_all)
-    yield ConceptScheme(id="scenario", name="Scenario", items=c_all)
-    yield ConceptScheme(id="region", name="Region", items=c_total)
-    yield ConceptScheme(id="year", name="Year", items=c_all)
-
-
-def add_unit(key: Dict, concept: Concept) -> None:
+def add_unit(key: Dict, concept: model.Concept) -> None:
     """Add units to a key."""
     # Retrieve the unit information, stored by read_items()
     anno = list(filter(lambda a: a.id == "preferred_unit", concept.annotations))[0]
@@ -72,50 +51,49 @@ def add_unit(key: Dict, concept: Concept) -> None:
 def collapse(row: pd.Series) -> pd.Series:
     """Collapse multiple concepts into fewer columns.
 
-    - 'measure' column gets 'lca_scope', 'pollutant', and/or 'fleet'.
-    - 'mode' column gets 'type', 'vehicle', and/or 'operator'.
+    - VARIABLE label is formatted using the labels for LCA_SCOPE, POLLUTANT, and/or
+      FLEET.
+    - MODE label is formatted using the labels for SERVICE, VEHICLE, AUTOMATION and/or
+      OPERATOR.
     """
     data = row.to_dict()
 
-    # Combine 3 concepts with 'measure' ("Variable")
-    lca_scope = data.pop("lca_scope", "")
-    if len(lca_scope):
-        data["measure"] += " (" + lca_scope + ")"
+    # Combine 3 concepts with the measure name ("VARIABLE")
+    fleet = data.pop("FLEET")
+    lca_scope = data.pop("LCA_SCOPE")
+    pollutant = data.pop("POLLUTANT")
 
-    pollutant = data.pop("pollutant", "")
-    if len(pollutant):
-        data["measure"] = pollutant + " " + data["measure"]
+    data["VARIABLE"] = (
+        f"{pollutant} {data['VARIABLE']}"
+        + (f" ({lca_scope})" if len(lca_scope) else "")
+        + (f" ({fleet.lower()} vehicles)" if fleet not in ("Total", "") else "")
+    ).strip()
 
-    fleet = data.pop("fleet", "")
-    if len(fleet):
-        if data["measure"] == "Energy intensity" and fleet == "all":
-            fleet = ""
-        else:
-            fleet = " (" + fleet + " vehicles)"
-        data["measure"] += fleet
+    # Combine 4 concepts with "MODE"
+    service = data.pop("SERVICE")
+    vehicle = data.pop("VEHICLE")
+    operator = data.pop("OPERATOR")
+    automation = data.pop("AUTOMATION")
 
-    # Combine 4 concepts with 'mode'
-    type = data.pop("type", "")
-    if len(type):
-        if data["mode"] in ["Road", "Rail"]:
-            data["mode"] = type + " " + data["mode"]
-        elif data["mode"] == "All":
-            data["mode"] = data["mode"] + " " + type
-
-    vehicle = data.pop("vehicle", "")
-    if len(vehicle) and vehicle != "All":
-        data["mode"] = vehicle
-
-    operator = data.pop("operator", "")
-    automation = data.pop("automation", "")
-    if len(operator) and len(automation) and data["mode"] == "LDV":
+    if len(operator) and len(automation) and data["MODE"] == "Light-duty vehicle":
         automation = "" if automation == "Human" else " AV"
-        data["mode"] += " ({}{})".format(operator.lower(), automation)
+        oa = " ({}{})".format(operator.lower(), automation)
+    else:
+        oa = ""
+
+    data["MODE"] = (
+        (f"{service} " if service != "Total" else "")
+        + data["MODE"]
+        + (f" {vehicle}" if vehicle != "Total" else "")
+        + oa
+    ).strip()
 
     return pd.Series(data)
 
 
-def name_for_id(concept_schemes: Dict, ids: List) -> Dict[str, Dict[str, str]]:
+def name_for_id(
+    dsd: model.DataStructureDefinition, ids: List
+) -> Dict[str, Dict[str, str]]:
     """Return a nested dict for use with :meth:`pandas.DataFrame.replace`.
 
     For the concept schemes `ids` (e.g. 'mode'), the
@@ -123,190 +101,150 @@ def name_for_id(concept_schemes: Dict, ids: List) -> Dict[str, Dict[str, str]]:
     :class:`.Concept` (e.g. 'air') is replaced with its
     :attr:`~.NameableArtefact.name` (e.g. 'Aviation').
     """
-    result = dict()
+    result = defaultdict(dict)
     for id in ids:
-        cs = concept_schemes[id]
-        result[id] = {c.id: c.name.localized_default() for c in cs.items.values()}
+        codelist = dsd.dimensions.get(id).local_representation.enumerated
+        for code in codelist:
+            if code.id == "_Z":
+                name = ""
+            else:
+                name = code.name.localized_default()
+                if not len(name):
+                    name = code.id.title()
 
-    # Where 'all' appears in the technology column, the template requests
-    # totals
-    result["technology"]["all"] = "Total"
+            result[id][code.id] = name
 
     return result
+
+
+def merge_dsd(
+    sm: sdmx.message.StructureMessage,
+    target: str,
+    others: List[str],
+    fill_value: str = "_Z",
+) -> model.DataSet:
+    """`Merge` 2 or more data structure definitions."""
+    dsd_target = sm.structure[target]
+
+    # Create a temporary DataSet
+    ds = model.DataSet(structured_by=dsd_target)
+
+    # Count of keys
+    count = 0
+
+    for dsd_id in others:
+        # Retrieve the DSD
+        dsd = sm.structure[dsd_id]
+
+        # Retrieve a constraint that affects this DSD
+        ccs = [cc for cc in sm.constraint.values() if dsd in cc.content]
+        assert len(ccs) <= 1
+        cc = ccs[0] if len(ccs) and len(ccs[0].data_content_region) else None
+
+        # Key for the VARIABLE dimension
+        base_key = model.Key(VARIABLE=dsd_id, described_by=dsd_target.dimensions)
+
+        # Add KeyValues for other dimensions included in the target but not in this DSD
+        for dim in dsd_target.dimensions:
+            if dim.id in base_key.values or dim.id in dsd.dimensions:
+                continue
+            base_key[dim.id] = dim.local_representation.enumerated[fill_value]
+
+        # Iterate over the possible keys in `dsd`; add to `k`
+        ds.add_obs(
+            model.Observation(dimension=(base_key + key).order(), value=np.NaN)
+            for key in dsd.iter_keys(constraint=cc)
+        )
+
+        log.info(f"{repr(dsd)}: {len(ds.obs) - count} keys")
+        count = len(ds.obs)
+
+    log.info(
+        f"Total keys: {len(ds.obs)}\n"
+        + "\n".join(map(lambda o: repr(o.dimension), ds.obs[:5]))
+    )
+
+    return ds
 
 
 def make_template(output_path: Path = None, verbose: bool = True):
     """Generate a data template.
 
-    Outputs files containing all keys specified in the :ref:`spec-yaml`. The file is
-    produced in two formats:
+    Outputs files containing all keys specified for the iTEM ``HISTORICAL`` data
+    structure definition. The file is produced in two formats:
 
-    - :file:`template.csv`: comma-separated values.
-    - :file:`template.xlsx`: Microsoft Excel.
+    - :file:`*.csv`: comma-separated values
+    - :file:`*.xlsx`: Microsoft Excel.
 
-    An 'index' file is also created (:file:`index.csv`, :file:`index.xlsx`). This file
-    maps between 'Full dimensionality' keys (i.e. with all conceptual dimensions), and
-    the 'Template (reduced)' columns appearing in :file:`template.csv`.
+    …and in three variants:
+
+    - :file:`full.*`: with full dimensionality for every concept.
+    - :file:`condensed.*`: with a reduced number of dimensions, with labels for some
+      dimensions combining labels for others in shorter, conventional, human-readable
+      form.
+    - :file:`index.*`: an index or map between the two above versions.
+
+    See also
+    --------
+    .collapse
     """
     # TODO Use SDMX constraints to filter on concepts that are parents of other concepts
 
     sm = generate()
-    cs_measure = sm.concept_scheme["TRANSPORT_MEASURE"]
-    dsd = sm.structure["HISTORICAL"]
 
-    # Common dimensions applied to all keys
-    common_dims = ["model", "scenario", "region", "year"]
-
-    # Read specification of the template
-    specs = yaml.safe_load(open(paths["data"] / "spec.yaml"))
-
-    # Filters to reduce the set of Keys; see below at 'Filter Keys'
-    exclude_global = []
-
-    # Processed dataframes
-    dfs = []
-
-    # Process each entry in the spec file
-    for n_spec, spec in enumerate(specs):
-        # List of Key objects representing data
-        keys = []
-
-        try:
-            # Retrieve the measure to add to the key later
-            measure_id = spec.pop("measure")
-            measure_concept = cs["measure"][measure_id]
-        except KeyError:
-            # Entry without a 'measure:' key is a list of global filters
-            exclude_global = spec.pop("exclude")
-            continue
-
-        # List of dimensions for these Keys
-        key_dims = common_dims + spec.pop("dims", [])
-
-        # A list of iterable objects containing the values along each dimension
-        iters = [iter(cs[d]) for d in key_dims]
-
-        # Iterate, adding keys by Cartesian product over the dimensions
-        for values in product(*iters):
-            # Create a 'key' with these values, the sort order, and the measure
-            key = dict(
-                zip(key_dims, map(lambda c: c.id, values)),
-                sort_order=n_spec,
-                measure=measure_concept.id,
-            )
-
-            # Add appropriate units
-            add_unit(key, measure_concept)
-
-            # Store the Key
-            keys.append(key)
-
-        if verbose:
-            print(f"\nSpec for {repr(measure_concept.id)}: {len(keys)} keys")
-
-        # Convert list → DataFrame for filtering
-        df = pd.DataFrame(keys).fillna("")
-
-        # Filter Keys by both global and spec-specific filters
-        for filter in exclude_global + spec.pop("exclude", []):
-            # 'not' operator (~) to exclude the matching rows
-            query_str = "~({})".format(filter)
-
-            try:
-                df.query(query_str, inplace=True)
-            except UndefinedVariableError:
-                # Filter references a dimension that's not in this dataframe;
-                # the filter isn't relevant
-                continue
-
-            if verbose:
-                print(f"  {df.shape[0]:5d} after constraint {query_str}")
-
-        # Store the filtered keys as a dataframe
-        dfs.append(df)
-
-    # Combine all dataframes
-    specs = pd.concat(dfs, axis=0, sort=False).fillna("")
-
-    # Convert to the traditional iTEM format
-
-    # Use names instead of IDs for these columns
-    use_name_cols = [
-        "type",
-        "mode",
-        "vehicle",
-        "technology",
-        "fuel",
-        "pollutant",
-        "automation",
-        "operator",
-        "measure",
-    ]
-
-    # Order of output columns
-    target_cols = common_dims[:-1] + [
-        "measure",
-        "unit",
-        "mode",
-        "technology",
-        "fuel",
-        "year",
-    ]
-
-    # Columns to sort content
-    sort_cols = [
-        "sort_order",
-        "measure",
-        "unit",
-        "type",
-        "mode",
-        "vehicle",
-        "technology",
-        "fuel",
-        "lca_scope",
-        "pollutant",
-    ]
-
-    replacements = name_for_id(cs, use_name_cols)
-
-    # Chain several operations for better performance
-    # - Replace some IDs with names
-    # - Sort
-    # - Save the full-resolution version as *specs_full*
-    # - Collapse multiple columns into fewer
-    # - Set preferred column order, drop the integer index
-    # - Rename columns to Title Case
-    specs_full = (
-        specs.replace(replacements).sort_values(by=sort_cols).reset_index(drop=True)
-    )
-    specs = (
-        specs_full.apply(collapse, axis=1)
-        .reindex(columns=target_cols)
-        .rename(columns={"measure": "variable"})
-        .rename(columns=lambda name: name.title())
+    ds = merge_dsd(
+        sm,
+        "HISTORICAL",
+        [
+            "GDP",
+            "POPULATION",
+            "PRICE_FUEL",
+            "PRICE_POLLUTANT",
+            "ACTIVITY_VEHICLE",
+            "ACTIVITY",
+            "ENERGY",
+            "EMISSIONS",
+            "ENERGY_INTENSITY",
+            "SALES",
+            "STOCK",
+            "LOAD_FACTOR",
+        ],
     )
 
-    if verbose:
-        print("", f"Total keys: {specs.shape[0]}", specs.head(10), sep="\n\n")
+    # Convert to pd.DataFrame
+    df0 = sdmx.to_pandas(ds).reset_index()
 
     # Save in multiple formats
     output_path = output_path or paths["output"]
+    log.info(f"Output to {output_path}/{{index,template}}.{{csv,xlsx}}")
 
-    specs.to_csv(output_path / "template.csv", index=False)
-    specs.to_excel(output_path / "template.xlsx", index=False)
+    # "Index" format: only simple replacements, full dimensionality
+    df1 = df0.replace({"_Z": "", np.NaN: "", "(REF_AREA)": "…", "(TIME_PERIOD)": "…"})
 
-    # Construct the index:
-    # - Horizontally concatenate the full-dimension and 'collapse' (with
-    #   'variable' column) data frames.
-    # - Drop the dummy dimensions.
-    # - Use '---' in empty cells for clarity.
-    index_data = {"Full dimensionality": specs_full, "Template (reduced)": specs}
-    index = (
-        pd.concat(index_data, axis=1)
-        .drop(columns=common_dims + list(map(str.title, common_dims)), axis=1, level=1)
-        .replace("", "---")
+    df1.to_csv(output_path / "full.csv")
+    df1.to_excel(output_path / "full.xlsx")
+
+    # "Template" format: more human-readable
+
+    # Use names instead of IDs for labels on these dimensions
+    replacements = name_for_id(
+        sm.structure["HISTORICAL"],
+        (
+            "AUTOMATION FLEET FUEL MODE OPERATOR POLLUTANT SERVICE TECHNOLOGY VARIABLE "
+            "VEHICLE"
+        ).split(),
     )
+    # Rename all columns except "Value" using data structure info
+    columns = {name: column_name(name) for name in df1.columns[:-1]}
+    columns["VALUE"] = "Value"
 
-    # Save the index
-    index.to_csv(output_path / "index.csv")
-    index.to_excel(output_path / "index.xlsx")
+    # Apply replacements; use collapse() above to reduce number of columns
+    df2 = df1.replace(replacements).apply(collapse, axis=1).rename(columns=columns)
+
+    df2.to_csv(output_path / "condensed.csv", index=False)
+    df2.to_excel(output_path / "condensed.xlsx", index=False)
+
+    # Output the index
+    df3 = pd.concat({"FULL": df0, "CONDENSED": df1}, axis=1)
+    df3.to_csv(output_path / "index.csv")
+    df3.to_excel(output_path / "index.xlsx")
