@@ -8,7 +8,7 @@ import pycountry
 import yaml
 
 from item.common import paths
-from item.historical.scripts import T000, T001, T003, T004, T009
+from item.historical.scripts import T000, T001, T003, T004, T009, T010
 from item.historical.scripts.util.managers.dataframe import ColumnName
 from item.remote import OpenKAPSARC, get_sdmx
 
@@ -35,6 +35,7 @@ MODULES = {
     3: T003,
     4: T004,
     9: T009,
+    10: T010,
 }
 
 #: Path for output from :func:`process`.
@@ -44,10 +45,23 @@ OUTPUT_PATH = paths["data"] / "historical" / "output"
 #: :meth:`iso_and_region` to replace names before they are looked up using
 #: :mod:`pycountry`.
 COUNTRY_NAME = {
-    "Montenegro, Republic of": "Montenegro",
+    "Azerbaidjan": "Azerbaijan",
     "Bosnia-Herzegovina": "Bosnia and Herzegovina",
+    "Bosnia": "Bosnia and Herzegovina",
+    "Brunei": "Brunei Darussalam",
+    "Congo Kinshasa ": "Congo, The Democratic Republic of the",
+    "Hong-Kong": "Hong Kong",
+    "Iran": "Iran, Islamic Republic of",
+    "Ivory Coast": "Côte d'Ivoire",
     "Korea": "Korea, Republic of",
+    "Macedonia": "North Macedonia",
+    "Moldavia": "Moldova",
+    "Montenegro, Republic of": "Montenegro",
+    "Palestine": "Palestine, State of",
+    "Russia": "Russian Federation",
     "Serbia, Republic of": "Serbia",
+    "South Korea": "Korea, Republic of",
+    "Syria": "Syrian Arab Republic",
     "The former Yugoslav Republic of Macedonia": "North Macedonia",
 }
 

@@ -145,6 +145,14 @@ T009
       :language: yaml
       :lines: 75-80
 
+T010
+----
+
+.. currentmodule:: item.historical.scripts.T010
+
+.. automodule:: item.historical.scripts.T010
+   :members:
+
 
 Quality diagnostics
 ===================
