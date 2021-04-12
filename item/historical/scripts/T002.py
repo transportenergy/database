@@ -1,7 +1,10 @@
 """Data cleaning code and configuration for T002."""
-from .util.managers.dataframe import ColumnName
 from functools import lru_cache
+
 import pandas as pd
+
+from item.historical.scripts.util.managers.dataframe import ColumnName
+from item.historical.util import dropna_logged
 
 #: Dimensions and attributes which do not vary across this data set.
 COMMON_DIMS = dict(
@@ -38,22 +41,7 @@ COLUMNS = dict(
 
 def process(df):
     """Process data set T002."""
-    # Getting a generic idea of what countries are missing values and dropping
-    # NaN values
-    #
-    # Rule: Erase all value with NaN
-
-    list_of_countries_with_missing_values = list(
-        set(df[df["Value"].isnull()]["Country"])
-    )
-    print(
-        ">> Number of countries missing values: {}".format(
-            len(list_of_countries_with_missing_values)
-        )
-    )
-    print(">> Countries missing values:")
-    print(list_of_countries_with_missing_values)
-    print(">> Number of rows to erase: {}".format(len(df[df["Value"].isnull()])))
+    df = df.pipe(dropna_logged, "Value", ["Country"])
 
     # Assign the 'Mode' and 'Variable' columns
     df = pd.concat([df, df["Variable"].apply(mode_and_variable)], axis=1)
