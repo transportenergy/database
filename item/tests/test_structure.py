@@ -1,12 +1,14 @@
+import logging
 from itertools import product
 
 import sdmx
 
-from item.sdmx import generate
-from item.structure import column_name, make_template
+from item.structure import column_name, generate, make_template
 
 
 def test_column_name(caplog):
+    caplog.set_level(logging.WARNING)
+
     # Correctly retrieves the name of a Concept from the data structures
     assert column_name("VEHICLE") == "Vehicle type"
 
@@ -39,4 +41,12 @@ def test_sdmx_roundtrip(tmp_path):
     # Structure can be read
     sm = sdmx.read_sdmx(path)
 
-    assert 3 == len(sm.constraint["PRICE_FUEL"].data_content_keys)
+    # One CubeRegion
+    assert 1 == len(sm.constraint["PRICE_FUEL"].data_content_region)
+
+    # One dimension with a MemberSelection
+    cr = sm.constraint["PRICE_FUEL"].data_content_region[0]
+    assert {"FUEL"} == set(d.id for d in cr.member.keys())
+
+    # 3 values in the MemberSelection
+    assert 3 == len(cr.member["FUEL"].values)
