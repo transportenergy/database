@@ -591,12 +591,12 @@ DATA_STRUCTURES = (
     DataStructureDefinition(
         id="HISTORICAL",
         description=(
-            "Structure of the 'unified' iTEM historical transport data.\n\n"
-            "This DSD has all possible dimensions, regardless of whether a particular "
-            "measure (represented in the 'VARIABLE' dimension) is relevant for that "
-            "measure. In the future, multiple data flows will be specified, each with a"
-            "distinct structure that reflects the dimensions that are valid for the "
-            "relevant measure(s)."
+            """Structure of the 'unified' iTEM historical transport data.
+
+This DSD has all possible dimensions, regardless of whether a particular measure
+(represented in the 'VARIABLE' dimension) is relevant for that measure. In the future,
+multiple data flows will be specified, each with a distinct structure that reflects the
+dimensions that are valid for the relevant measure(s)."""
         ),
         **_annotate(
             _dimensions=(
@@ -608,12 +608,12 @@ DATA_STRUCTURES = (
     DataStructureDefinition(
         id="MODEL",
         description=(
-            "Structure of for iTEM model intercomparison data.\n\n"
-            "This DSD has all possible dimensions, regardless of whether a particular "
-            "measure (represented in the 'VARIABLE' dimension) is relevant for that "
-            "measure. In the future, multiple data flows will be specified, each with a"
-            "distinct structure that reflects the dimensions that are valid for the "
-            "relevant measure(s)."
+            """Structure for iTEM model intercomparison data.
+
+This DSD has all possible dimensions, regardless of whether a particular measure
+(represented in the 'VARIABLE' dimension) is relevant for that measure. In the future,
+multiple data flows will be specified, each with a distinct structure that reflects the
+dimensions that are valid for the relevant measure(s)."""
         ),
         **_annotate(
             _dimensions=(
@@ -627,55 +627,145 @@ DATA_STRUCTURES = (
 _allowable = m.ConstraintRole(role=m.ConstraintRoleType.allowable)
 
 
+def _exclude_z(dims):
+    return [{"included": False, dim: "_Z"} for dim in dims.split()]
+
+
+def _exclude(**kwargs):
+    return [{"included": False, k: v} for k, v in kwargs.items()]
+
+
 #: Constraints applying to DSDs.
-#:
-#: .. todo:: Add the following general constraints from the former :file:`spec.yaml`:
-#:
-#:    General
-#:
-#:    - Vehicle types are only relevant for road modes
-#:      ``mode != 'road' and vehicle != 'all'``
-#:    - Vehicle types for freight only
-#:      ``type == 'passenger' and vehicle == 'truck'``
-#:    - Vehicle types for passengers only
-#:      ``type == 'freight' and vehicle in ['ldv', 'bus', '2w+3w']``
-#:    - Air freight is (largely) provided as a byproduct of passenger service; most
-#:      models do not include it separately
-#:      ``type == 'freight' and mode == 'air'``
-#:    - Assume hybrid and fuel cell technologies not used for air, rail, water, or small
-#:      road vehicles
-#:      ``mode in ['air', 'rail', 'water'] and technology in ['hybrid', 'fc']``
-#:      ``vehicle == '2w+3w' and technology in ['hybrid', 'fc']``
-#:    - Combustion powertrains do not take electricity as an input
-#:      ``technology == 'combustion' and fuel == 'electricity'``
-#:    - Fuel cell powertrains take only hydrogen as an input
-#:      ``technology == 'fc' and fuel != 'hydrogen'``
-#:    - Electric powertrains take only electricity as an input
-#:      ``technology == 'electric' and fuel != 'electricity'``
-#:    - Shared and automated vehicles only relevant for LDVs
-#:      ``vehicle != ['ldv'] and automation == 'av'``
-#:      ``vehicle == '2w+3w' and operator == 'hire'``
-#:      ``vehicle not in ['ldv', '2w+3w'] and operator == 'own'``
-#:
-#:    Applying to ``ACTIVITY`` and ``ACTIVITY_VEH``:
-#:
-#:    - Omit sums by technology across modes
-#:      ``mode == 'all' and technology != 'all'``
-#:
-#:    Applying to ``EMISSIONS``:
-#:
-#:    - No use-phase emissions from electricity
-#:      ``lca_scope == 'ttw' and fuel == 'electricity'``
-#:    - Not concerned with e.g. HFC emissions from refrigerants, or CH₄ emissions at
-#:      service stations; typically assigned to non-transport sectors even in models
-#:      that include them.
-#:      ``lca_scope == 'wtt'``
-#:      ``lca_scope == 'wtw' and technology != 'all'``
-#:    - No totals across AQ species
-#:      ``pollutant == 'aq'``
-#:    - Only use-phase emissions of air quality pollutants
-#:      ``pollutant in ['bc', 'nox', 'pm25', 'so2'] and lca_scope != 'ttw'``
 CONSTRAINTS = (
+    ContentConstraint(
+        id="GENERAL0",
+        description="Vehicle types are only relevant for road modes.",
+        role=_allowable,
+        **_annotate(
+            _data_content_region=[dict(included=False, MODE="! ROAD", VEHICLE="! _T")],
+        ),
+    ),
+    ContentConstraint(
+        id="GENERAL1",
+        description="Vehicle types for freight or passenger service only.",
+        role=_allowable,
+        **_annotate(
+            _data_content_region=[
+                dict(included=False, SERVICE="P", VEHICLE="TRUCK"),
+                dict(included=False, SERVICE="F", VEHICLE="LDV BUS 2W+3W"),
+            ]
+        ),
+    ),
+    ContentConstraint(
+        id="GENERAL2",
+        description=(
+            "Air freight is (largely) provided as a byproduct of passenger service; "
+            "most iTEM models do not include it separately"
+        ),
+        role=_allowable,
+        **_annotate(
+            _data_content_region=[dict(included=False, SERVICE="F", MODE="AIR")]
+        ),
+    ),
+    ContentConstraint(
+        id="GENERAL3",
+        description=(
+            "Assume hybrid-electric and fuel cell powertrain technologies not used for "
+            "air, rail, water, or small road vehicles."
+        ),
+        role=_allowable,
+        **_annotate(
+            _data_content_region=[
+                dict(included=False, MODE="AIR RAIL WATER", TECHNOLOGY="HYBRID FC"),
+                dict(included=False, VEHICLE="2W+3W", TECHNOLOGY="HYBRID FC"),
+            ]
+        ),
+    ),
+    ContentConstraint(
+        id="GENERAL4",
+        name="Technology/fuel constraints",
+        description=(
+            """- Combustion powertrains do not take electricity as an input.
+- Fuel cell powertrains take only hydrogen as an input.
+- Hydrogen is only used in fuel cell powertrains.
+- Electric powertrains take only electricity as an input.
+"""
+        ),
+        role=_allowable,
+        **_annotate(
+            _data_content_region=[
+                dict(included=False, TECHNOLOGY="COMBUSTION", FUEL="ELEC"),
+                dict(included=False, TECHNOLOGY="FC", FUEL="! H2"),
+                dict(included=False, TECHNOLOGY="! FC", FUEL="H2"),
+                dict(included=False, TECHNOLOGY="ELECTRIC", FUEL="! ELEC"),
+            ]
+        ),
+    ),
+    ContentConstraint(
+        id="GENERAL5",
+        description="Shared and automated vehicles only relevant for LDVs.",
+        role=_allowable,
+        **_annotate(
+            _data_content_region=[
+                dict(included=False, VEHICLE="! LDV", AUTOMATION="AV"),
+                dict(included=False, VEHICLE="2W+3W", OPERATOR="HIRE"),
+                dict(included=False, VEHICLE="LDV 2W+3W", OPERATOR="OWN"),
+            ]
+        ),
+    ),
+    ContentConstraint(
+        id="GENERAL6",
+        description="Don't require reporting the sum of road + rail.",
+        role=_allowable,
+        **_annotate(_data_content_region=_exclude(MODE="LAND OFFROAD ACTIVE")),
+    ),
+    ContentConstraint(
+        id="ACTIVITY",
+        description="Omit sums by technology across modes.",
+        role=_allowable,
+        **_annotate(
+            _data_content_region=[dict(included=False, MODE="_T", TECHNOLOGY="! _T")]
+            + _exclude_z("AUTOMATION MODE OPERATOR SERVICE TECHNOLOGY VEHICLE")
+        ),
+    ),
+    ContentConstraint(
+        id="ACTIVITY_VEHICLE",
+        description="Omit sums by technology across modes.",
+        role=_allowable,
+        **_annotate(
+            _data_content_region=[dict(included=False, MODE="_T", TECHNOLOGY="! _T")]
+            + _exclude_z("AUTOMATION MODE OPERATOR SERVICE TECHNOLOGY VEHICLE")
+        ),
+    ),
+    ContentConstraint(
+        id="EMISSIONS",
+        description=(
+            """- No use-phase emissions from electricity.
+- No total across air quality species; _Z invalid.
+- No use-phase emissions from electricity.
+- Not concerned with e.g. HFC emissions from refrigerants, or CH₄ emissions at service
+  stations. These are typically assigned to non-transport sectors even in models that
+  include them.
+- Only use-phase emissions of air quality pollutants.
+         """
+        ),
+        role=_allowable,
+        **_annotate(
+            _data_content_region=[
+                dict(included=False, FUEL="ELEC", LCA_SCOPE="TTW"),
+                dict(included=False, POLLUTANT="_Z AQ"),
+                dict(included=False, LCA_SCOPE="TTW", FUEL="ELEC"),
+                dict(included=False, LCA_SCOPE="WTW", TECHNOLOGY="! _T"),
+                dict(included=False, POLLUTANT="BC NOX PM25 SO2", LCA_SCOPE="! TTW"),
+            ]
+            + _exclude_z("FUEL MODE SERVICE TECHNOLOGY VEHICLE")
+        ),
+    ),
+    ContentConstraint(
+        id="ENERGY",
+        role=_allowable,
+        **_annotate(_data_content_region=_exclude_z("MODE SERVICE TECHNOLOGY VEHICLE")),
+    ),
     ContentConstraint(
         id="ENERGY_INTENSITY",
         description=(
@@ -685,17 +775,26 @@ CONSTRAINTS = (
             "only."
         ),
         role=_allowable,
-        **_annotate(_data_content_keys={"FLEET": ["ALL", "NEW"]}),
+        **_annotate(
+            _data_content_region=[dict(FLEET="_T NEW")]
+            + _exclude(SERVICE="_T _Z")
+            + _exclude_z("MODE TECHNOLOGY")
+        ),
+    ),
+    ContentConstraint(
+        id="LOAD_FACTOR",
+        role=_allowable,
+        **_annotate(_data_content_region=_exclude_z("MODE SERVICE VEHICLE")),
     ),
     ContentConstraint(
         id="PRICE_FUEL",
         role=_allowable,
-        **_annotate(_data_content_keys={"FUEL": ["GASOLINE", "DIESEL", "ELECTRICITY"]}),
+        **_annotate(_data_content_region=[dict(FUEL="GASOLINE DIESEL ELEC")]),
     ),
     ContentConstraint(
         id="PRICE_POLLUTANT",
         role=_allowable,
-        **_annotate(_data_content_keys={"POLLUTANT": ["GHG"]}),
+        **_annotate(_data_content_region=[dict(POLLUTANT="GHG")]),
     ),
     ContentConstraint(
         id="SALES",
@@ -705,7 +804,11 @@ CONSTRAINTS = (
             "(re)sale of used road vehicles."
         ),
         role=_allowable,
-        **_annotate(_data_content_keys={"FLEET": ["NEW"], "MODE": ["ROAD"]}),
+        **_annotate(
+            _data_content_region=[dict(FLEET="NEW", MODE="ROAD")]
+            + _exclude(SERVICE="_T _Z")
+            + _exclude_z("TECHNOLOGY VEHICLE")
+        ),
     ),
     ContentConstraint(
         id="STOCK",
@@ -714,6 +817,10 @@ CONSTRAINTS = (
             " vehicles. It excludes e.g. stock of aircraft or ships."
         ),
         role=_allowable,
-        **_annotate(_data_content_keys={"MODE": ["ROAD"]}),
+        **_annotate(
+            _data_content_region=[dict(MODE="ROAD")]
+            + _exclude(SERVICE="_T _Z")
+            + _exclude_z("TECHNOLOGY VEHICLE")
+        ),
     ),
 )
