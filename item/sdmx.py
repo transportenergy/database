@@ -1,3 +1,4 @@
+import logging
 from collections import ChainMap
 from datetime import datetime
 from functools import lru_cache
@@ -9,10 +10,11 @@ from sdmx.model import (
     Annotation,
     Code,
     Concept,
-    ConceptScheme,
     ContentConstraint,
     DataStructureDefinition,
 )
+
+log = logging.getLogger(__name__)
 
 #: Current version of all data structures.
 #:
@@ -47,11 +49,6 @@ def _pop_anno(obj, id):
         return None
 
 
-def update_object(obj, properties):
-    for name, value in properties.items():
-        setattr(obj, name, value)
-
-
 @lru_cache()
 def get_cdc():
     """Retrieve the ``CROSS_DOMAIN_CONCEPTS`` from the SDMX Global Registry."""
@@ -77,122 +74,213 @@ def generate() -> msg.StructureMessage:
         ],
     )
 
-    ma_args = dict(
-        maintainer=item,
-        version=VERSION,
-        is_external_reference=False,
-    )
-
-    as_ = m.AgencyScheme(id="iTEM", **ma_args)
+    as_ = m.AgencyScheme(id="iTEM")
     as_.append(item)
     sm.organisation_scheme[as_.id] = as_
+
     sm.header = msg.Header(sender=item)
 
+    # Add concept schemes
     for cs in CONCEPT_SCHEMES:
-        update_object(cs, ma_args)
-        cs.extend(CONCEPTS[cs.id])
         sm.concept_scheme[cs.id] = cs
 
+    # Process code lists
     for id, codes in CODELISTS.items():
-        cl = m.Codelist(id=f"CL_{id}", **ma_args)
+        # Create a code list object
+        cl = m.Codelist(id=f"CL_{id}")
+
         # Add each code and any children
-        # TODO Move this upstream
+        # TODO move this upstream to sdmx1
         for c in codes:
             cl.append(c)
             cl.extend(c.child)
 
+        # Add to the message
         sm.codelist[cl.id] = cl
 
-    # Retrieve the CROSS_DOMAIN_CONCEPTS scheme from the SDMX Global Registry
-    cdc = get_cdc()
+    # Process data structure definitions
+    for dsd in DATA_STRUCTURES:
+        prepare_dsd(dsd, sm)
 
+        # Add to the message
+        sm.structure[dsd.id] = dsd
+
+    # Process content constraints
+    for cc in CONSTRAINTS:
+        # Add the constraint to the message
+        sm.constraint[cc.id] = cc
+
+        # Look up the object that is constrained
+        try:
+            dsd = sm.structure[cc.id]
+        except KeyError:
+            log.info(f"No constraint(s) for {repr(dsd)}")
+            continue
+
+        # Update the constraint with a reference to the DSD
+        cc.content.add(dsd)
+
+        # Convert annotations into DataKeySet and CubeRegion objects, associated with
+        # the DSDs
+        dks_from_anno(cc, dsd)
+        cr_from_anno(cc, dsd)
+
+        # Update the constraint using applicable CubeRegions from GENERAL0, GENERAL1,
+        # etc.
+        merge_general_constraints(cc, dsd, sm)
+
+    # Add MaintainableArtefact properties to all objects
+    for kind in (
+        "codelist",
+        "concept_scheme",
+        "constraint",
+        "organisation_scheme",
+        "structure",
+    ):
+        for obj in getattr(sm, kind).values():
+            obj.maintainer = item
+            obj.version = VERSION
+            obj.is_external_reference = False
+
+    return sm
+
+
+def prepare_dsd(dsd: m.DataStructureDefinition, sm: msg.StructureMessage):
+    """Populate data structures within `dsd`."""
     # Concepts for each dimension of each DSD
     dsd_concepts = ChainMap(
         sm.concept_scheme["TRANSPORT"],
         sm.concept_scheme["MODELING"],
-        cdc,
+        # Retrieve the CROSS_DOMAIN_CONCEPTS scheme from the SDMX Global Registry
+        get_cdc(),
     )
 
-    for dsd in DATA_STRUCTURES:
-        # Set the maintainer etc.
-        update_object(dsd, ma_args)
+    try:
+        # Pop an annotation and use it to produce a list of dimension IDs
+        dims = _pop_anno(dsd, "_dimensions").split()
+    except AttributeError:
+        # No dimensions
+        dims = []
 
-        # Pop an annotation and use it to produce a list of dimension IDs (see below)
-        try:
-            dims = _pop_anno(dsd, "_dimensions").split()
-        except AttributeError:
-            dims = []
+    # Add common dimensions
+    dims = dims + ["REF_AREA", "TIME_PERIOD"]
 
-        # Add common dimensions
-        dims = dims + ["REF_AREA", "TIME_PERIOD"]
+    # Add dimensions to the data structure
+    for order, concept_id in enumerate(dims):
+        # Locate the corresponding concept in one of three concept schemes
+        concept = dsd_concepts.get(concept_id)
 
-        # Add dimensions to the data structure
-        for order, concept_id in enumerate(dims):
-            # Locate the corresponding concept in one of three concept schemes
-            concept = dsd_concepts.get(concept_id)
+        if concept_id == "VARIABLE":
+            d = m.MeasureDimension(
+                id="VARIABLE",
+                name="Variable",
+                description="Reference to a concept from CL_TRANSPORT_MEASURES.",
+                local_representation=m.Representation(
+                    enumerated=sm.concept_scheme["TRANSPORT_MEASURE"]
+                ),
+            )
+        elif concept is None:
+            raise KeyError(concept_id)
+        else:
+            # Create the dimension, referring to the concept
+            d = m.Dimension(
+                id=concept_id, name=concept.name, concept_identity=concept, order=order
+            )
 
-            if concept_id == "VARIABLE":
-                d = m.MeasureDimension(
-                    id="VARIABLE",
-                    name="Measure",
-                    description="Reference to a concept from CL_TRANSPORT_MEASURES.",
-                    local_representation=m.Representation(
-                        enumerated=sm.concept_scheme["TRANSPORT_MEASURE"]
-                    ),
+            try:
+                # The dimension is represented by the corresponding code list, if any
+                d.local_representation = m.Representation(
+                    enumerated=sm.codelist[f"CL_{concept_id}"]
                 )
-            elif concept is None:
-                raise KeyError(concept_id)
-            else:
-                # Create the dimension, referring to the concept
-                d = m.Dimension(
-                    id=concept_id,
-                    name=concept.name,
-                    concept_identity=concept,
-                    order=order,
+            except KeyError:
+                pass  # No iTEM codelist for this concept
+
+        # Append this dimension
+        dsd.dimensions.append(d)
+
+    # Add a primary measure: either the matching one
+    concept = dsd_concepts.get(dsd.id) or dsd_concepts.get("OBS_VALUE")
+    dsd.measures.append(
+        m.PrimaryMeasure(id=concept.id, name=concept.name, concept_identity=concept)
+    )
+
+    # Assign order to the dimensions
+    dsd.dimensions.assign_order()
+
+
+def cr_from(info: dict, dsd: m.DataStructureDefinition) -> m.CubeRegion:
+    """Create a :class:`.CubeRegion` from a simple :class:`dict` of `info`."""
+    cr = m.CubeRegion(included=info.pop("included", True))
+    for dim_id, values in info.items():
+        dim = dsd.dimensions.get(dim_id)
+
+        values = values.split()
+        if values[0] == "!":
+            included = False
+            values.pop(0)
+        else:
+            included = True
+
+        cr.member[dim] = m.MemberSelection(
+            included=included,
+            values_for=dim,
+            values=[m.MemberValue(value=value) for value in values],
+        )
+
+    return cr
+
+
+def cr_from_anno(obj: m.ContentConstraint, dsd: m.DataStructureDefinition) -> None:
+    """Convert an annotation on `obj` into a :class:`.CubeRegion` constraint."""
+    all_info = _pop_anno(obj, "_data_content_region")
+
+    if all_info is None:
+        return
+
+    for info in all_info:
+        obj.data_content_region.append(cr_from(info, dsd))
+
+
+def dks_from_anno(obj: m.ContentConstraint, dsd: m.DataStructureDefinition) -> None:
+    """Convert an annotation on `obj` into a :class:`.DataKeySet` constraint."""
+    info = _pop_anno(obj, "_data_content_keys")
+    if info is None:
+        return
+
+    dks = m.DataKeySet(included=True, keys=[])
+    for dim_id, values in info.items():
+        dim = dsd.dimensions.get(dim_id)
+
+        for value in values:
+            dks.keys.append(
+                m.DataKey(
+                    key_value={dim: m.ComponentValue(value_for=dim, value=value)},
+                    included=True,
                 )
+            )
 
-                try:
-                    # The dimension is represented by the corresponding code list, if
-                    # any
-                    d.local_representation = m.Representation(
-                        enumerated=sm.codelist[f"CL_{concept_id}"]
-                    )
-                except KeyError:
-                    pass  # No iTEM codelist for this concept
+    obj.data_content_keys = dks
 
-            # Append this dimension
-            dsd.dimensions.append(d)
 
-        # Add the DSD to the StructureMessage
-        sm.structure[dsd.id] = dsd
+def merge_general_constraints(
+    cc: m.ContentConstraint,
+    dsd: m.DataStructureDefinition,
+    sm: msg.StructureMessage,
+) -> None:
+    """Merge general constraints from `sm` into `cc` if relevant to `dsd`."""
+    for other_cc in filter(
+        lambda obj: obj.id.startswith("GENERAL"), sm.constraint.values()
+    ):
+        for i, info in enumerate(_get_anno(other_cc, "_data_content_region")):
+            if not (set(info.keys()) - {"included"}) < set(
+                dim.id for dim in dsd.dimensions
+            ):
+                continue
 
-    for c in CONSTRAINTS:
-        # Look up the object that is constrained
-        dsd = sm.structure[c.id]
-
-        # Update the constraint with a reference to the DSD
-        c.content.add(dsd)
-
-        # Pop the dictionary of data content keys
-        dck = _pop_anno(c, "_data_content_keys")
-
-        # Convert into SDMX objects
-        c.data_content_keys = m.DataKeySet(included=True, keys=[])
-        for dim_id, values in dck.items():
-            dim = dsd.dimensions.get(dim_id)
-
-            for value in values:
-                c.data_content_keys.keys.append(
-                    m.DataKey(
-                        key_value={dim: m.ComponentValue(value_for=dim, value=value)},
-                        included=True,
-                    )
-                )
-
-        # Add the Constraints to the StructureMessage
-        sm.constraint[c.id] = c
-
-    return sm
+            # log.debug(
+            #     f"Extend {repr(cc)} using {repr(other_cc)}.data_content_region[{i}]"
+            # )
+            cc.data_content_region.append(cr_from(info, dsd))
 
 
 CS_TRANSPORT = m.ConceptScheme(
