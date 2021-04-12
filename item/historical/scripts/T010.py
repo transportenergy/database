@@ -1,4 +1,6 @@
 """Data cleaning code and configuration for T010."""
+from typing import Any, Dict
+
 from item.historical.util import dropna_logged
 from item.structure import column_name
 from item.utils import convert_units
@@ -16,7 +18,7 @@ COMMON_DIMS = dict(
 )
 
 #: Columns to drop from the raw data.
-COLUMNS = dict(
+COLUMNS: Dict[str, Any] = dict(
     drop=[],
     # Column containing country name for determining ISO 3166 alpha-3 codes and
     # iTEM regions. Commented, because this is the default value.
