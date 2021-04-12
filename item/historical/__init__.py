@@ -128,6 +128,7 @@ def fetch_source(id, use_cache=True):
     cache_path = paths["historical input"] / f"{id}.csv"
 
     if use_cache and cache_path.exists():
+        log.info(f"From cache at {cache_path}")
         return cache_path
 
     # Information for fetching the data
