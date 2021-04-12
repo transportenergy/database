@@ -25,6 +25,17 @@ def _annotate(**kwargs):
     return dict(annotations=[Annotation(id=k, text=repr(v)) for k, v in kwargs.items()])
 
 
+def _get_anno(obj, id):
+    """Wrapper around :meth:`AnnotableArtefact.get_annotation`.
+
+    Like :func:`_pop_anno`, but doesn't remove the annotation.
+    """
+    try:
+        return eval(obj.get_annotation(id=id).text.localized_default())
+    except KeyError:
+        return None
+
+
 def _pop_anno(obj, id):
     """Wrapper around :meth:`AnnotableArtefact.pop_annotation`.
 
