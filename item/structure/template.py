@@ -1,37 +1,21 @@
 import logging
 from collections import defaultdict
-from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List
 
 import numpy as np
 import pandas as pd
 import sdmx
-from sdmx import model
+import sdmx.model as m
 
 from item.common import paths
-from item.sdmx import generate
+from item.structure import column_name
+from item.structure.sdmx import generate, merge_dsd
 
 log = logging.getLogger(__name__)
 
 
-@lru_cache()
-def column_name(id: str) -> str:
-    """Return a human-readable name for a dimension in the historical DSD."""
-    try:
-        value = dict(VARIABLE="Variable", YEAR="Year", ID="ID")[id]
-        log.warning(f"Deprecated dimension id: {repr(id)}")
-        return value
-    except KeyError:
-        return (
-            generate()
-            .structure["HISTORICAL"]
-            .dimensions.get(id.upper())
-            .concept_identity.name.localized_default()
-        )
-
-
-def add_unit(key: Dict, concept: model.Concept) -> None:
+def add_unit(key: Dict, concept: m.Concept) -> None:
     """Add units to a key."""
     # Retrieve the unit information, stored by read_items()
     anno = list(filter(lambda a: a.id == "preferred_unit", concept.annotations))[0]
@@ -91,9 +75,7 @@ def collapse(row: pd.Series) -> pd.Series:
     return pd.Series(data)
 
 
-def name_for_id(
-    dsd: model.DataStructureDefinition, ids: List
-) -> Dict[str, Dict[str, str]]:
+def name_for_id(dsd: m.DataStructureDefinition, ids: List) -> Dict[str, Dict[str, str]]:
     """Return a nested dict for use with :meth:`pandas.DataFrame.replace`.
 
     For the concept schemes `ids` (e.g. 'mode'), the
@@ -115,56 +97,6 @@ def name_for_id(
             result[id][code.id] = name
 
     return result
-
-
-def merge_dsd(
-    sm: sdmx.message.StructureMessage,
-    target: str,
-    others: List[str],
-    fill_value: str = "_Z",
-) -> model.DataSet:
-    """`Merge` 2 or more data structure definitions."""
-    dsd_target = sm.structure[target]
-
-    # Create a temporary DataSet
-    ds = model.DataSet(structured_by=dsd_target)
-
-    # Count of keys
-    count = 0
-
-    for dsd_id in others:
-        # Retrieve the DSD
-        dsd = sm.structure[dsd_id]
-
-        # Retrieve a constraint that affects this DSD
-        ccs = [cc for cc in sm.constraint.values() if dsd in cc.content]
-        assert len(ccs) <= 1
-        cc = ccs[0] if len(ccs) and len(ccs[0].data_content_region) else None
-
-        # Key for the VARIABLE dimension
-        base_key = model.Key(VARIABLE=dsd_id, described_by=dsd_target.dimensions)
-
-        # Add KeyValues for other dimensions included in the target but not in this DSD
-        for dim in dsd_target.dimensions:
-            if dim.id in base_key.values or dim.id in dsd.dimensions:
-                continue
-            base_key[dim.id] = dim.local_representation.enumerated[fill_value]
-
-        # Iterate over the possible keys in `dsd`; add to `k`
-        ds.add_obs(
-            model.Observation(dimension=(base_key + key).order(), value=np.NaN)
-            for key in dsd.iter_keys(constraint=cc)
-        )
-
-        log.info(f"{repr(dsd)}: {len(ds.obs) - count} keys")
-        count = len(ds.obs)
-
-    log.info(
-        f"Total keys: {len(ds.obs)}\n"
-        + "\n".join(map(lambda o: repr(o.dimension), ds.obs[:5]))
-    )
-
-    return ds
 
 
 def make_template(output_path: Path = None, verbose: bool = True):

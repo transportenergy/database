@@ -1,20 +1,18 @@
-import logging
-from collections import ChainMap
-from datetime import datetime
-from functools import lru_cache
+from typing import Dict, List
 
-import sdmx.message as msg
-import sdmx.model as m
-from sdmx import Client
 from sdmx.model import (
+    Agency,
+    AgencyScheme,
     Annotation,
     Code,
     Concept,
+    ConceptScheme,
+    Contact,
+    ConstraintRole,
+    ConstraintRoleType,
     ContentConstraint,
     DataStructureDefinition,
 )
-
-log = logging.getLogger(__name__)
 
 #: Current version of all data structures.
 #:
@@ -22,268 +20,46 @@ log = logging.getLogger(__name__)
 VERSION = "0.1"
 
 
-def _annotate(**kwargs):
+def anno(**kwargs) -> Dict[str, List[Annotation]]:
     """Store `kwargs` as annotations on a :class:`AnnotableArtefact` for later use."""
     return dict(annotations=[Annotation(id=k, text=repr(v)) for k, v in kwargs.items()])
 
 
-def _get_anno(obj, id):
-    """Wrapper around :meth:`AnnotableArtefact.get_annotation`.
+def exclude_z(dims: str) -> List[Dict]:
+    """Return "_data_content_region" annotation content to exclude "_Z" codes.
 
-    Like :func:`_pop_anno`, but doesn't remove the annotation.
+    Parameters
+    ----------
+    dims :
+        Space-separated list of dimensions on which to exclude "_Z" codes.
     """
-    try:
-        return eval(obj.get_annotation(id=id).text.localized_default())
-    except KeyError:
-        return None
+    return [{"included": False, dim: "_Z"} for dim in dims.split()]
 
 
-def _pop_anno(obj, id):
-    """Wrapper around :meth:`AnnotableArtefact.pop_annotation`.
-
-    Inverse of :func:`_annotate`.
-    """
-    try:
-        return eval(obj.pop_annotation(id=id).text.localized_default())
-    except KeyError:
-        return None
+def exclude(**kwargs):
+    """Return a "_data_content_region" annotation content to exclude multiple codes."""
+    return [{"included": False, k: v} for k, v in kwargs.items()]
 
 
-@lru_cache()
-def get_cdc():
-    """Retrieve the ``CROSS_DOMAIN_CONCEPTS`` from the SDMX Global Registry."""
-    id = "CROSS_DOMAIN_CONCEPTS"
-    msg = Client("SGR").conceptscheme(id)
-    return msg.concept_scheme[id]
-
-
-@lru_cache()
-def generate() -> msg.StructureMessage:
-    """Return the SDMX data structures for iTEM data."""
-    sm = msg.StructureMessage(prepared=datetime.now())
-
-    item = m.Agency(
-        id="iTEM",
-        name="International Transport Energy Modeling",
-        contact=[
-            m.Contact(
-                name="iTEM organizing group",
-                email=["mail@transportenergy.org"],
-                uri=["https://transportenergy.org"],
-            )
-        ],
-    )
-
-    as_ = m.AgencyScheme(id="iTEM")
-    as_.append(item)
-    sm.organisation_scheme[as_.id] = as_
-
-    sm.header = msg.Header(sender=item)
-
-    # Add concept schemes
-    for cs in CONCEPT_SCHEMES:
-        sm.concept_scheme[cs.id] = cs
-
-    # Process code lists
-    for id, codes in CODELISTS.items():
-        # Create a code list object
-        cl = m.Codelist(id=f"CL_{id}")
-
-        # Add each code and any children
-        # TODO move this upstream to sdmx1
-        for c in codes:
-            cl.append(c)
-            cl.extend(c.child)
-
-        # Add to the message
-        sm.codelist[cl.id] = cl
-
-    # Process data structure definitions
-    for dsd in DATA_STRUCTURES:
-        prepare_dsd(dsd, sm)
-
-        # Add to the message
-        sm.structure[dsd.id] = dsd
-
-    # Process content constraints
-    for cc in CONSTRAINTS:
-        # Add the constraint to the message
-        sm.constraint[cc.id] = cc
-
-        # Look up the object that is constrained
-        try:
-            dsd = sm.structure[cc.id]
-        except KeyError:
-            log.info(f"No constraint(s) for {repr(dsd)}")
-            continue
-
-        # Update the constraint with a reference to the DSD
-        cc.content.add(dsd)
-
-        # Convert annotations into DataKeySet and CubeRegion objects, associated with
-        # the DSDs
-        dks_from_anno(cc, dsd)
-        cr_from_anno(cc, dsd)
-
-        # Update the constraint using applicable CubeRegions from GENERAL0, GENERAL1,
-        # etc.
-        merge_general_constraints(cc, dsd, sm)
-
-    # Add MaintainableArtefact properties to all objects
-    for kind in (
-        "codelist",
-        "concept_scheme",
-        "constraint",
-        "organisation_scheme",
-        "structure",
-    ):
-        for obj in getattr(sm, kind).values():
-            obj.maintainer = item
-            obj.version = VERSION
-            obj.is_external_reference = False
-
-    return sm
-
-
-def prepare_dsd(dsd: m.DataStructureDefinition, sm: msg.StructureMessage):
-    """Populate data structures within `dsd`."""
-    # Concepts for each dimension of each DSD
-    dsd_concepts = ChainMap(
-        sm.concept_scheme["TRANSPORT"],
-        sm.concept_scheme["MODELING"],
-        # Retrieve the CROSS_DOMAIN_CONCEPTS scheme from the SDMX Global Registry
-        get_cdc(),
-    )
-
-    try:
-        # Pop an annotation and use it to produce a list of dimension IDs
-        dims = _pop_anno(dsd, "_dimensions").split()
-    except AttributeError:
-        # No dimensions
-        dims = []
-
-    # Add common dimensions
-    dims = dims + ["REF_AREA", "TIME_PERIOD"]
-
-    # Add dimensions to the data structure
-    for order, concept_id in enumerate(dims):
-        # Locate the corresponding concept in one of three concept schemes
-        concept = dsd_concepts.get(concept_id)
-
-        if concept_id == "VARIABLE":
-            d = m.MeasureDimension(
-                id="VARIABLE",
-                name="Variable",
-                description="Reference to a concept from CL_TRANSPORT_MEASURES.",
-                local_representation=m.Representation(
-                    enumerated=sm.concept_scheme["TRANSPORT_MEASURE"]
-                ),
-            )
-        elif concept is None:
-            raise KeyError(concept_id)
-        else:
-            # Create the dimension, referring to the concept
-            d = m.Dimension(
-                id=concept_id, name=concept.name, concept_identity=concept, order=order
-            )
-
-            try:
-                # The dimension is represented by the corresponding code list, if any
-                d.local_representation = m.Representation(
-                    enumerated=sm.codelist[f"CL_{concept_id}"]
+AS_ITEM = AgencyScheme(
+    id="iTEM",
+    items=[
+        Agency(
+            id="iTEM",
+            name="International Transport Energy Modeling",
+            contact=[
+                Contact(
+                    name="iTEM organizing group",
+                    email=["mail@transportenergy.org"],
+                    uri=["https://transportenergy.org"],
                 )
-            except KeyError:
-                pass  # No iTEM codelist for this concept
-
-        # Append this dimension
-        dsd.dimensions.append(d)
-
-    # Add a primary measure: either the matching one
-    concept = dsd_concepts.get(dsd.id) or dsd_concepts.get("OBS_VALUE")
-    dsd.measures.append(
-        m.PrimaryMeasure(id=concept.id, name=concept.name, concept_identity=concept)
-    )
-
-    # Assign order to the dimensions
-    dsd.dimensions.assign_order()
-
-
-def cr_from(info: dict, dsd: m.DataStructureDefinition) -> m.CubeRegion:
-    """Create a :class:`.CubeRegion` from a simple :class:`dict` of `info`."""
-    cr = m.CubeRegion(included=info.pop("included", True))
-    for dim_id, values in info.items():
-        dim = dsd.dimensions.get(dim_id)
-
-        values = values.split()
-        if values[0] == "!":
-            included = False
-            values.pop(0)
-        else:
-            included = True
-
-        cr.member[dim] = m.MemberSelection(
-            included=included,
-            values_for=dim,
-            values=[m.MemberValue(value=value) for value in values],
+            ],
         )
-
-    return cr
-
-
-def cr_from_anno(obj: m.ContentConstraint, dsd: m.DataStructureDefinition) -> None:
-    """Convert an annotation on `obj` into a :class:`.CubeRegion` constraint."""
-    all_info = _pop_anno(obj, "_data_content_region")
-
-    if all_info is None:
-        return
-
-    for info in all_info:
-        obj.data_content_region.append(cr_from(info, dsd))
+    ],
+)
 
 
-def dks_from_anno(obj: m.ContentConstraint, dsd: m.DataStructureDefinition) -> None:
-    """Convert an annotation on `obj` into a :class:`.DataKeySet` constraint."""
-    info = _pop_anno(obj, "_data_content_keys")
-    if info is None:
-        return
-
-    dks = m.DataKeySet(included=True, keys=[])
-    for dim_id, values in info.items():
-        dim = dsd.dimensions.get(dim_id)
-
-        for value in values:
-            dks.keys.append(
-                m.DataKey(
-                    key_value={dim: m.ComponentValue(value_for=dim, value=value)},
-                    included=True,
-                )
-            )
-
-    obj.data_content_keys = dks
-
-
-def merge_general_constraints(
-    cc: m.ContentConstraint,
-    dsd: m.DataStructureDefinition,
-    sm: msg.StructureMessage,
-) -> None:
-    """Merge general constraints from `sm` into `cc` if relevant to `dsd`."""
-    for other_cc in filter(
-        lambda obj: obj.id.startswith("GENERAL"), sm.constraint.values()
-    ):
-        for i, info in enumerate(_get_anno(other_cc, "_data_content_region")):
-            if not (set(info.keys()) - {"included"}) < set(
-                dim.id for dim in dsd.dimensions
-            ):
-                continue
-
-            # log.debug(
-            #     f"Extend {repr(cc)} using {repr(other_cc)}.data_content_region[{i}]"
-            # )
-            cc.data_content_region.append(cr_from(info, dsd))
-
-
-CS_TRANSPORT = m.ConceptScheme(
+CS_TRANSPORT = ConceptScheme(
     id="TRANSPORT",
     description="Concepts used as dimensions or attributes for transport data.",
     items=[
@@ -328,7 +104,7 @@ CS_TRANSPORT = m.ConceptScheme(
     ],
 )
 
-CS_MODELING = m.ConceptScheme(
+CS_MODELING = ConceptScheme(
     id="MODELING",
     description="Concepts related to model-based research & assessment.",
     items=[
@@ -347,7 +123,7 @@ CS_MODELING = m.ConceptScheme(
     ],
 )
 
-CS_TRANSPORT_MEASURE = m.ConceptScheme(
+CS_TRANSPORT_MEASURE = ConceptScheme(
     id="TRANSPORT_MEASURE",
     description="Concepts used as measures in transport data.",
     items=[
@@ -358,7 +134,7 @@ CS_TRANSPORT_MEASURE = m.ConceptScheme(
                 "Amount of travel or transport by a person, vehicle, or collection of "
                 "these."
             ),
-            **_annotate(
+            **anno(
                 preferred_units={
                     "SERVICE == passenger": "10⁹ passenger-km / yr",
                     "SERVICE == freight": "10⁹ tonne-km / yr",
@@ -366,17 +142,17 @@ CS_TRANSPORT_MEASURE = m.ConceptScheme(
                 }
             ),
         ),
-        Concept(id="ENERGY", name="Energy", **_annotate(preferred_units="PJ / yr")),
+        Concept(id="ENERGY", name="Energy", **anno(preferred_units="PJ / yr")),
         Concept(
             id="ENERGY_INTENSITY",
             name="Energy intensity of activity",
-            **_annotate(preferred_units="MJ / vehicle-km"),
+            **anno(preferred_units="MJ / vehicle-km"),
         ),
         Concept(
             id="EMISSIONS",
             name="Emissions",
             description="Mass of a pollutant emitted.",
-            **_annotate(
+            **anno(
                 preferred_units={
                     "POLLUTANT == CO2": "10⁶ t CO₂ / yr",
                     "POLLUTANT == GHG": "10⁶ t CO₂e / yr",
@@ -388,13 +164,13 @@ CS_TRANSPORT_MEASURE = m.ConceptScheme(
         Concept(
             id="GDP",
             name="Gross Domestic Product",
-            **_annotate(preferred_units="10⁹ USD(2005) / year"),
+            **anno(preferred_units="10⁹ USD(2005) / year"),
         ),
         Concept(
             id="LOAD_FACTOR",
             name="Load factor",
             description="Amount of activity provided per vehicle",
-            **_annotate(
+            **anno(
                 preferred_units={
                     "SERVICE == PASSENGER": "passenger / vehicle",
                     "SERVICE == FREIGHT": "tonne / vehicle",
@@ -405,13 +181,13 @@ CS_TRANSPORT_MEASURE = m.ConceptScheme(
             id="POPULATION",
             name="Population",
             description="i.e. of people.",
-            **_annotate(preferred_units="10⁶ persons"),
+            **anno(preferred_units="10⁶ persons"),
         ),
         Concept(
             id="PRICE",
             name="Price",
             description="Market or fixed price for commodity.",
-            **_annotate(
+            **anno(
                 preferred_units={
                     "POLLUTANT == CO2": "USD(2005) / t CO₂",
                     "POLLUTANT == GHG": "USD(2005) / t CO₂e",
@@ -426,13 +202,13 @@ CS_TRANSPORT_MEASURE = m.ConceptScheme(
             id="SALES",
             name="Sales",
             description="New sales of vehicles in a period.",
-            **_annotate(preferred_units="10⁶ vehicle / yr"),
+            **anno(preferred_units="10⁶ vehicle / yr"),
         ),
         Concept(
             id="STOCK",
             name="Stock",
             description="Quantity of transport vehicles.",
-            **_annotate(preferred_units="10⁶ vehicle"),
+            **anno(preferred_units="10⁶ vehicle"),
         ),
     ],
 )
@@ -626,18 +402,16 @@ DATA_STRUCTURES = (
     DataStructureDefinition(
         id="ACTIVITY",
         description="Activity in terms of quantity of service provided.",
-        **_annotate(_dimensions="SERVICE MODE VEHICLE TECHNOLOGY AUTOMATION OPERATOR"),
+        **anno(_dimensions="SERVICE MODE VEHICLE TECHNOLOGY AUTOMATION OPERATOR"),
     ),
     DataStructureDefinition(
         id="ACTIVITY_VEHICLE",
         description="Activity of transport vehicles.",
-        **_annotate(_dimensions="SERVICE MODE VEHICLE TECHNOLOGY AUTOMATION OPERATOR"),
+        **anno(_dimensions="SERVICE MODE VEHICLE TECHNOLOGY AUTOMATION OPERATOR"),
     ),
     DataStructureDefinition(
         id="EMISSIONS",
-        **_annotate(
-            _dimensions="SERVICE MODE VEHICLE TECHNOLOGY FUEL POLLUTANT LCA_SCOPE"
-        ),
+        **anno(_dimensions="SERVICE MODE VEHICLE TECHNOLOGY FUEL POLLUTANT LCA_SCOPE"),
     ),
     DataStructureDefinition(
         id="ENERGY",
@@ -645,16 +419,16 @@ DATA_STRUCTURES = (
             "Observations measure the total energy consumed by the vehicles per year "
             "during the TIME_PERIOD."
         ),
-        **_annotate(_dimensions="SERVICE MODE VEHICLE TECHNOLOGY FLEET"),
+        **anno(_dimensions="SERVICE MODE VEHICLE TECHNOLOGY FLEET"),
     ),
     DataStructureDefinition(
         id="ENERGY_INTENSITY",
-        **_annotate(_dimensions="SERVICE MODE VEHICLE TECHNOLOGY FLEET"),
+        **anno(_dimensions="SERVICE MODE VEHICLE TECHNOLOGY FLEET"),
     ),
     DataStructureDefinition(id="GDP"),
     DataStructureDefinition(id="POPULATION"),
-    DataStructureDefinition(id="PRICE_FUEL", **_annotate(_dimensions="FUEL")),
-    DataStructureDefinition(id="PRICE_POLLUTANT", **_annotate(_dimensions="POLLUTANT")),
+    DataStructureDefinition(id="PRICE_FUEL", **anno(_dimensions="FUEL")),
+    DataStructureDefinition(id="PRICE_POLLUTANT", **anno(_dimensions="POLLUTANT")),
     DataStructureDefinition(
         id="LOAD_FACTOR",
         description=(
@@ -662,11 +436,11 @@ DATA_STRUCTURES = (
             "technology. Implicitly TECHNOLOGY is 'ALL', so the observations measure "
             "the average load factor across all powertrain technologies."
         ),
-        **_annotate(_dimensions="SERVICE MODE VEHICLE"),
+        **anno(_dimensions="SERVICE MODE VEHICLE"),
     ),
     DataStructureDefinition(
         id="SALES",
-        **_annotate(_dimensions="SERVICE MODE VEHICLE TECHNOLOGY FLEET"),
+        **anno(_dimensions="SERVICE MODE VEHICLE TECHNOLOGY FLEET"),
     ),
     DataStructureDefinition(
         id="STOCK",
@@ -675,7 +449,7 @@ DATA_STRUCTURES = (
             "Implicitly FLEET is 'ALL', so the observations measure the total of new "
             "and used vehicles."
         ),
-        **_annotate(_dimensions="SERVICE MODE VEHICLE TECHNOLOGY"),
+        **anno(_dimensions="SERVICE MODE VEHICLE TECHNOLOGY"),
     ),
     DataStructureDefinition(
         id="HISTORICAL",
@@ -687,7 +461,7 @@ This DSD has all possible dimensions, regardless of whether a particular measure
 multiple data flows will be specified, each with a distinct structure that reflects the
 dimensions that are valid for the relevant measure(s)."""
         ),
-        **_annotate(
+        **anno(
             _dimensions=(
                 "VARIABLE SERVICE MODE VEHICLE FUEL TECHNOLOGY AUTOMATION OPERATOR "
                 "POLLUTANT LCA_SCOPE FLEET"
@@ -704,7 +478,7 @@ This DSD has all possible dimensions, regardless of whether a particular measure
 multiple data flows will be specified, each with a distinct structure that reflects the
 dimensions that are valid for the relevant measure(s)."""
         ),
-        **_annotate(
+        **anno(
             _dimensions=(
                 "MODEL SCENARIO VARIABLE SERVICE MODE VEHICLE FUEL TECHNOLOGY "
                 "AUTOMATION OPERATOR POLLUTANT LCA_SCOPE FLEET"
@@ -713,15 +487,7 @@ dimensions that are valid for the relevant measure(s)."""
     ),
 )
 
-_allowable = m.ConstraintRole(role=m.ConstraintRoleType.allowable)
-
-
-def _exclude_z(dims):
-    return [{"included": False, dim: "_Z"} for dim in dims.split()]
-
-
-def _exclude(**kwargs):
-    return [{"included": False, k: v} for k, v in kwargs.items()]
+_allowable = ConstraintRole(role=ConstraintRoleType.allowable)
 
 
 #: Constraints applying to DSDs.
@@ -730,7 +496,7 @@ CONSTRAINTS = (
         id="GENERAL0",
         description="Vehicle types are only relevant for road modes.",
         role=_allowable,
-        **_annotate(
+        **anno(
             _data_content_region=[dict(included=False, MODE="! ROAD", VEHICLE="! _T")],
         ),
     ),
@@ -738,7 +504,7 @@ CONSTRAINTS = (
         id="GENERAL1",
         description="Vehicle types for freight or passenger service only.",
         role=_allowable,
-        **_annotate(
+        **anno(
             _data_content_region=[
                 dict(included=False, SERVICE="P", VEHICLE="TRUCK"),
                 dict(included=False, SERVICE="F", VEHICLE="LDV BUS 2W+3W"),
@@ -752,9 +518,7 @@ CONSTRAINTS = (
             "most iTEM models do not include it separately"
         ),
         role=_allowable,
-        **_annotate(
-            _data_content_region=[dict(included=False, SERVICE="F", MODE="AIR")]
-        ),
+        **anno(_data_content_region=[dict(included=False, SERVICE="F", MODE="AIR")]),
     ),
     ContentConstraint(
         id="GENERAL3",
@@ -763,7 +527,7 @@ CONSTRAINTS = (
             "air, rail, water, or small road vehicles."
         ),
         role=_allowable,
-        **_annotate(
+        **anno(
             _data_content_region=[
                 dict(included=False, MODE="AIR RAIL WATER", TECHNOLOGY="HYBRID FC"),
                 dict(included=False, VEHICLE="2W+3W", TECHNOLOGY="HYBRID FC"),
@@ -781,7 +545,7 @@ CONSTRAINTS = (
 """
         ),
         role=_allowable,
-        **_annotate(
+        **anno(
             _data_content_region=[
                 dict(included=False, TECHNOLOGY="COMBUSTION", FUEL="ELEC"),
                 dict(included=False, TECHNOLOGY="FC", FUEL="! H2"),
@@ -794,7 +558,7 @@ CONSTRAINTS = (
         id="GENERAL5",
         description="Shared and automated vehicles only relevant for LDVs.",
         role=_allowable,
-        **_annotate(
+        **anno(
             _data_content_region=[
                 dict(included=False, VEHICLE="! LDV", AUTOMATION="AV"),
                 dict(included=False, VEHICLE="2W+3W", OPERATOR="HIRE"),
@@ -806,24 +570,24 @@ CONSTRAINTS = (
         id="GENERAL6",
         description="Don't require reporting the sum of road + rail.",
         role=_allowable,
-        **_annotate(_data_content_region=_exclude(MODE="LAND OFFROAD ACTIVE")),
+        **anno(_data_content_region=exclude(MODE="LAND OFFROAD ACTIVE")),
     ),
     ContentConstraint(
         id="ACTIVITY",
         description="Omit sums by technology across modes.",
         role=_allowable,
-        **_annotate(
+        **anno(
             _data_content_region=[dict(included=False, MODE="_T", TECHNOLOGY="! _T")]
-            + _exclude_z("AUTOMATION MODE OPERATOR SERVICE TECHNOLOGY VEHICLE")
+            + exclude_z("AUTOMATION MODE OPERATOR SERVICE TECHNOLOGY VEHICLE")
         ),
     ),
     ContentConstraint(
         id="ACTIVITY_VEHICLE",
         description="Omit sums by technology across modes.",
         role=_allowable,
-        **_annotate(
+        **anno(
             _data_content_region=[dict(included=False, MODE="_T", TECHNOLOGY="! _T")]
-            + _exclude_z("AUTOMATION MODE OPERATOR SERVICE TECHNOLOGY VEHICLE")
+            + exclude_z("AUTOMATION MODE OPERATOR SERVICE TECHNOLOGY VEHICLE")
         ),
     ),
     ContentConstraint(
@@ -839,7 +603,7 @@ CONSTRAINTS = (
          """
         ),
         role=_allowable,
-        **_annotate(
+        **anno(
             _data_content_region=[
                 dict(included=False, FUEL="ELEC", LCA_SCOPE="TTW"),
                 dict(included=False, POLLUTANT="_Z AQ"),
@@ -847,13 +611,13 @@ CONSTRAINTS = (
                 dict(included=False, LCA_SCOPE="WTW", TECHNOLOGY="! _T"),
                 dict(included=False, POLLUTANT="BC NOX PM25 SO2", LCA_SCOPE="! TTW"),
             ]
-            + _exclude_z("FUEL MODE SERVICE TECHNOLOGY VEHICLE")
+            + exclude_z("FUEL MODE SERVICE TECHNOLOGY VEHICLE")
         ),
     ),
     ContentConstraint(
         id="ENERGY",
         role=_allowable,
-        **_annotate(_data_content_region=_exclude_z("MODE SERVICE TECHNOLOGY VEHICLE")),
+        **anno(_data_content_region=exclude_z("MODE SERVICE TECHNOLOGY VEHICLE")),
     ),
     ContentConstraint(
         id="ENERGY_INTENSITY",
@@ -864,26 +628,26 @@ CONSTRAINTS = (
             "only."
         ),
         role=_allowable,
-        **_annotate(
+        **anno(
             _data_content_region=[dict(FLEET="_T NEW")]
-            + _exclude(SERVICE="_T _Z")
-            + _exclude_z("MODE TECHNOLOGY")
+            + exclude(SERVICE="_T _Z")
+            + exclude_z("MODE TECHNOLOGY")
         ),
     ),
     ContentConstraint(
         id="LOAD_FACTOR",
         role=_allowable,
-        **_annotate(_data_content_region=_exclude_z("MODE SERVICE VEHICLE")),
+        **anno(_data_content_region=exclude_z("MODE SERVICE VEHICLE")),
     ),
     ContentConstraint(
         id="PRICE_FUEL",
         role=_allowable,
-        **_annotate(_data_content_region=[dict(FUEL="GASOLINE DIESEL ELEC")]),
+        **anno(_data_content_region=[dict(FUEL="GASOLINE DIESEL ELEC")]),
     ),
     ContentConstraint(
         id="PRICE_POLLUTANT",
         role=_allowable,
-        **_annotate(_data_content_region=[dict(POLLUTANT="GHG")]),
+        **anno(_data_content_region=[dict(POLLUTANT="GHG")]),
     ),
     ContentConstraint(
         id="SALES",
@@ -893,10 +657,10 @@ CONSTRAINTS = (
             "(re)sale of used road vehicles."
         ),
         role=_allowable,
-        **_annotate(
+        **anno(
             _data_content_region=[dict(FLEET="NEW", MODE="ROAD")]
-            + _exclude(SERVICE="_T _Z")
-            + _exclude_z("TECHNOLOGY VEHICLE")
+            + exclude(SERVICE="_T _Z")
+            + exclude_z("TECHNOLOGY VEHICLE")
         ),
     ),
     ContentConstraint(
@@ -906,10 +670,10 @@ CONSTRAINTS = (
             " vehicles. It excludes e.g. stock of aircraft or ships."
         ),
         role=_allowable,
-        **_annotate(
+        **anno(
             _data_content_region=[dict(MODE="ROAD")]
-            + _exclude(SERVICE="_T _Z")
-            + _exclude_z("TECHNOLOGY VEHICLE")
+            + exclude(SERVICE="_T _Z")
+            + exclude_z("TECHNOLOGY VEHICLE")
         ),
     ),
 )
