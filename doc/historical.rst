@@ -153,6 +153,14 @@ T010
 .. automodule:: item.historical.scripts.T010
    :members:
 
+T012
+----
+
+.. currentmodule:: item.historical.scripts.T012
+
+.. automodule:: item.historical.scripts.T012
+   :members:
+
 
 Quality diagnostics
 ===================

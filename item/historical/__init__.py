@@ -8,7 +8,7 @@ import pycountry
 import yaml
 
 from item.common import paths
-from item.historical.scripts import T000, T001, T003, T004, T009, T010
+from item.historical.scripts import T000, T001, T003, T004, T009, T010, T012
 from item.historical.scripts.util.managers.dataframe import ColumnName
 from item.remote import OpenKAPSARC, get_sdmx
 
@@ -36,6 +36,7 @@ MODULES = {
     4: T004,
     9: T009,
     10: T010,
+    12: T012,
 }
 
 #: Path for output from :func:`process`.
@@ -45,24 +46,41 @@ OUTPUT_PATH = paths["data"] / "historical" / "output"
 #: :meth:`iso_and_region` to replace names before they are looked up using
 #: :mod:`pycountry`.
 COUNTRY_NAME = {
-    "Azerbaidjan": "Azerbaijan",
-    "Bosnia-Herzegovina": "Bosnia and Herzegovina",
-    "Bosnia": "Bosnia and Herzegovina",
-    "Brunei": "Brunei Darussalam",
-    "Congo Kinshasa ": "Congo, The Democratic Republic of the",
-    "Hong-Kong": "Hong Kong",
-    "Iran": "Iran, Islamic Republic of",
-    "Ivory Coast": "Côte d'Ivoire",
-    "Korea": "Korea, Republic of",
-    "Macedonia": "North Macedonia",
-    "Moldavia": "Moldova",
-    "Montenegro, Republic of": "Montenegro",
-    "Palestine": "Palestine, State of",
-    "Russia": "Russian Federation",
-    "Serbia, Republic of": "Serbia",
-    "South Korea": "Korea, Republic of",
-    "Syria": "Syrian Arab Republic",
-    "The former Yugoslav Republic of Macedonia": "North Macedonia",
+    "Azerbaidjan": "AZE",
+    "Bolivia (Plurinational State of)": "BOL",
+    "Bosnia-Herzegovina": "BIH",
+    "Bosnia": "BIH",
+    "Brunei": "BRN",
+    # NB for T012. This includes both GGY and JEY; ambiguous.
+    # "Channel Islands": "",
+    "China, Hong Kong SAR": "HKG",
+    "China, Macao SAR": "MAC",
+    "China, Taiwan Province of China": "TWN",
+    "Congo Kinshasa ": "COD",
+    "Dem. People's Republic of Korea": "PRK",
+    "Democratic Republic of the Congo": "COD",
+    "Holy See": "VAT",
+    "Hong-Kong": "HKG",
+    "Iran (Islamic Republic of)": "IRN",
+    "Iran": "IRN",
+    "Ivory Coast": "CIV",
+    "Korea": "KOR",
+    "Macedonia": "MKD",
+    "Micronesia (Fed. States of)": "FSM",
+    "Moldavia": "MDA",
+    "Montenegro, Republic of": "MNE",
+    "Palestine": "PSE",
+    "Republic of Korea": "KOR",
+    "Russia": "RUS",
+    "Saint Helena": "SHN",
+    "Serbia, Republic of": "SRB",
+    "South Korea": "KOR",
+    "State of Palestine": "PSE",
+    "Syria": "SYR",
+    "The former Yugoslav Republic of Macedonia": "MKD",
+    "United States Virgin Islands": "VIR",
+    "Venezuela (Bolivarian Republic of)": "VEN",
+    "Wallis and Futuna Islands": "WLF",
 }
 
 
