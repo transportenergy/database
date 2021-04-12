@@ -352,6 +352,7 @@ CONCEPT_SCHEMES = [
 ]
 
 CL_AUTOMATION = (
+    Code(id="_T", name="Total"),
     Code(id="_Z", name="Not applicable"),
     Code(id="HUMAN", name="Human", description="Vehicle operated by a human driver."),
     Code(
@@ -360,8 +361,12 @@ CL_AUTOMATION = (
 )
 
 CL_FLEET = (
+    Code(
+        id="_T",
+        name="Total",
+        description="All vehicles in use in the reporting period.",
+    ),
     Code(id="_Z", name="Not applicable"),
-    Code(id="ALL", description="All vehicles in use in the reporting period."),
     Code(id="NEW", description="Only newly-sold vehicles in the reporting period."),
     Code(
         id="USED",
@@ -372,8 +377,8 @@ CL_FLEET = (
 )
 
 CL_FUEL = (
+    Code(id="_T", name="Total", description="All fuels."),
     Code(id="_Z", name="Not applicable"),
-    Code(id="ALL", description="All fuels."),
     Code(
         id="LIQUID",
         name="All liquid",
@@ -385,8 +390,8 @@ CL_FUEL = (
         ],
     ),
     Code(id="NG", name="Natural gas"),
-    Code(id="HYDROGEN"),
-    Code(id="ELECTRICITY"),
+    Code(id="H2", name="Hydrogen"),
+    Code(id="ELEC", name="Electricity"),
 )
 
 CL_LCA_SCOPE = (
@@ -397,16 +402,28 @@ CL_LCA_SCOPE = (
 )
 
 CL_MODE = (
+    Code(id="_T", name="Total", description="All transport modes."),
     Code(id="_Z", name="Not applicable"),
-    Code(id="ALL", name="All", description="All transport modes."),
     Code(id="AIR", name="Aviation"),
-    Code(id="LAND", name="Land transport"),
-    Code(id="ROAD", name="Road"),
-    Code(id="RAIL", name="Rail"),
+    Code(
+        id="LAND",
+        name="All land transport modes.",
+        child=[
+            Code(id="RAIL", name="Rail"),
+            Code(id="ROAD", name="Road", description="Motorized road transport."),
+            Code(
+                id="OFFROAD",
+                name="Off-road",
+                description="Motorized off-road transport.",
+            ),
+            Code(id="ACTIVE", name="Non-motorized"),
+        ],
+    ),
     Code(id="WATER", name="Water"),
 )
 
 CL_OPERATOR = (
+    Code(id="_T", name="Total"),
     Code(id="_Z", name="Not applicable"),
     Code(
         id="OWN",
@@ -435,9 +452,7 @@ CL_POLLUTANT = (
             "Greenhouse gases. Where used for totals, all GHGs are conveted to an "
             "equivalence basis."
         ),
-        child=[
-            Code(id="CO2", name="CO₂", description="Carbon dioxide."),
-        ],
+        child=[Code(id="CO2", name="CO₂", description="Carbon dioxide.")],
     ),
     Code(
         id="AQ",
@@ -462,20 +477,42 @@ CL_POLLUTANT = (
 )
 
 CL_SERVICE = (
+    Code(id="_T", name="Total"),
     Code(id="_Z", name="Not applicable"),
     Code(id="P", name="Passenger"),
     Code(id="F", name="Freight"),
 )
 
-CL_VEHICLE = (
+CL_TECHNOLOGY = (
+    Code(id="_T", name="Total", description="All technologies."),
     Code(id="_Z", name="Not applicable"),
-    Code(id="ALL", description="All vehicle types."),
+    Code(
+        id="IC",
+        name="Combustion",
+        description=(
+            "Using only chemical fuels. Inclusive of powertrains that store energy as"
+            "electricity, i.e. hybrids."
+        ),
+    ),
+    Code(id="ELECTRIC"),
+    Code(id="HYBRID", description="Using both electricity and chemical fuels."),
+    Code(
+        id="FC",
+        name="Fuel cell",
+        description="Using electrochemical conversion of fuel to electricity.",
+    ),
+)
+
+CL_VEHICLE = (
+    Code(id="_T", name="Total", description="All vehicle types."),
+    Code(id="_Z", name="Not applicable"),
     Code(
         id="LDV",
+        name="Light-duty vehicle",
         description="Light-duty road vehicle, including cars, SUVs, and light trucks.",
     ),
-    Code(id="BUS"),
-    Code(id="TRUCK"),
+    Code(id="BUS", name="Bus"),
+    Code(id="TRUCK", name="Truck"),
     Code(id="2W+3W", description="Two- and three-wheeled road vehicles."),
 )
 
@@ -490,6 +527,7 @@ CODELISTS = {
     "OPERATOR": CL_OPERATOR,
     "POLLUTANT": CL_POLLUTANT,
     "SERVICE": CL_SERVICE,
+    "TECHNOLOGY": CL_TECHNOLOGY,
     "VEHICLE": CL_VEHICLE,
 }
 
