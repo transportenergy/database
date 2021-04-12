@@ -195,9 +195,10 @@ def generate() -> msg.StructureMessage:
     return sm
 
 
-CONCEPTS = {
-    #: Concepts for the ``iTEM:TRANSPORT`` concept scheme.
-    "TRANSPORT": (
+CS_TRANSPORT = m.ConceptScheme(
+    id="TRANSPORT",
+    description="Concepts used as dimensions or attributes for transport data.",
+    items=[
         # Used as dimensions
         Concept(
             id="SERVICE",
@@ -226,15 +227,23 @@ CONCEPTS = {
         Concept(id="POLLUTANT", name="Species of environmental pollutant"),
         Concept(
             id="LCA_SCOPE",
-            name="LCA scope",
+            name="Life-cycle analysis scope",
             description="Scope of analysis covered by a transport life-cycle measure",
         ),
         Concept(
             id="FLEET",
-            description="Part of a fleet of transport vehicles, e.g. new versus used.",
+            name="Fleet",
+            description=(
+                "Portion of a fleet of transport vehicles, e.g. new versus used."
+            ),
         ),
-    ),
-    "MODELING": (
+    ],
+)
+
+CS_MODELING = m.ConceptScheme(
+    id="MODELING",
+    description="Concepts related to model-based research & assessment.",
+    items=[
         Concept(
             id="MODEL",
             name="Model",
@@ -247,8 +256,13 @@ CONCEPTS = {
                 "Name or other identifier of a specific configuration of a model."
             ),
         ),
-    ),
-    "TRANSPORT_MEASURE": (
+    ],
+)
+
+CS_TRANSPORT_MEASURE = m.ConceptScheme(
+    id="TRANSPORT_MEASURE",
+    description="Concepts used as measures in transport data.",
+    items=[
         Concept(
             id="ACTIVITY",
             name="Transport activity",
@@ -271,8 +285,8 @@ CONCEPTS = {
             **_annotate(preferred_units="MJ / vehicle-km"),
         ),
         Concept(
-            id="EMISSION",
-            name="Emission",
+            id="EMISSIONS",
+            name="Emissions",
             description="Mass of a pollutant emitted.",
             **_annotate(
                 preferred_units={
@@ -332,24 +346,11 @@ CONCEPTS = {
             description="Quantity of transport vehicles.",
             **_annotate(preferred_units="10⁶ vehicle"),
         ),
-    ),
-}
+    ],
+)
 
 #: Concept schemes.
-CONCEPT_SCHEMES = [
-    ConceptScheme(
-        id="TRANSPORT",
-        description="Concepts used as dimensions or attributes for transport data.",
-    ),
-    ConceptScheme(
-        id="MODELING",
-        description="Concepts related to model-based research & assessment.",
-    ),
-    ConceptScheme(
-        id="TRANSPORT_MEASURE",
-        description="Concepts used as measures in transport data.",
-    ),
-]
+CONCEPT_SCHEMES = [CS_TRANSPORT, CS_MODELING, CS_TRANSPORT_MEASURE]
 
 CL_AUTOMATION = (
     Code(id="_T", name="Total"),
