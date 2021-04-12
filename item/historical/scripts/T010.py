@@ -28,7 +28,6 @@ COLUMNS: Dict[str, Any] = dict(
 
 def process(df):
     """Process data set T010."""
-    print(df.head())
 
     def clean(df):
         return df.assign(
