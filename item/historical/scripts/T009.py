@@ -14,7 +14,6 @@ COMMON_DIMS = dict(
 
 
 COLUMNS = dict(
-    drop=["frequency"],
     rename=dict(
         country_name="Country",
         date="Year",

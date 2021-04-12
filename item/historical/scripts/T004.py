@@ -22,7 +22,7 @@ from functools import lru_cache
 
 import pandas as pd
 
-from .util.managers.dataframe import ColumnName
+from item.structure import column_name
 
 #: Separator character for :func:`pandas.read_csv`.
 CSV_SEP = ";"
@@ -45,8 +45,8 @@ COLUMNS = dict(
 #: Mapping between existing values and values to be assigned.
 MAP = {
     "Type of vehicle": {
-        # Columns to which the values should be assigned
-        "_columns": (ColumnName.SERVICE.value, ColumnName.VEHICLE_TYPE.value),
+        # Dimensions to which the values should be assigned
+        "_dims": ("SERVICE", "VEHICLE"),
         # Key is the value appearing in the variable column; values are a tuple for the
         # two columns
         "New lorries (vehicle wt over 3500 kg)": ("Freight", "Heavy Truck"),
@@ -56,7 +56,7 @@ MAP = {
         "New light goods vehicles": ("Freight", "Light Truck"),
     },
     "Fuel type": {
-        "_columns": (ColumnName.TECHNOLOGY.value, ColumnName.FUEL.value),
+        "_dims": ("TECHNOLOGY", "FUEL"),
         "- LPG": ("Natural Gas Vehicle", "Natural Gas"),
         "- Compressed natural gas (CNG)": ("Natural Gas Vehicle", "Natural Gas"),
         "- Liquefied natural gas (LNG)": ("Natural Gas Vehicle", "Natural Gas"),
@@ -80,7 +80,7 @@ MAP = {
 
 
 def process(df):
-    df = df.rename(columns={"Date": ColumnName.YEAR.value})
+    df = df.rename(columns={"Date": column_name("YEAR")})
 
     # U
     return pd.concat(
@@ -96,4 +96,6 @@ def process(df):
 @lru_cache()
 def map_column(value, column):
     """Apply mapping to `value` in `column`."""
-    return pd.Series(MAP[column][value], index=MAP[column]["_columns"])
+    return pd.Series(
+        MAP[column][value], index=list(map(column_name, MAP[column]["_dims"]))
+    )

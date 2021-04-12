@@ -4,7 +4,7 @@ from item.common import init_log, log
 
 
 def test_log(item_tmp_dir):
-    init_log()
+    init_log(file=True)
 
     # Log using the standard Python method
     logger = logging.getLogger("item")
