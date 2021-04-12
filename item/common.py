@@ -3,17 +3,9 @@ import logging.config
 import os
 from os.path import abspath, join
 from pathlib import Path
-from warnings import filterwarnings
 
 import yaml
 from pkg_resources import resource_filename  # noqa: F401
-
-# Occurs with pandas 0.20 and xarray 0.9.1
-filterwarnings(
-    "ignore",
-    message=".*pandas.tslib module is deprecated.*",
-    module="xarray.core.formatting",
-)
 
 # Various paths to data
 paths = {
