@@ -48,14 +48,21 @@ def load_config(path=None):
 def init(path=None):
     load_config(path)
     init_paths()
+    init_log()
 
 
-def init_log(verbose=True):
+def init_log(verbose=True, file=False):
     with open(Path(__file__).with_name("logging.yaml")) as f:
         log_config = yaml.safe_load(f)
 
     # Set up the log file
-    log_config["handlers"]["file_handler"]["filename"] = paths["log"] / "item.log"
+    if file:
+        log_config["handlers"]["file_handler"]["filename"] = paths["log"] / "item.log"
+    else:
+        del log_config["handlers"]["file_handler"]
+        log_config["root"]["handlers"].pop(
+            log_config["root"]["handlers"].index("file_handler")
+        )
 
     # Activate verbose output
     if verbose:
@@ -100,12 +107,7 @@ def init_paths(**kwargs):
 
 def log(*items, level=logging.INFO):
     """Write a collection of *items* to the log."""
-    if _logger is None:
-        init_log()
-    if level == logging.INFO:
-        _logger.info(*items)
-    elif level == logging.DEBUG:
-        _logger.debug(*items)
+    logging.getLogger("item").log(level, *items)
 
 
 def make_database_dirs(path, dry_run):
