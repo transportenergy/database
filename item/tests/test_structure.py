@@ -1,4 +1,3 @@
-import logging
 from itertools import product
 
 import sdmx
@@ -7,7 +6,8 @@ from item.structure import column_name, generate, make_template
 
 
 def test_column_name(caplog):
-    caplog.set_level(logging.WARNING)
+    # Force clear of lru_cache()
+    column_name.cache_clear()
 
     # Correctly retrieves the name of a Concept from the data structures
     assert column_name("VEHICLE") == "Vehicle type"
