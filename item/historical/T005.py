@@ -1,9 +1,7 @@
 from functools import lru_cache
 
-from item.historical.util import dropna_logged
 from item.structure import column_name
 from item.utils import convert_units
-
 
 #: Dimensions and attributes which do not vary across this data set.
 COMMON_DIMS = dict(
