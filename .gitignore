@@ -25,6 +25,9 @@ coverage.xml
 dist
 htmlcov/
 
+# requests-cache
+item.sqlite
+
 # Data files/generated
 *.csv
 *.xlsx
@@ -43,4 +46,3 @@ ci/*.json
 # Editors
 /**/.idea
 *.eggs
-

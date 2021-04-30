@@ -8,7 +8,7 @@ import pycountry
 import yaml
 
 from item.common import paths
-from item.historical.scripts import T000, T001, T003, T004, T009, T010, T012
+from item.historical.scripts import T000, T001, T002, T003, T004, T009, T010, T012
 from item.historical.scripts.util.managers.dataframe import ColumnName
 from item.remote import OpenKAPSARC, get_sdmx
 
@@ -20,7 +20,7 @@ SCRIPTS = [
     # Converted to a submodule, below.
     # 'T000',
     # 'T001',
-    "T002",
+    # "T002",
     # "T003",
     "T005",
     "T006",
@@ -32,6 +32,7 @@ SCRIPTS = [
 MODULES = {
     0: T000,
     1: T001,
+    2: T002,
     3: T003,
     4: T004,
     9: T009,
