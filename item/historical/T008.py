@@ -1,3 +1,11 @@
+from functools import lru_cache
+
+from item.structure import column_name
+
+#: Separator character for :func:`pandas.read_csv`.
+CSV_SEP = ";"
+
+
 #: Dimensions and attributes which do not vary across this data set.
 COMMON_DIMS = dict(
     source="UNECE",
@@ -21,15 +29,27 @@ def check(df):
 
 
 def process(df):
-    raise NotImplementedError
-    # TODO rename "Date" → "Year"
-    # TODO map "Measurement" column to "Unit":
-    # - "absolute value" → "10^6 vehicle"
-    # - "per 1000 inhabitants" → "vehicle / 1000 capita"
-    # TODO map "Vehicle category" values to vehicle_type:
-    # - Special purpose vehicles ---> Special purpose vehicles
-    # - Passenger cars ---> LDV
-    # - Trams ---> Trams
-    # - Motorcycles ---> Motorcycles
-    # - Motor coaches, buses and trolley bus ---> Bus
-    # - Mopeds ---> Mopeds
+    return (
+        df.rename(columns=dict(Date=column_name("YEAR")))
+        .assign(
+            unit=df["Measurement"].apply(map_unit),
+            vehicle_type=df["Vehicle Category"].apply(map_vehicle_type),
+        )
+        .drop(columns=["Measurement", "Vehicle Category"])
+    )
+
+
+@lru_cache()
+def map_unit(value):
+    return {
+        "absolute value": "10^6 vehicle",
+        "per 1000 inhabitants": "vehicle / kiloperson",
+    }.get(value)
+
+
+@lru_cache()
+def map_vehicle_type(value):
+    return {
+        "Passenger cars": "LDV",
+        "Motor coaches, buses and trolley bus": "Bus",
+    }.get(value, value)
