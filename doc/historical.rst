@@ -18,12 +18,8 @@ Input data is retrieved using via OpenKAPSARC and SDMX APIs, according to the ty
 Processing
 ==========
 
-The general function :func:`~historical.process` applies common cleaning steps to each dataset, while loading and making use of dataset-specific checks, processing steps, and configuration from a submodule like :mod:`.T001`, as listed in :data:`.MODULES`.
+The general function :func:`~historical.process` applies common cleaning steps to each dataset, while loading and making use of dataset-specific checks, processing steps, and configuration from a submodule like :mod:`.T001`.
 See the documentation of :func:`~historical.process` for a detailed description of the steps.
-
-*Previously*, input data sets were cleaned and transformed by IPython notebooks in the :file:`item/historical/scripts` directory, as listed in :data:`.SCRIPTS`.
-The notebook name corresponds to the input data set which it handles, e.g. :file:`T001.ipynb`.
-
 
 .. _diagnostics:
 
@@ -70,25 +66,15 @@ Code reference
 .. automodule:: item.historical.diagnostic
    :members:
 
-.. currentmodule:: item.historical.scripts.util.managers.dataframe
-
-.. autoclass:: ColumnName
-   :show-inheritance:
-   :undoc-members:
-   :private-members:
-   :inherited-members:
-   :member-order: bysource
-
-
 Specific data sets
 ==================
 
 T000
 ----
 
-.. currentmodule:: item.historical.scripts.T000
+.. currentmodule:: item.historical.T000
 
-.. automodule:: item.historical.scripts.T000
+.. automodule:: item.historical.T000
    :members:
 
    .. literalinclude:: ../item/data/historical/sources.yaml
@@ -99,9 +85,9 @@ T000
 T001
 ----
 
-.. currentmodule:: item.historical.scripts.T001
+.. currentmodule:: item.historical.T001
 
-.. automodule:: item.historical.scripts.T001
+.. automodule:: item.historical.T001
    :members:
 
    .. literalinclude:: ../item/data/historical/sources.yaml
@@ -112,9 +98,9 @@ T001
 T003
 ----
 
-.. currentmodule:: item.historical.scripts.T003
+.. currentmodule:: item.historical.T003
 
-.. automodule:: item.historical.scripts.T003
+.. automodule:: item.historical.T003
    :members:
 
    .. literalinclude:: ../item/data/historical/sources.yaml
@@ -124,9 +110,9 @@ T003
 T004
 ----
 
-.. currentmodule:: item.historical.scripts.T004
+.. currentmodule:: item.historical.T004
 
-.. automodule:: item.historical.scripts.T004
+.. automodule:: item.historical.T004
    :members:
 
    .. literalinclude:: ../item/data/historical/sources.yaml
@@ -136,9 +122,9 @@ T004
 T009
 ----
 
-.. currentmodule:: item.historical.scripts.T009
+.. currentmodule:: item.historical.T009
 
-.. automodule:: item.historical.scripts.T009
+.. automodule:: item.historical.T009
    :members:
 
    .. literalinclude:: ../item/data/historical/sources.yaml
@@ -148,17 +134,17 @@ T009
 T010
 ----
 
-.. currentmodule:: item.historical.scripts.T010
+.. currentmodule:: item.historical.T010
 
-.. automodule:: item.historical.scripts.T010
+.. automodule:: item.historical.T010
    :members:
 
 T012
 ----
 
-.. currentmodule:: item.historical.scripts.T012
+.. currentmodule:: item.historical.T012
 
-.. automodule:: item.historical.scripts.T012
+.. automodule:: item.historical.T012
    :members:
 
 
