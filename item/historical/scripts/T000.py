@@ -73,6 +73,7 @@ def mode_and_vehicle_type(variable_name):
     Variable                                      Mode  Vehicle type
     ============================================= ===== ============
     Rail passenger transport                      Rail  All
+    Road passenger transport                      Road  All
     Road passenger transport by buses and coaches Road  Bus
     Road passenger transport by passenger cars    Road  LDV
     Total inland passenger transport              All   All
