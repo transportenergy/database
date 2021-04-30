@@ -1,3 +1,10 @@
+from functools import lru_cache
+
+from item.historical.util import dropna_logged
+from item.structure import column_name
+from item.utils import convert_units
+
+
 #: Dimensions and attributes which do not vary across this data set.
 COMMON_DIMS = dict(
     source="JRC",
@@ -10,35 +17,46 @@ COMMON_DIMS = dict(
 
 #: Columns to drop from the raw data.
 COLUMNS = dict(
-    drop=["IPCC-Annex", "World Region"],
+    drop=["IPCC_description", "IPCC-Annex", "World Region"],
 )
 
 
 def process(df):
-    raise NotImplementedError
-    # TODO column 'ISO-A3' already has ISO 3166 alpha-3 codes; use this instead of
-    #      regenerating
+    """Process T005.
+
+    1. Select only measures with IDs beginning "1.A.3".
+    2. Melt from wide to long format.
+    3. Drop NA values.
+    4. Map from the IPCC emissions category (e.g. "1.A.3.a") to mode (e.g. "Air");
+       see :func:`map_mode`.
+    5. Convert from Mt/a to Gt/a.
+    """
     # TODO use the following
     # - Int. Aviation --> World
     # - Int. Shipping --> World
-    # TODO discard rows where "IPCC" is anything other than r"1\.A\.3*"
-    # TODO the Jupyter notebook assigned the units "10^6 tonne / year", but then
-    #      divided the magnitudes by 1e3 *without* changing the units. The text says
-    #      "For each value, convert them to billion"
-    # TODO map "Mode". Per the Jupyter notebook: "There are five IPCC descriptions and
-    #      this is how each one is mapped to our schema:
-    # - 1. For countries:
-    # -     IPCC --> Mode
-    # -     Railways --> Rail
-    # -     Road Transportation --> Road
-    # -     Civil Aviation --> Air
-    # -     Other Transportation --> Other
-    # -     Water-borne Navigation --> Shipping
-    # -
-    # - 2. For Int. Aviation country:
-    # -     IPCC --> Mode
-    # -     Civil Aviation --> Domestic Aviation
-    # -
-    # - 3. For Int. Shipping country:
-    # -     IPCC --> Mode
-    # -     Water-Borne Navigation --> Domestic Shipping
+
+    return (
+        df[df["IPCC"].str.startswith("1.A.3")]
+        .melt(
+            id_vars=["ISO_A3", "Name", "IPCC"],
+            var_name=column_name("YEAR"),
+            value_name=column_name("VALUE"),
+        )
+        .dropna(subset=[column_name("VALUE")])
+        .rename(
+            columns={"ISO_A3": column_name("ISO_CODE"), "Name": column_name("COUNTRY")}
+        )
+        .assign(mode=lambda df: df["IPCC"].apply(map_mode))
+        .pipe(convert_units, "megatonne / year", "gigatonne / year")
+    )
+
+
+@lru_cache
+def map_mode(value):
+    return {
+        "1.A.3.a": "Air",  # "Civil Aviation"
+        "1.A.3.b": "Road",  # "Road Transportation"
+        "1.A.3.c": "Rail",  # "Railways"
+        "1.A.3.d": "Water",  # "Water-borne Navigation"
+        "1.A.3.e": "Other",  # "Other Transportation"
+    }.get(value)
