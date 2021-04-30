@@ -58,6 +58,22 @@ COUNTRY_NAME = {
     "Wallis and Futuna Islands": "WLF",
 }
 
+# From T005
+#
+# Cape Verde --> Cabo Verde
+# Congo_the Democratic Republic of the --> Congo, The Democratic Republic of the
+# Cote d'Ivoire --> Côte d'Ivoire
+# Libyan Arab Jamahiriya --> Libya
+# Macedonia, the former Yugoslav Republic of --> ?
+# Netherlands Antilles --> ANT
+# Reunion --> Réunion
+# Saint Helena --> Saint Helena, Ascension and Tristan da Cunha
+# Serbia and Montenegro --> SCG
+# Swaziland --> Eswatini
+# Taiwan_Province of China --> Taiwan, Province of China
+# Tanzania_United Republic of --> Tanzania, United Republic of
+# Virgin Islands_British --> Virgin Islands, British
+# World --> WLD (we will use this code)
 
 #: Map from ISO 3166 alpha-3 code to region name.
 REGION = {}
