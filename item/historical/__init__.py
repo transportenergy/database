@@ -2,6 +2,7 @@ import logging
 import os
 from copy import deepcopy
 from functools import lru_cache
+from importlib import import_module
 
 import pandas as pd
 import pycountry
@@ -225,7 +226,7 @@ def process(id):
     id_str = source_str(id)
 
     # Get the module for this data set
-    dataset_module = __import__(f"item.historical.{id_str}")
+    dataset_module = import_module(f"item.historical.{id_str}")
 
     if getattr(dataset_module, "FETCH", False):
         # Fetch directly from source
