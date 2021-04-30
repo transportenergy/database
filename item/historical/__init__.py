@@ -225,7 +225,7 @@ def process(id):
     id_str = source_str(id)
 
     # Get the module for this data set
-    dataset_module = __import__(f"item.historical.scripts.{id_str}")
+    dataset_module = __import__(f"item.historical.{id_str}")
 
     if getattr(dataset_module, "FETCH", False):
         # Fetch directly from source
