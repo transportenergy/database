@@ -11,6 +11,7 @@ import yaml
 from item.common import paths
 from item.historical.util import ColumnName
 from item.remote import OpenKAPSARC, get_sdmx
+from item.structure import column_name
 
 log = logging.getLogger(__name__)
 
@@ -126,7 +127,7 @@ def cache_results(id_str, df):
     # - 'Unstack' the 'Year' dimension to columns, i.e. wide format.
     # - Return the index to columns in the dataframe.
     # - Write to file.
-    df.set_index(columns).unstack(ColumnName.YEAR.value).reset_index().to_csv(
+    df.set_index(columns).unstack(column_name("YEAR")).reset_index().to_csv(
         path, index=False
     )
     log.info(f"Write {path}")
@@ -276,14 +277,12 @@ def process(id):
     df = df.combine_first(df[country_col].apply(iso_and_region))
 
     # Values to assign across all observations: the dataset ID
-    assign_values = {ColumnName.ID.value: id_str}
+    assign_values = {column_name("ID"): id_str}
 
     # Handle any COMMON_DIMS, if defined
     for dim, value in getattr(dataset_module, "COMMON_DIMS", {}).items():
-        # Standard name for the column
-        col_name = getattr(ColumnName, dim.upper()).value
-        # Copy the value to be assigned
-        assign_values[col_name] = value
+        # Retrieve a dimension ID; copy the value to be assigned
+        assign_values[column_name(dim.upper())] = value
 
     # - Assign the values.
     # - Order the columns in the standard order.
@@ -323,8 +322,10 @@ def iso_and_region(name):
 
     # Look up the region, construct a Series, and return
     return pd.Series(
-        [alpha_3, REGION.get(alpha_3, "N/A")],
-        index=[ColumnName.ISO_CODE.value, ColumnName.ITEM_REGION.value],
+        {
+            column_name("ISO_CODE"): alpha_3,
+            column_name("ITEM_REGION"): REGION.get(alpha_3, "N/A"),
+        }
     )
 
 
