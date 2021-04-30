@@ -3,8 +3,9 @@ from functools import lru_cache
 
 import pandas as pd
 
-from item.historical.scripts.util.managers.dataframe import ColumnName
 from item.historical.util import dropna_logged
+from item.structure import column_name
+
 
 #: Dimensions and attributes which do not vary across this data set.
 COMMON_DIMS = dict(
@@ -43,58 +44,29 @@ def process(df):
     """Process data set T002."""
     df = df.pipe(dropna_logged, "Value", ["Country"])
 
-    # Assign the 'Mode' and 'Variable' columns
-    df = pd.concat([df, df["Variable"].apply(mode_and_variable)], axis=1)
-
-    # TODO Find a way on dealing with the "Variable" columns case in a better way
-    # When the value for the "Variable" column is not unique, the code breaks.
-    del df["Variable"]
-    df.rename({"Var 2": ColumnName.VARIABLE.value}, axis=1, inplace=True)
-
-    # Assign the 'Unit' column
-    df = pd.concat([df, df["Unit"].apply(unit)], axis=1)
-
-    # TODO same as in 'Variable' column
-    del df["Unit"]
-    df.rename({"Unit 2": ColumnName.UNIT.value}, axis=1, inplace=True)
-
-    # 1. Drop null values.
-    # 2. Convert to the preferred iTEM units.
-    df = df.dropna()
-
-    return df
-
-
-@lru_cache()
-def mode_and_variable(variable_name):
-
-    # Mode
-    if "Rail" in variable_name:
-        mode = "Rail"
-    else:
-        mode = "Shipping"
-
-    # Variable
-    if "TEU" in variable_name:
-        variable = "Freight (TEU)"
-    else:
-        variable = "Freight (Weight)"
-
-    return pd.Series(
-        [mode, variable],
-        index=[ColumnName.MODE.value, "Var 2"],
+    # Assign 'Mode', 'Variable', and 'Unit' values
+    return pd.concat(
+        [
+            df.drop(columns=["Variable", "Unit"]),
+            df["Variable"].apply(map_variable),
+            df["Unit"].apply(map_unit),
+        ],
+        axis=1,
     )
 
 
 @lru_cache()
-def unit(unit_name):
-
-    if unit_name == "Tonnes":
-        unit = "10^3 tonnes / yr"
-    else:
-        unit = unit_name
-
+def map_variable(value):
     return pd.Series(
-        [unit],
-        index=["Unit 2"],
+        {
+            column_name("MODE"): "Rail" if "Rail" in value else "Shipping",
+            column_name("VARIABLE"): "Freight ({})".format(
+                "TEU" if "TEU" in value else "Weight"
+            ),
+        }
     )
+
+
+@lru_cache()
+def map_unit(value):
+    return pd.Series({"Unit": "10^3 tonne / year" if value == "Tonnes" else value})
