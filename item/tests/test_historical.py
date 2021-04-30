@@ -48,15 +48,6 @@ def test_fetch(source_id):
     fetch_source(source_id, use_cache=False)
 
 
-def test_import():
-    # All historical database classes can be imported
-    from item.historical.scripts.util.managers.country_code import CountryCodeManager
-    from item.historical.scripts.util.managers.dataframe import DataframeManager
-
-    CountryCodeManager()
-    DataframeManager(dataset_id=None)
-
-
 def test_input_file(item_tmp_dir):
     # Create some temporary files in any order
     files = [

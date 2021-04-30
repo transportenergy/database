@@ -8,7 +8,6 @@ COMMANDS = [
     ("historical",),
     ("historical", "diagnostics"),
     ("historical", "phase1"),
-    ("historical", "run-scripts"),
     # model
     ("model",),
     ("model", "process_raw"),
