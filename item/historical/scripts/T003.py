@@ -108,8 +108,14 @@ def process(df):
         .assign(Variable="Freight Activity")
         # Rename columns
         .rename(
-            columns=dict(mode="Mode", service="Service", vehicle_type="Vehicle Type")
+            columns=dict(
+                mode="Mode or medium of transport",
+                service="Service",
+                vehicle_type="Vehicle type",
+            )
         )
         # Sort
-        .sort_values(by=["Country", "Year", "Mode", "Vehicle Type"])
+        .sort_values(
+            by=["Country", "Year", "Mode or medium of transport", "Vehicle type"]
+        )
     )

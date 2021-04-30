@@ -17,7 +17,7 @@ COLUMNS = dict(
     rename=dict(
         country_name="Country",
         date="Year",
-        type_of_vehicle_name="Vehicle Type",
+        type_of_vehicle_name="Vehicle type",
         value="Value",
     ),
 )
@@ -44,6 +44,6 @@ def process(df):
     # Strip "- " prefix from Fuel strings
     df["Technology"] = df["fuel_type_name"].str.lstrip("- ").replace({"Total": "All"})
 
-    df["Service"] = df["Vehicle Type"].apply(service)
+    df["Service"] = df["Vehicle type"].apply(service)
 
     return df

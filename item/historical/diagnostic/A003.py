@@ -16,9 +16,9 @@ def compute(activity, stock):
         From :mod:`.T009`.
     """
     # Select activity
-    activity = activity.query("Mode == 'Road' and `Vehicle Type` == 'All'").set_index(
-        ["ISO Code", "Year"]
-    )
+    activity = activity.query(
+        "`Mode or medium of transport` == 'Road' and `Vehicle type` == 'All'"
+    ).set_index(["ISO Code", "Year"])
 
     # Select stock
     vehicle_types = [
@@ -26,7 +26,7 @@ def compute(activity, stock):
         "Lorries (vehicle wt over 3500 kg)",
         "Road tractors",
     ]
-    mask = stock.Fuel.isin(["All"]) & stock["Vehicle Type"].isin(vehicle_types)
+    mask = stock.Fuel.isin(["All"]) & stock["Vehicle type"].isin(vehicle_types)
     stock = stock[mask].groupby(["ISO Code", "Year"]).sum(numeric_only=True)
 
     df = (
@@ -36,7 +36,14 @@ def compute(activity, stock):
         # Restore column names, for convert_units()
         .rename("Value")
         .reset_index()
-        .assign(Variable="Load factor", Service="Freight", Fuel="All", Mode="Road")
+        .assign(
+            **{
+                "Variable": "Load factor",
+                "Service": "Freight",
+                "Fuel": "All",
+                "Mode or medium of transport": "Road",
+            }
+        )
         # To preferred units
         .pipe(convert_units, "Gt km / year / kvehicle", "kt km / year / vehicle")
     )
