@@ -8,37 +8,11 @@ import pycountry
 import yaml
 
 from item.common import paths
-from item.historical.scripts import T000, T001, T002, T003, T004, T009, T010, T012
 from item.historical.scripts.util.managers.dataframe import ColumnName
 from item.remote import OpenKAPSARC, get_sdmx
 
 log = logging.getLogger(__name__)
 
-
-#: List of data processing Jupyter/IPython notebooks.
-SCRIPTS = [
-    # Converted to a submodule, below.
-    # 'T000',
-    # 'T001',
-    # "T002",
-    # "T003",
-    "T005",
-    "T006",
-    "T007",
-    "T008",
-]
-
-#: Submodules usable with :func:`process`.
-MODULES = {
-    0: T000,
-    1: T001,
-    2: T002,
-    3: T003,
-    4: T004,
-    9: T009,
-    10: T010,
-    12: T012,
-}
 
 #: Path for output from :func:`process`.
 OUTPUT_PATH = paths["data"] / "historical" / "output"
@@ -235,7 +209,7 @@ def process(id):
     id_str = source_str(id)
 
     # Get the module for this data set
-    dataset_module = MODULES[id]
+    dataset_module = __import__(f"item.historical.scripts.{id_str}")
 
     if getattr(dataset_module, "FETCH", False):
         # Fetch directly from source
