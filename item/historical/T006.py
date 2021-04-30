@@ -43,7 +43,7 @@ def process(df):
     )
 
 
-@lru_cache
+@lru_cache()
 def map_mode_vehicle_type(value):
     return pd.Series(
         {

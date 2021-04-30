@@ -49,7 +49,7 @@ def process(df):
     )
 
 
-@lru_cache
+@lru_cache()
 def map_mode(value):
     return {
         "1.A.3.a": "Air",  # "Civil Aviation"
