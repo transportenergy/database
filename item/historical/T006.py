@@ -1,10 +1,21 @@
+from functools import lru_cache
+
+import pandas as pd
+
+from item.structure import column_name
+
+#: Separator character for :func:`pandas.read_csv`.
+CSV_SEP = ";"
+
+
 #: Dimensions and attributes which do not vary across this data set.
 COMMON_DIMS = dict(
     source="Eurostat",
     service="Freight",
     technology="All",
     vehicle_type="All",
-    variable="Activity",
+    variable="Activity, share of volume",
+    unit="percent",
 )
 
 #: Columns to drop from the raw data.
@@ -17,22 +28,28 @@ def check(df):
     # Canary checks for expected contents
     assert (df["Frequency"] == "Annual").all()
     assert (df["Measure"] == "Percentage").all()
-    assert (df["Variable"] == "Freight Activity").all()
 
 
 def process(df):
-    raise NotImplementedError
-
-    df = df.query("'Tra Mode' != 'Railways, inland waterways - sum of available data'")
-    # TODO rename "Geo" → "Country"
-    # TODO rename "Date" → "Year"
     # TODO handle the following:
     # - 'European Union (current composition)'
     # - 'Germany (until 1990 former territory of the FRG)'
-    # TODO the Jupyter notebook assigned units "% tonne-kilometres / year" —it's
-    #      unclear what this means. Check.
-    # TODO map the following
-    #      Tra Mode --> Mode --> Vehicle Type
-    #      Railways -> Rail --> All
-    #      Roads -> Road --> All
-    #      Inland waterways --> Shipping -> Inland Waterway
+    return (
+        pd.concat([df, df["Tra Mode"].apply(map_mode_vehicle_type)], axis=1)
+        .rename(columns={"Tra Mode": "Tra_Mode"})
+        .query("Tra_Mode != 'Railways, inland waterways - sum of available data'")
+        .drop(columns=["Tra_Mode"])
+        .rename(columns=dict(Geo=column_name("COUNTRY"), Date=column_name("YEAR")))
+    )
+
+
+@lru_cache
+def map_mode_vehicle_type(value):
+    return pd.Series(
+        {
+            "Railways": ["Rail", "All"],
+            "Roads": ["Road", "LDV"],
+            "Inland waterways": ["Shipping", "All"],
+        }.get(value),
+        index=[column_name("MODE"), column_name("VEHICLE_TYPE")],
+    )
