@@ -1,11 +1,5 @@
-import io
 import logging
-import os
-import subprocess
-import sys
-from pathlib import Path
-
-import nbformat
+from enum import Enum
 
 log = logging.getLogger(__name__)
 
@@ -28,66 +22,25 @@ def dropna_logged(df, column, log_columns=[]):
     return df[~to_drop]
 
 
-def run_notebook(nb_path, tmp_path, env=os.environ, kernel=None):
-    """Execute a Jupyter notebook via nbconvert and collect output.
+class ColumnName(Enum):
+    """Column names for processed historical data.
 
-    Copied from ixmp.testing.
-
-    Parameters
-    ----------
-    nb_path : path-like
-        The notebook file to execute.
-    tmp_path : path-like
-        A directory in which to create temporary output.
-    env : dict-like
-        Execution environment for `nbconvert`.
-    kernel : str
-        Jupyter kernel to use. Default: `python2` or `python3`, matching the
-        current Python version.
-
-    Returns
-    -------
-    nb : :class:`nbformat.NotebookNode`
-        Parsed and executed notebook.
-    errors : list
-        Any execution errors.
+    The order of definition below is the standard order.
     """
-    # IPython kernel
-    kernel = kernel or "python{}".format(sys.version_info[0])
 
-    # Temporary notebook to contain execution output
-    fname = Path(tmp_path) / "test.ipynb"
+    # TODO replace references to this enum with references to the 'HISTORICAL' DSD
 
-    command = [
-        "jupyter",
-        "nbconvert",
-        "--to",
-        "notebook",
-        "--execute",
-        "--ExecutePreprocessor.timeout=600",
-        f"--ExecutePreprocessor.kernel_name={kernel}",
-        "--output",
-        str(fname),
-        str(nb_path),
-    ]
-
-    # Change to directory containing the notebook to be executed
-    os.chdir(nb_path.parent)
-
-    # Execute
-    subprocess.check_call(command, env=env)
-
-    # Read the output notebook
-    nb = nbformat.read(io.open(fname, encoding="utf-8"), nbformat.current_nbformat)
-
-    # Store errors
-    errors = []
-    for cell in nb.cells:
-        for output in cell.get("outputs", []):
-            if output.output_type == "error":
-                errors.append(output)
-
-    # Remove output
-    fname.unlink()
-
-    return nb, errors
+    SOURCE = "Source"
+    COUNTRY = "Country"
+    ISO_CODE = "ISO Code"
+    ITEM_REGION = "Region"
+    VARIABLE = "Variable"
+    UNIT = "Unit"
+    SERVICE = "Service"
+    MODE = "Mode"
+    VEHICLE_TYPE = "Vehicle Type"
+    TECHNOLOGY = "Technology"
+    FUEL = "Fuel"
+    VALUE = "Value"
+    YEAR = "Year"
+    ID = "ID"

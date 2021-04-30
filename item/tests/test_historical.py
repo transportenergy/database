@@ -6,9 +6,8 @@ import pytest
 
 import item
 from item.common import paths
-from item.historical import SCRIPTS, fetch_source, input_file, process, source_str
+from item.historical import fetch_source, input_file, process, source_str
 from item.historical.diagnostic import A003, coverage
-from item.historical.util import run_notebook
 
 
 @pytest.mark.slow
@@ -80,17 +79,6 @@ def test_process(dataset_id):
     )
 
     process(dataset_id)
-
-
-# Path to IPython notebooks
-nb_path = Path(item.__file__).parent / "historical" / "scripts"
-
-
-@pytest.mark.parametrize("dataset_id", SCRIPTS)
-def test_run_notebook(dataset_id, tmp_path):
-    # Notebook runs top-to-bottom without cell errors
-    nb, errors = run_notebook(nb_path / f"{dataset_id}.ipynb", tmp_path)
-    assert errors == []
 
 
 @pytest.mark.parametrize("dataset_id, N_areas", [(0, 58), (1, 37), (2, 53), (3, 57)])
