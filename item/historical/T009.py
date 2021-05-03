@@ -4,8 +4,10 @@ from functools import lru_cache
 #: Fetch directly from the source, or cache.
 FETCH = True
 
+#: iTEM data flow matching the data from this source.
+DATAFLOW = "STOCK"
+
 COMMON_DIMS = dict(
-    fuel="All",
     mode="Road",
     source="United Nations Economic Commission for Europe",
     variable="Stock",
@@ -16,34 +18,41 @@ COMMON_DIMS = dict(
 COLUMNS = dict(
     rename=dict(
         country_name="Country",
-        date="Year",
-        type_of_vehicle_name="Vehicle Type",
-        value="Value",
+        date="TIME_PERIOD",
+        type_of_vehicle_name="VEHICLE",
+        value="VALUE",
     ),
 )
 
 
 @lru_cache()
-def service(value):
+def map_service(value):
     """Determine 'service' dimension based on a vehicle type."""
     if value in [
         "Light goods road vehicles",
         "Lorries (vehicle wt over 3500 kg)",
         "Road tractors",
     ]:
-        return "Freight"
+        return "F"
     elif value in ["Motor coaches, buses and trolleybuses", "Passenger cars"]:
-        return "Passenger"
+        return "P"
     else:
         raise ValueError(value)
 
 
 def process(df):
-    df = df.rename(columns=COLUMNS["rename"])
+    """Process input data for data set T009.
 
-    # Strip "- " prefix from Fuel strings
-    df["Technology"] = df["fuel_type_name"].str.lstrip("- ").replace({"Total": "All"})
-
-    df["Service"] = df["Vehicle Type"].apply(service)
-
-    return df
+    - Assign “SERVICE” based on “VEHICLE” values.
+    - Assign “TECHNOLOGY” by stripping "- " prefix from “fuel_type_name” values.
+    """
+    return (
+        df.rename(columns=COLUMNS["rename"])
+        .assign(
+            SERVICE=lambda df_: df_["VEHICLE"].apply(map_service),
+            TECHNOLOGY=lambda df_: df_["fuel_type_name"]
+            .str.lstrip("- ")
+            .replace({"Total": "_T"}),
+        )
+        .drop(columns=["fuel_type_name"])
+    )
