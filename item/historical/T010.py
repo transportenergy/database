@@ -1,50 +1,45 @@
 """Data cleaning code and configuration for T010."""
-from typing import Any, Dict
-
 from item.historical.util import dropna_logged
-from item.structure import column_name
 from item.utils import convert_units
 
+#: iTEM data flow matching the data from this source.
+DATAFLOW = "STOCK"
+
 #: Dimensions and attributes which do not vary across this data set.
+#:
+#: NB “_T” the code for “Total”, is used for the ‘TECHNOLOGY’ and ‘VEHICLE’ dimensions,
+#: since this data set provides totals.
 COMMON_DIMS = dict(
     source="International Organization of Motor Vehicle Manufacturers",
     variable="Stock",
     service="Freight",
-    fuel="All",
-    technology="All",
-    vehicle_type="All",
     unit="10^6 vehicle",
     mode="Road",
+    technology="_T",
+    vehicle="_T",
 )
 
-#: Columns to drop from the raw data.
-COLUMNS: Dict[str, Any] = dict(
-    drop=[],
-    # Column containing country name for determining ISO 3166 alpha-3 codes and
-    # iTEM regions. Commented, because this is the default value.
-    # country_name="Country",
-)
+#: Column name to map to ISO 3166 alpha-3 codes.
+COLUMNS = dict(country_name="REGIONS/COUNTRIES")
 
 
 def process(df):
-    """Process data set T010."""
+    """Process data set T010.
 
-    def clean(df):
-        return df.assign(
-            Country=df["Country"].str.title(),
-            Value=df["Value"].str.replace(",", "").astype(float),
+    - Melt from wide to long format.
+    - Remove the ‘,’ thousands separators from the values in the ‘VALUE’ column; convert
+      to :class:`float`.
+    - Drop null values.
+    - Convert units from 10³ vehicles to 10⁴ vehicles.
+    """
+    df[COLUMNS["country_name"]]
+    return (
+        df.melt(
+            id_vars=[COLUMNS["country_name"]],
+            var_name="TIME_PERIOD",
+            value_name="VALUE",
         )
-
-    # - Melt
-    # - Remove the ',' from the values in the 'Value' column; convert to float
-    # - Drop null values.
-    # - Convert to the preferred iTEM units.
-    df = (
-        df.rename(columns={"REGIONS/COUNTRIES": "Country"})
-        .melt(id_vars=["Country"], var_name=column_name("YEAR"), value_name="Value")
-        .pipe(clean)
-        .pipe(dropna_logged, "Value", ["Country"])
-        .pipe(convert_units, "Mvehicle", "Gvehicle")
+        .assign(VALUE=lambda df_: df_["VALUE"].str.replace(",", "").astype(float))
+        .pipe(dropna_logged, "VALUE", [COLUMNS["country_name"]])
+        .pipe(convert_units, "kvehicle", "Mvehicle")
     )
-
-    return df
