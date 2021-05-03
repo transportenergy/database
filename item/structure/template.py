@@ -162,7 +162,7 @@ def make_template(output_path: Path = None, verbose: bool = True):
 
     # "Template" format: more human-readable
 
-    # Use names instead of IDs for labels on these dimensions
+    # Use names instead of IDs for labels in these dimensions
     replacements = name_for_id(
         sm.structure["HISTORICAL"],
         (

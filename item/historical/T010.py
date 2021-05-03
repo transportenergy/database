@@ -32,7 +32,6 @@ def process(df):
     - Drop null values.
     - Convert units from 10³ vehicles to 10⁴ vehicles.
     """
-    df[COLUMNS["country_name"]]
     return (
         df.melt(
             id_vars=[COLUMNS["country_name"]],
