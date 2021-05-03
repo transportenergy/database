@@ -71,11 +71,13 @@ CS_TRANSPORT = ConceptScheme(
                 "Type of transport service e.g. transport of passengers or of freight."
             ),
         ),
-        Concept(id="MODE", name="Mode or medium of transport"),
+        Concept(id="MODE", name="Mode", description="Mode or medium of transport."),
         Concept(
-            id="VEHICLE", name="Vehicle type", description="Type of transport vehicle"
+            id="VEHICLE", name="Vehicle type", description="Type of transport vehicle."
         ),
-        Concept(id="FUEL", name="Fuel or energy carrier for transport"),
+        Concept(
+            id="FUEL", name="Fuel", description="Fuel or energy carrier for transport."
+        ),
         Concept(
             id="TECHNOLOGY",
             name="Powertrain technology",
@@ -85,14 +87,25 @@ CS_TRANSPORT = ConceptScheme(
         ),
         Concept(
             id="AUTOMATION",
-            name="Degree of automation in operation of transport vehicles",
+            name="Automation",
+            description="Degree of automation in operation of transport vehicles.",
         ),
-        Concept(id="OPERATOR", name="Entity operating a transport vehicle"),
-        Concept(id="POLLUTANT", name="Species of environmental pollutant"),
+        Concept(
+            id="OPERATOR",
+            name="Operator",
+            description="Entity operating a transport vehicle.",
+        ),
+        Concept(
+            id="POLLUTANT",
+            name="Species",
+            description="Species of environmental pollutant.",
+        ),
         Concept(
             id="LCA_SCOPE",
-            name="Life-cycle analysis scope",
-            description="Scope of analysis covered by a transport life-cycle measure",
+            name="LCA scope",
+            description=(
+                "Scope of analysis covered by a transport life-cycle (LC) measure."
+            ),
         ),
         Concept(
             id="FLEET",
