@@ -1,5 +1,3 @@
-from functools import lru_cache
-
 from item.utils import convert_units
 
 #: iTEM data flow matching the data from this source.
@@ -22,13 +20,20 @@ COLUMNS = dict(
     drop=["IPCC_description", "IPCC-Annex", "Name", "World Region"],
 )
 
-
+#: Map from IPCC emissions category codes to iTEM ``CL_MODE`` values. The actual
+#: descriptions appear in the ``IPCC_description`` column, which is discarded.
+#:
+#: - 1.A.3.a: Civil Aviation
+#: - 1.A.3.b: Road Transportation
+#: - 1.A.3.c: Railways
+#: - 1.A.3.d: Water-borne Navigation
+#: - 1.A.3.e: Other Transportation
 MAP_MODE = {
-    "1.A.3.a": "Air",  # "Civil Aviation"
-    "1.A.3.b": "Road",  # "Road Transportation"
-    "1.A.3.c": "Rail",  # "Railways"
-    "1.A.3.d": "Water",  # "Water-borne Navigation"
-    "1.A.3.e": "Other",  # "Other Transportation"
+    "1.A.3.a": "Air",
+    "1.A.3.b": "Road",
+    "1.A.3.c": "Rail",
+    "1.A.3.d": "Water",
+    "1.A.3.e": "Other",
 }
 
 
