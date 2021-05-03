@@ -4,7 +4,7 @@ This module:
 
 - Detects and corrects :issue:`32`, a data error in the upstream source where China
   observation values for years 1990 to 2001 inclusive are too low by 2 orders of
-  magnitude.
+  magnitude (see also :issue:`57`).
 
 """
 import logging
@@ -14,6 +14,8 @@ from item.utils import convert_units
 
 log = logging.getLogger(__name__)
 
+#: iTEM data flow matching the data from this source.
+DATAFLOW = "ACTIVITY"
 
 #: Dimensions and attributes which do not vary across this data set.
 COMMON_DIMS = dict(
@@ -22,20 +24,21 @@ COMMON_DIMS = dict(
     # There is only one activity being perform in this dataset and that is the
     # "Freight Activity". We are setting, for each row, the variable "Freight
     # Activity"
-    variable="Freight Activity",
+    variable="Activity",
     # Add the same source to all rows since all data comes from the same source
     source="International Transport Forum",
     # Since all the data is associated to "Freight," the Service is "Freight"
-    service="Freight",
+    service="F",
     # The dataset does not provide any data about those two columns, so we
     # add the default value of "All" in both cases
-    technology="All",
-    fuel="All",
+    technology="_T",
     # Since all the data is about shipping, all rows have "Shipping" as mode
     mode="Shipping",
     # Since all the data in this dataset is associted to coastal shipping, the
     # vehicle type is "Coastal"
-    vehicle_type="Coastal",
+    vehicle="Coastal",
+    automation="_T",
+    operator="_T",
 )
 
 #: Columns to drop from the raw data.
@@ -53,22 +56,27 @@ COLUMNS = dict(
         "Unit Code",
         "Unit",
     ],
-    # Column containing country name for determining ISO 3166 alpha-3 codes and
-    # iTEM regions. Commented, because this is the default value.
-    # country_name='Country',
 )
+
+#: Flag for whether :issue:`32` is detected by :func:`check` and should be fixed by
+#: :func:`process`.
+FIX_32 = False
 
 
 def check(df):
     """Check data set T001."""
     # Input data contain only the expected variable name
-    assert df["Variable"].unique() == ["Coastal shipping (national transport)"]
+    assert df["Variable"].unique() == [
+        "Coastal shipping (national transport)"
+    ], "Values in 'Variable' column"
 
     # Input data have the expected units
-    assert df["PowerCode"].unique() == ["Millions"]
-    assert df["Unit"].unique() == ["Tonnes-kilometres"]
+    assert df["PowerCode"].unique() == ["Millions"], "Values in 'PowerCode' column"
+    assert df["Unit"].unique() == ["Tonnes-kilometres"], "Values in 'Unit' column"
 
     # Detect #32
+    global FIX_32
+
     # Data for CHN, including one year before and after the error
     obs = df.query("COUNTRY == 'CHN' and Year >= 1985 and Year <= 2002").set_index(
         "Year"
@@ -81,11 +89,16 @@ def check(df):
     expected = empty.interpolate("index")
 
     # Ratio of interpolated and observed values is about 100 for the years containing
-    # the error.
-    # TODO if the data is corrected in the original, this assertion will fail;
-    #      then remove this code and the corresponding correction in process(), below.
-    assert ((expected / obs).iloc[1:-1] >= 95).all()
-    log.info("Confirmed 10² magnitude error in China 1990–2001")
+    # the error
+    check = (expected / obs).iloc[1:-1] >= 95
+
+    if check.all():
+        log.info("Confirmed 10² magnitude error in China 1990–2001")
+        FIX_32 = True
+    elif not check.any():
+        log.info("10² magnitude error in China 1990–2001 absent")
+    else:
+        raise AssertionError(f"Ambiguous:\n{repr(check)}")
 
 
 def process(df):
@@ -95,17 +108,17 @@ def process(df):
     - Convert from Mt km / year to Gt km / year.
     """
     # Drop rows with nulls in "Value"; log corresponding values in "Country"
-    df = dropna_logged(df, "Value", ["Country"])
-
-    # 1. Drop null values.
-    # 2. Convert to the preferred iTEM units.
-    #    TODO read the preferred units (here 'Gt km / year') from a common
-    #    location
-    df = df.dropna().pipe(convert_units, "Mt km / year", "Gt km / year")
+    # TODO read the preferred units (here 'Gt km / year') from a common location
+    df = df.pipe(dropna_logged, "Value", ["Country"]).pipe(
+        convert_units, "Mt km / year", "Gt km / year"
+    )
 
     # Correct #32
-    corrected = df.query("Country == 'China' and Year > 1985 and Year < 2002").copy()
-    corrected["Value"] *= 100.0
-    df.update(corrected)
+    if FIX_32:
+        corrected = df.query(
+            "Country == 'China' and Year > 1985 and Year < 2002"
+        ).copy()
+        corrected["Value"] *= 100.0
+        df.update(corrected)
 
     return df
