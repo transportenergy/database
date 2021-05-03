@@ -257,40 +257,65 @@ def process(id):
         raise RuntimeError(msg)
 
     # Information about columns. If not defined, use defaults.
-    columns = dict(country_name="Country")
-    columns.update(getattr(dataset_module, "COLUMNS", {}))
+    COLUMNS = getattr(dataset_module, "COLUMNS", {})
 
-    try:
-        # List of column names to drop
-        drop_cols = columns["drop"]
-    except KeyError:
-        # No variable COLUMNS in dataset_module, or no key 'drop'
-        log.info(f"No columns to drop for {id_str}")
-    else:
+    # List of column names to drop
+    drop_cols = COLUMNS.get("drop", [])
+    if len(drop_cols):
         df.drop(columns=drop_cols, inplace=True)
         log.info(f"Drop {len(drop_cols)} extra column(s)")
+    else:
+        # No variable COLUMNS in dataset_module, or no key 'drop'
+        log.info(f"No columns to drop for {id_str}")
 
     # Call the dataset-specific process() function; returns a modified df
     df = dataset_module.process(df)
     log.info(f"{len(df)} observations")
 
-    # Assign ISO 3166 alpha-3 codes and iTEM regions from a country name column
-    country_col = columns["country_name"]
-    # Use pandas.Series.apply() to apply the same function to each entry in
-    # the column. Join these to the existing data frame as additional columns.
-    df = df.combine_first(df[country_col].apply(iso_and_region))
+    if "REF_AREA" not in df.columns:
+        # Assign ISO 3166 alpha-3 codes from a country name column
+        country_col = COLUMNS.get("country_name", "Country")
+
+        # Use pandas.Series.apply() to apply the same function to each entry in
+        # the column. Join these to the existing data frame as additional columns.
+        df = df.assign(REF_AREA=df[country_col].apply(iso_alpha_3))
+
+    df = df.rename(columns=dim_id_for_column_name)
+
+    drop_cols = ["_drop"] if "_drop" in df.columns else []
 
     # Values to assign across all observations: the dataset ID
-    assign_values = {column_name("ID"): id_str}
+    assign_values = {"ID": id_str}
+
+    # Assign "_Z" (not applicable) for dimensions not relevant to this data flow
+    df_id = getattr(dataset_module, "DATAFLOW", None)
+    for dim, value in fill_values_for_dataflow(df_id).items():
+        if dim in df.columns:
+            # Mismatch: the data set returns detail here that's not specified in the
+            # data flow, e.g. T004
+            log.info(
+                f"Dimension {repr(dim)} should be {repr(value)} for dataflow "
+                f"{repr(df_id)}, but values exist; do not overwrite"
+            )
+            continue
+        assign_values[dim] = value
 
     # Handle any COMMON_DIMS, if defined
     for dim, value in getattr(dataset_module, "COMMON_DIMS", {}).items():
         # Retrieve a dimension ID; copy the value to be assigned
-        assign_values[column_name(dim.upper())] = value
+        assign_values[dim.upper()] = value
+
+    dsd = generate().structure["HISTORICAL"]
 
     # - Assign the values.
     # - Order the columns in the standard order.
-    df = df.assign(**assign_values).reindex(columns=[ev.value for ev in ColumnName])
+    df = (
+        df.drop(columns=drop_cols)
+        .assign(**assign_values)
+        .reindex(
+            columns=["ID"] + [dim.id for dim in dsd.dimensions] + ["VALUE", "UNIT"]
+        )
+    )
 
     # Check for missing values
     rows = df.isna().any(axis=1)
