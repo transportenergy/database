@@ -2,8 +2,10 @@
 import numpy as np
 
 from item.historical.util import dropna_logged
-from item.structure import column_name
 from item.utils import convert_units
+
+#: iTEM data flow matching the data from this source.
+DATAFLOW = "POPULATION"
 
 #: Dimensions and attributes which do not vary across this data set.
 COMMON_DIMS = dict(
@@ -12,7 +14,10 @@ COMMON_DIMS = dict(
     unit="10^6 people",
 )
 
-#: Columns to drop from the raw data.
+#: Column names:
+#:
+#: - ``drop``: to drop from the raw data.
+#: - ``country_name``: to map to ISO 3166 codes.
 COLUMNS = dict(
     drop=[
         "Index",
@@ -21,34 +26,37 @@ COLUMNS = dict(
         "Country code",
         "Parent code",
     ],
-    # Column containing country name for determining ISO 3166 alpha-3 codes and
-    # iTEM regions. Commented, because this is the default value.
-    # country_name='Country',
+    #
+    country_name="Region, subregion, country or area *",
 )
 
 
 def process(df):
-    """Process data set T012."""
+    """Process data set T012.
 
-    def clean(df):
-        return df.assign(
-            Value=df["Value"]
-            .str.replace(" ", "")
-            .replace("...", "NaN")
-            .astype(np.float),
-        )
-
-    # - Select only rows with Type == "Country/Area".
-    # - Rename the column with country names to to "Country".
-    # - Remove spaces from strings in the "Value" column; convert to numeric.
-    # - Drop null values.
-    # - Convert to the preferred iTEM units.
+    - Select only rows with ``Type == "Country/Area"``; then drop this column.
+    - Rename "Channel Islands" (ISO 3166 numeric code 830) with 831 (Jersey), the larger
+      (compared to 832/Guernsey) of the two Channel Islands. Code 830 does not exist.
+    - Melt from wide to long format.
+    - Remove spaces from strings in the "Value" column; convert to numeric.
+    - Drop null values.
+    - Convert units from 10³ persons to 10⁶ persons.
+    """
     return (
         df.query("Type == 'Country/Area'")
         .drop("Type", axis=1)
-        .rename(columns={"Region, subregion, country or area *": "Country"})
-        .melt(id_vars=["Country"], var_name=column_name("YEAR"), value_name="Value")
-        .pipe(clean)
-        .pipe(dropna_logged, "Value", ["Country"])
-        .pipe(convert_units, "Mpassenger", "Gpassenger")
+        .replace("Channel Islands", "Jersey")
+        .melt(
+            id_vars=[COLUMNS["country_name"]],
+            var_name="TIME_PERIOD",
+            value_name="Value",
+        )
+        .assign(
+            Value=lambda df_: df_["Value"]
+            .str.replace(" ", "")
+            .replace("...", "NaN")
+            .astype(np.float)
+        )
+        .pipe(dropna_logged, "Value", [COLUMNS["country_name"]])
+        .pipe(convert_units, "kpassenger", "Mpassenger")
     )
