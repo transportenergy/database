@@ -2,19 +2,7 @@ from itertools import product
 
 import sdmx
 
-from item.structure import column_name, generate, make_template
-
-
-def test_column_name(caplog):
-    # Force clear of lru_cache()
-    column_name.cache_clear()
-
-    # Correctly retrieves the name of a Concept from the data structures
-    assert column_name("VEHICLE") == "Vehicle type"
-
-    # Warning is logged for deprecated IDs
-    assert column_name("YEAR") == "Year"
-    assert "Deprecated dimension id: 'YEAR'" in caplog.messages
+from item.structure import generate, make_template
 
 
 def test_make_template(tmp_path):

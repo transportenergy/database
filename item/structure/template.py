@@ -9,7 +9,6 @@ import sdmx
 import sdmx.model as m
 
 from item.common import paths
-from item.structure import column_name
 from item.structure.sdmx import _get_anno, generate, merge_dsd
 
 log = logging.getLogger(__name__)
@@ -172,8 +171,12 @@ def make_template(output_path: Path = None, verbose: bool = True):
         ).split(),
     )
     # Rename all columns except "Value" using data structure info
-    columns = {name: column_name(name) for name in df1.columns[:-1]}
-    columns["VALUE"] = "Value"
+    columns = dict()
+    for dim_id in df1.columns:
+        c = sm.structure["HISTORICAL"].dimensions.get(dim_id).concept_identity
+        # Use the dimension ID in title case for VARIABLE and VALUE, which do not have a
+        # .concept_identity
+        columns[dim_id] = c.name.localized_default() if c else dim_id.title()
 
     # Apply replacements; use collapse() above to reduce number of columns
     df2 = df1.replace(replacements).apply(collapse, axis=1).rename(columns=columns)

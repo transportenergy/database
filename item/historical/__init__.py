@@ -9,9 +9,7 @@ import pycountry
 import yaml
 
 from item.common import paths
-from item.historical.util import ColumnName
 from item.remote import OpenKAPSARC, get_sdmx
-from item.structure import column_name
 
 log = logging.getLogger(__name__)
 
