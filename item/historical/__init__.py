@@ -23,59 +23,54 @@ OUTPUT_PATH = paths["data"] / "historical" / "output"
 #: :meth:`iso_and_region` to replace names before they are looked up using
 #: :mod:`pycountry`.
 COUNTRY_NAME = {
-    "Azerbaidjan": "AZE",
-    "Bolivia (Plurinational State of)": "BOL",
-    "Bosnia-Herzegovina": "BIH",
-    "Bosnia": "BIH",
-    "Brunei": "BRN",
-    # NB for T012. This includes both GGY and JEY; ambiguous.
-    # "Channel Islands": "",
-    "China, Hong Kong SAR": "HKG",
-    "China, Macao SAR": "MAC",
-    "China, Taiwan Province of China": "TWN",
-    "Congo Kinshasa ": "COD",
-    "Dem. People's Republic of Korea": "PRK",
-    "Democratic Republic of the Congo": "COD",
-    "Holy See": "VAT",
-    "Hong-Kong": "HKG",
-    "Iran (Islamic Republic of)": "IRN",
-    "Iran": "IRN",
-    "Ivory Coast": "CIV",
-    "Korea": "KOR",
-    "Macedonia": "MKD",
-    "Micronesia (Fed. States of)": "FSM",
-    "Moldavia": "MDA",
-    "Montenegro, Republic of": "MNE",
-    "Palestine": "PSE",
-    "Republic of Korea": "KOR",
-    "Russia": "RUS",
-    "Saint Helena": "SHN",
-    "Serbia, Republic of": "SRB",
-    "South Korea": "KOR",
-    "State of Palestine": "PSE",
-    "Syria": "SYR",
-    "The former Yugoslav Republic of Macedonia": "MKD",
-    "United States Virgin Islands": "VIR",
-    "Venezuela (Bolivarian Republic of)": "VEN",
-    "Wallis and Futuna Islands": "WLF",
+    "azerbaidjan": "AZE",
+    "bolivia (plurinational state of)": "BOL",
+    "bosnia-herzegovina": "BIH",
+    "bosnia": "BIH",
+    "brunei": "BRN",
+    "cape verde": "CPV",
+    "china, hong kong sar": "HKG",
+    "china, macao sar": "MAC",
+    "china, taiwan province of china": "TWN",
+    "congo kinshasa ": "COD",
+    "congo_the democratic republic of the": "COD",
+    "cote d'ivoire": "CIV",
+    "dem. people's republic of korea": "PRK",
+    "democratic republic of the congo": "COD",
+    "former yugoslav republic of macedonia, the": "MKD",
+    "germany (until 1990 former territory of the frg)": "DEU",
+    "holy see": "VAT",
+    "hong-kong": "HKG",
+    "iran (islamic republic of)": "IRN",
+    "iran": "IRN",
+    "ivory coast": "CIV",
+    "korea": "KOR",
+    "libyan arab jamahiriya": "LBY",
+    "macedonia, the former yugoslav republic of": "MKD",
+    "macedonia": "MKD",
+    "micronesia (fed. states of)": "FSM",
+    "moldavia": "MDA",
+    "montenegro, republic of": "MNE",
+    "palestine": "PSE",
+    "republic of korea": "KOR",
+    "reunion": "REU",
+    "russia": "RUS",
+    "saint helena": "SHN",
+    "serbia and montenegro": "SCG",
+    "serbia, republic of": "SRB",
+    "south korea": "KOR",
+    "state of palestine": "PSE",
+    "swaziland": "SWZ",
+    "syria": "SYR",
+    "taiwan_province of china": "TWN",
+    "tanzania_united republic of": "TZA",
+    "the former yugoslav republic of macedonia": "MKD",
+    "united states virgin islands": "VIR",
+    "venezuela (bolivarian republic of)": "VEN",
+    "virgin islands_british": "VGB",
+    "wallis and futuna islands": "WLF",
 }
 
-# From T005
-#
-# Cape Verde --> Cabo Verde
-# Congo_the Democratic Republic of the --> Congo, The Democratic Republic of the
-# Cote d'Ivoire --> Côte d'Ivoire
-# Libyan Arab Jamahiriya --> Libya
-# Macedonia, the former Yugoslav Republic of --> ?
-# Netherlands Antilles --> ANT
-# Reunion --> Réunion
-# Saint Helena --> Saint Helena, Ascension and Tristan da Cunha
-# Serbia and Montenegro --> SCG
-# Swaziland --> Eswatini
-# Taiwan_Province of China --> Taiwan, Province of China
-# Tanzania_United Republic of --> Tanzania, United Republic of
-# Virgin Islands_British --> Virgin Islands, British
-# World --> WLD (we will use this code)
 
 #: Map from ISO 3166 alpha-3 code to region name.
 REGION = {}
