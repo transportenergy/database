@@ -25,7 +25,7 @@ def test_make_template(tmp_path):
         assert (tmp_path / base).with_suffix(suffix).exists()
 
     # Files have the expected length
-    expected_keys = 6162
+    expected_keys = 20763
     assert expected_keys + 1 == sum(1 for _ in open(tmp_path / "condensed.csv"))
     assert expected_keys + 1 == sum(1 for _ in open(tmp_path / "full.csv"))
     assert expected_keys + 2 == sum(1 for _ in open(tmp_path / "index.csv"))
