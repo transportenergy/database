@@ -94,5 +94,5 @@ def test_A003():
     assert 950 <= len(result)
 
     # A specific value is present and as expected
-    obs = result.query("`ISO Code` == 'USA' and Year == 2015")["Value"].squeeze()
+    obs = result.query("REF_AREA == 'USA' and TIME_PERIOD == 2015")["VALUE"].squeeze()
     assert np.isclose(obs, 0.02098, rtol=1e-3)

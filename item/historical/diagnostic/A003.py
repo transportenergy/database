@@ -15,28 +15,29 @@ def compute(activity, stock):
     stock : pandas.DataFrame
         From :mod:`.T009`.
     """
+    spacetime = ["REF_AREA", "TIME_PERIOD"]
+
     # Select activity
-    activity = activity.query("Mode == 'Road' and `Vehicle Type` == 'All'").set_index(
-        ["ISO Code", "Year"]
-    )
+    activity = activity.query("MODE == 'Road' and VEHICLE == '_T'").set_index(spacetime)
 
     # Select stock
-    vehicle_types = [
-        "Light goods road vehicles",
-        "Lorries (vehicle wt over 3500 kg)",
-        "Road tractors",
-    ]
-    mask = stock.Fuel.isin(["All"]) & stock["Vehicle Type"].isin(vehicle_types)
-    stock = stock[mask].groupby(["ISO Code", "Year"]).sum(numeric_only=True)
+    mask = stock.FUEL.isin(["_Z"]) & stock.VEHICLE.isin(
+        [
+            "Light goods road vehicles",
+            "Lorries (vehicle wt over 3500 kg)",
+            "Road tractors",
+        ]
+    )
+    stock = stock[mask].groupby(spacetime).sum(numeric_only=True)
 
     df = (
         # Compute ratio, drop nulls
-        (activity["Value"] / stock["Value"])
+        (activity["VALUE"] / stock["VALUE"])
         .dropna()
         # Restore column names, for convert_units()
-        .rename("Value")
+        .rename("VALUE")
         .reset_index()
-        .assign(Variable="Load factor", Service="Freight", Fuel="All", Mode="Road")
+        .assign(VARIABLE="Load factor", SERVICE="F", MODE="Road")
         # To preferred units
         .pipe(convert_units, "Gt km / year / kvehicle", "kt km / year / vehicle")
     )
