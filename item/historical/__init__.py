@@ -3,6 +3,7 @@ import os
 from copy import deepcopy
 from functools import lru_cache
 from importlib import import_module
+from typing import Dict, Optional
 
 import pandas as pd
 import pycountry
@@ -10,6 +11,7 @@ import yaml
 
 from item.common import paths
 from item.remote import OpenKAPSARC, get_sdmx
+from item.structure import generate
 
 log = logging.getLogger(__name__)
 
@@ -70,6 +72,8 @@ COUNTRY_NAME = {
 }
 
 
+# TODO don't do this every time this file is imported; add a utility function somewhere
+# to generate it, like .structure.generate().
 #: Map from ISO 3166 alpha-3 code to region name.
 REGION = {}
 # Populate the map from the regions.yaml file
@@ -289,8 +293,54 @@ def process(id):
 
 
 @lru_cache()
-def iso_and_region(name):
-    """Return (ISO 3166 alpha-3 code, iTEM region) for a country *name*.
+def fill_values_for_dataflow(dataflow_id: Optional[str]) -> Dict[str, str]:
+    """Return a dictionary of fill values for the data flow `dataflow_id`."""
+    result: Dict[str, str] = dict()
+
+    if dataflow_id is None:
+        return result
+
+    # Retrieve the SDMX data structures
+    sm = generate()
+
+    # Data structure for this data set
+    dsd = sm.structure[dataflow_id]
+
+    # Iterate over dimensions in the full dimensionality structure
+    for dim in sm.structure["HISTORICAL"].dimensions:
+        try:
+            # Try to retrieve a matching dimension from the structure of this data set
+            dsd.dimensions.get(dim.id)
+        except KeyError:
+            # No match → this dimension is not applicable to this data set → fill
+            result[dim.id] = "_Z"
+
+    return result
+
+
+@lru_cache()
+def dim_id_for_column_name(name):
+    """Return a dimension ID in the iTEM ‘HISTORICAL’ structure for a column `name`."""
+    return {
+        "COUNTRY": "_drop",
+        "ISO CODE": "REF_AREA",
+        "VEHICLE TYPE": "VEHICLE",
+        "YEAR": "TIME_PERIOD",
+    }.get(name.upper(), name.upper())
+
+
+@lru_cache()
+def get_area_name_map():
+    sm = generate()
+    return {
+        code.name.localized_default().lower(): code.id
+        for code in sm.codelist["CL_AREA"]
+    }
+
+
+@lru_cache()
+def iso_alpha_3(name: str) -> str:
+    """Return ISO 3166 alpha-3 code for a country `name`.
 
     Parameters
     ----------
@@ -300,26 +350,44 @@ def iso_and_region(name):
         'official_name', or 'common_name' field. Replacements from
         :data:`COUNTRY_NAME` are applied.
     """
-    # lru_cache() ensures this function call is as fast as a dictionary lookup
-    # after the first time each country name is seen
+    # lru_cache() ensures this function call is as fast as a dictionary lookup after
+    # the first time each country name is seen
 
     # Maybe map a known, non-standard value to a standard value
-    name = COUNTRY_NAME.get(name, name)
+    name = COUNTRY_NAME.get(name.lower(), name)
 
-    # Use pycountry's built-in, case-insensitive lookup on all fields including
-    # name, official_name, and common_name
+    # Use pycountry's built-in, case-insensitive lookup on all fields including name,
+    # official_name, and common_name
+    for db in (pycountry.countries, pycountry.historic_countries):
+        try:
+            return db.lookup(name).alpha_3
+        except LookupError:
+            continue
+
     try:
-        alpha_3 = pycountry.countries.lookup(name).alpha_3
-    except LookupError:
-        alpha_3 = ""
+        return get_area_name_map()[name.lower()]
+    except KeyError:
+        raise LookupError(name)
 
-    # Look up the region, construct a Series, and return
-    return pd.Series(
-        {
-            column_name("ISO_CODE"): alpha_3,
-            column_name("ITEM_REGION"): REGION.get(alpha_3, "N/A"),
-        }
-    )
+
+@lru_cache()
+def get_item_region(code: str) -> str:
+    """Return iTEM region for a country's ISO 3166 alpha-3 `code`, or “N/A”."""
+    return REGION.get(code, "N/A")
+
+
+@lru_cache()
+def get_country_name(code: str) -> str:
+    """Return the country name for a country's ISO 3166 alpha-3 `code`."""
+    for db in (pycountry.countries, pycountry.historic_countries):
+        try:
+            return db.get(alpha_3=code).name
+        except AttributeError:
+            continue
+
+    # Possibly an area code like "B0"
+    sm = generate()
+    return sm.codelist["CL_AREA"][code].name.localized_default()
 
 
 def source_str(id):
