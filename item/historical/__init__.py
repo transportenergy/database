@@ -292,6 +292,14 @@ def process(id):
     # - Order the columns in the standard order.
     df = df.assign(**assign_values).reindex(columns=[ev.value for ev in ColumnName])
 
+    # Check for missing values
+    rows = df.isna().any(axis=1)
+    if rows.any():
+        log.error(f"Incomplete; missing values in {rows.sum()} rows:")
+        print(df[rows])
+        print(df[rows].head(1).transpose())
+        raise RuntimeError
+
     # Save the result to cache
     cache_results(id_str, df)
 
