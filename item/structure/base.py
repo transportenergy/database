@@ -323,6 +323,7 @@ CL_MODE = (
         ],
     ),
     Code(id="WATER", name="Water"),
+    Code(id="PIPE", name="Pipeline"),
 )
 
 CL_OPERATOR = (
