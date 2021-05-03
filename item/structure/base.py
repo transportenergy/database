@@ -272,11 +272,27 @@ CL_FUEL = (
         child=[
             Code(id="DIESEL"),
             Code(id="GASOLINE"),
-            Code(id="BIOFUEL", name="Liquid biofuel"),
+            Code(
+                id="BIOFUEL",
+                name="Liquid biofuel",
+                child=[
+                    Code(id="BIODIESEL"),
+                    Code(id="BIOETH", name="Bioethanol"),
+                ],
+            ),
             Code(id="SYNTHETIC", description="a.k.a. synfuels, electrofuels."),
         ],
     ),
-    Code(id="NG", name="Natural gas"),
+    Code(
+        id="GAS",
+        name="Gas",
+        description="All gaseous fuels",
+        child=[
+            Code(id="CNG", name="CNG", description="Compressed natural gas."),
+            Code(id="LNG", name="LNG", description="Liquified natural gas."),
+            Code(id="LPG", name="LPG", description="Liquified propane gas."),
+        ],
+    ),
     Code(id="H2", name="Hydrogen"),
     Code(id="ELEC", name="Electricity"),
 )
@@ -380,9 +396,41 @@ CL_TECHNOLOGY = (
             "Using only chemical fuels. Inclusive of powertrains that store energy as"
             "electricity, i.e. hybrids."
         ),
+        child=[
+            Code(id="HYBRID", description="Hybridized internal combustion."),
+            Code(id="NONHYB", description="Non-hybridized internal combusion."),
+        ],
     ),
-    Code(id="ELECTRIC"),
-    Code(id="HYBRID", description="Using both electricity and chemical fuels."),
+    Code(
+        id="ELEC",
+        name="Electric",
+        description="Powertrains that can be charged using electricity.",
+        child=[
+            Code(
+                id="BEV",
+                description="Battery-electric powertrain using no chemical fuels.",
+            ),
+            Code(
+                id="PHEV",
+                name="Plug-in hybrid-electric",
+                description=(
+                    "Powertrain that can use both chemical fuels and electricity."
+                ),
+                child=[
+                    Code(
+                        id="PHEV-D",
+                        name="Diesel PHEV",
+                        description="PHEV powertrain that uses diesel fuel.",
+                    ),
+                    Code(
+                        id="PHEV-G",
+                        name="Diesel PHEV",
+                        description="PHEV powertrain that uses gasoline fuel.",
+                    ),
+                ],
+            ),
+        ],
+    ),
     Code(
         id="FC",
         name="Fuel cell",
