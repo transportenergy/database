@@ -40,9 +40,8 @@ Output is produced in a new folder named :file:`FOLDER`.
 On our continuous integration infrastructure, for every build, these diagnostics are run automatically and uploaded to cloud storage for reference.
 For instance:
 
-- For `GitHub pull request #23 <https://github.com/transportenergy/database/pull/23>`_, the Travis CI service produced `build number 313 <https://travis-ci.com/github/transportenergy/database/builds/156068167>`_.
-- The uploaded diagnostics from this build are available at: https://storage.googleapis.com/historical-data-ci.transportenergy.org/313.1/index.html
-
+- For GitHub :pull:`71`, the GitHub Actions build produced `build number 41 <https://github.com/transportenergy/database/runs/2476980208>`_.
+- The uploaded diagnostics from this build are available at: https://storage.googleapis.com/data.transportenergy.org/historical/ci/41/index.html
 
 Code reference
 ==============
@@ -77,10 +76,9 @@ T000
 .. automodule:: item.historical.T000
    :members:
 
-   .. literalinclude:: ../item/data/historical/sources.yaml
-      :language: yaml
-      :lines: 1-10
-
+.. literalinclude:: ../item/data/historical/sources.yaml
+   :language: yaml
+   :lines: 1-9
 
 T001
 ----
@@ -90,10 +88,21 @@ T001
 .. automodule:: item.historical.T001
    :members:
 
-   .. literalinclude:: ../item/data/historical/sources.yaml
-      :language: yaml
-      :lines: 12-20
+.. literalinclude:: ../item/data/historical/sources.yaml
+   :language: yaml
+   :lines: 11-18
 
+T002
+----
+
+.. currentmodule:: item.historical.T002
+
+.. automodule:: item.historical.T002
+   :members:
+
+.. literalinclude:: ../item/data/historical/sources.yaml
+   :language: yaml
+   :lines: 20-27
 
 T003
 ----
@@ -103,9 +112,9 @@ T003
 .. automodule:: item.historical.T003
    :members:
 
-   .. literalinclude:: ../item/data/historical/sources.yaml
-      :language: yaml
-      :lines: 32-40
+.. literalinclude:: ../item/data/historical/sources.yaml
+   :language: yaml
+   :lines: 29-36
 
 T004
 ----
@@ -115,9 +124,57 @@ T004
 .. automodule:: item.historical.T004
    :members:
 
-   .. literalinclude:: ../item/data/historical/sources.yaml
-      :language: yaml
-      :lines: 42-45
+.. literalinclude:: ../item/data/historical/sources.yaml
+   :language: yaml
+   :lines: 38-40
+
+T005
+----
+
+.. currentmodule:: item.historical.T005
+
+.. automodule:: item.historical.T005
+   :members:
+
+.. literalinclude:: ../item/data/historical/sources.yaml
+   :language: yaml
+   :lines: 42-47
+
+T006
+----
+
+.. currentmodule:: item.historical.T006
+
+.. automodule:: item.historical.T006
+   :members:
+
+.. literalinclude:: ../item/data/historical/sources.yaml
+   :language: yaml
+   :lines: 49-54
+
+T007
+----
+
+.. currentmodule:: item.historical.T007
+
+.. automodule:: item.historical.T007
+   :members:
+
+.. literalinclude:: ../item/data/historical/sources.yaml
+   :language: yaml
+   :lines: 56-61
+
+T008
+----
+
+.. currentmodule:: item.historical.T008
+
+.. automodule:: item.historical.T008
+   :members:
+
+.. literalinclude:: ../item/data/historical/sources.yaml
+   :language: yaml
+   :lines: 63-68
 
 T009
 ----
@@ -127,9 +184,9 @@ T009
 .. automodule:: item.historical.T009
    :members:
 
-   .. literalinclude:: ../item/data/historical/sources.yaml
-      :language: yaml
-      :lines: 75-80
+.. literalinclude:: ../item/data/historical/sources.yaml
+   :language: yaml
+   :lines: 70-75
 
 T010
 ----
@@ -139,6 +196,10 @@ T010
 .. automodule:: item.historical.T010
    :members:
 
+.. literalinclude:: ../item/data/historical/sources.yaml
+   :language: yaml
+   :lines: 77-82
+
 T012
 ----
 
@@ -147,6 +208,9 @@ T012
 .. automodule:: item.historical.T012
    :members:
 
+.. literalinclude:: ../item/data/historical/sources.yaml
+   :language: yaml
+   :lines: 91-96
 
 Quality diagnostics
 ===================
