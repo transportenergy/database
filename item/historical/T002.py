@@ -4,7 +4,9 @@ from functools import lru_cache
 import pandas as pd
 
 from item.historical.util import dropna_logged
-from item.structure import column_name
+
+#: iTEM data flow matching the data from this source.
+DATAFLOW = "ACTIVITY"
 
 #: Dimensions and attributes which do not vary across this data set.
 COMMON_DIMS = dict(
@@ -12,11 +14,13 @@ COMMON_DIMS = dict(
     source="International Transport Forum",
     # Since all the data is associated to "Freight," the Service is "Freight"
     service="Freight",
+    vehicle="Container",
     # The dataset does not provide any data on the following columns, so we
     # add the default value of "All" in both cases
-    technology="All",
-    fuel="All",
-    vehicle_type="Container",
+    automation="_T",
+    fuel="_T",
+    operator="_T",
+    technology="_T",
 )
 
 #: Columns to drop from the raw data.
@@ -58,14 +62,12 @@ def process(df):
 def map_variable(value):
     return pd.Series(
         {
-            column_name("MODE"): "Rail" if "Rail" in value else "Shipping",
-            column_name("VARIABLE"): "Freight ({})".format(
-                "TEU" if "TEU" in value else "Weight"
-            ),
+            "MODE": "Rail" if "Rail" in value else "Shipping",
+            "VARIABLE": "Freight ({})".format("TEU" if "TEU" in value else "Weight"),
         }
     )
 
 
 @lru_cache()
 def map_unit(value):
-    return pd.Series({"Unit": "10^3 tonne / year" if value == "Tonnes" else value})
+    return pd.Series({"UNIT": "10^3 tonne / year" if value == "Tonnes" else value})
