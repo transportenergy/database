@@ -2,19 +2,21 @@ from functools import lru_cache
 
 import pandas as pd
 
-from item.structure import column_name
-
 #: Separator character for :func:`pandas.read_csv`.
 CSV_SEP = ";"
+
+#: iTEM data flow matching the data from this source.
+DATAFLOW = "ACTIVITY"
 
 #: Dimensions and attributes which do not vary across this data set.
 COMMON_DIMS = dict(
     source="Eurostat",
-    service="Passenger",
-    technology="All",
-    fuel="All",
+    service="P",
     variable="Activity, share of distance",
     unit="percent",
+    technology="_T",
+    automation="_T",
+    operator="_T",
 )
 
 #: Columns to drop from the raw data.
@@ -30,18 +32,19 @@ def check(df):
 
 
 def process(df):
-    return pd.concat([df, df["Vehicle"].apply(map_mode_vehicle_type)], axis=1).rename(
-        columns=dict(Geo=column_name("COUNTRY"), Date=column_name("YEAR"))
-    )
+    return pd.concat(
+        [df.drop(columns=["Vehicle"]), df["Vehicle"].apply(map_mode_vehicle_type)],
+        axis=1,
+    ).rename(columns=dict(Geo="Country", Date="TIME_PERIOD"))
 
 
 @lru_cache()
 def map_mode_vehicle_type(value):
     return pd.Series(
         {
-            "Trains": ["Rail", "All"],
+            "Trains": ["Rail", "_T"],
             "Passenger cars": ["Road", "LDV"],
-            "Motor coaches, buses and trolley buses": ["Road", "LDV"],
+            "Motor coaches, buses and trolley buses": ["Road", "BUS"],
         }.get(value),
-        index=[column_name("MODE"), column_name("VEHICLE_TYPE")],
+        index=["MODE", "VEHICLE"],
     )
