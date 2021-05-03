@@ -62,7 +62,7 @@ def test_input_file(item_tmp_dir):
 
 
 @pytest.mark.parametrize("dataset_id", [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12])
-def test_process(dataset_id):
+def test_process(caplog, dataset_id):
     """Test common interface for processing scripts."""
     # Always use the path from within the repo
     paths["historical input"] = Path(item.__file__).parent.joinpath(
@@ -70,6 +70,9 @@ def test_process(dataset_id):
     )
 
     process(dataset_id)
+
+    # Processing produced valid results that can be pivoted to wide format
+    assert "Processing produced non-unique keys; no -wide output" not in caplog.messages
 
 
 @pytest.mark.parametrize("dataset_id, N_areas", [(0, 58), (1, 37), (2, 53), (3, 57)])
