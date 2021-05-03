@@ -2,26 +2,25 @@ from functools import lru_cache
 
 import pandas as pd
 
-from item.structure import column_name
-
 #: Separator character for :func:`pandas.read_csv`.
 CSV_SEP = ";"
 
+#: iTEM data flow matching the data from this source.
+DATAFLOW = "ACTIVITY"
 
 #: Dimensions and attributes which do not vary across this data set.
 COMMON_DIMS = dict(
     source="Eurostat",
-    service="Freight",
-    technology="All",
-    vehicle_type="All",
+    service="F",
     variable="Activity, share of volume",
     unit="percent",
+    technology="_T",
+    automation="_T",
+    operator="_T",
 )
 
 #: Columns to drop from the raw data.
-COLUMNS = dict(
-    drop=["Frequency", "Measure"],
-)
+COLUMNS = dict(drop=["Frequency", "Measure"])
 
 
 def check(df):
@@ -31,15 +30,12 @@ def check(df):
 
 
 def process(df):
-    # TODO handle the following:
-    # - 'European Union (current composition)'
-    # - 'Germany (until 1990 former territory of the FRG)'
     return (
         pd.concat([df, df["Tra Mode"].apply(map_mode_vehicle_type)], axis=1)
         .rename(columns={"Tra Mode": "Tra_Mode"})
         .query("Tra_Mode != 'Railways, inland waterways - sum of available data'")
         .drop(columns=["Tra_Mode"])
-        .rename(columns=dict(Geo=column_name("COUNTRY"), Date=column_name("YEAR")))
+        .rename(columns=dict(Geo="Country", Date="TIME_PERIOD"))
     )
 
 
@@ -47,9 +43,9 @@ def process(df):
 def map_mode_vehicle_type(value):
     return pd.Series(
         {
-            "Railways": ["Rail", "All"],
+            "Railways": ["Rail", "_T"],
             "Roads": ["Road", "LDV"],
-            "Inland waterways": ["Shipping", "All"],
+            "Inland waterways": ["Shipping", "_T"],
         }.get(value),
-        index=[column_name("MODE"), column_name("VEHICLE_TYPE")],
+        index=["MODE", "VEHICLE"],
     )
