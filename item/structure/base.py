@@ -216,6 +216,15 @@ CS_TRANSPORT_MEASURE = ConceptScheme(
 #: Concept schemes.
 CONCEPT_SCHEMES = [CS_TRANSPORT, CS_MODELING, CS_TRANSPORT_MEASURE]
 
+#: Codes for the REF_AREA dimension, from SDMX codelist ``ESTAT:CL_AREA(1.8)``.
+CL_AREA = (
+    Code(id="_X", name="Not allocated/unspecified"),
+    Code(id="B0", name="European Union (current composition)"),
+    Code(id="B4", name="European Union (27 countries)"),
+    Code(id="B5", name="European Union (28 countries)"),
+    Code(id="W0", name="World"),
+)
+
 CL_AUTOMATION = (
     Code(id="_T", name="Total"),
     Code(id="_Z", name="Not applicable"),
@@ -385,6 +394,7 @@ CL_VEHICLE = (
 #: Codes for various code lists.
 CODELISTS = {
     "AUTOMATION": CL_AUTOMATION,
+    "AREA": CL_AREA,
     "FLEET": CL_FLEET,
     "FUEL": CL_FUEL,
     "LCA_SCOPE": CL_LCA_SCOPE,
