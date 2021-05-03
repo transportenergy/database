@@ -108,7 +108,7 @@ def cache_results(id_str, df):
     # Pivot to wide format ('user friendly view')
 
     # Columns for wide format
-    columns = [col.value for col in ColumnName if col != ColumnName.VALUE]
+    columns = list(c for c in df.columns if c != "VALUE")
 
     duplicates = df.duplicated(subset=columns, keep=False)
     if duplicates.any():
@@ -120,11 +120,18 @@ def cache_results(id_str, df):
     # Write wide format
     path = OUTPUT_PATH / f"{id_str}-clean-wide.csv"
 
+    # - Add the iTEM region and country name. NB this would be slightly faster after
+    #   unstacking, but would require more complicated code to get the desired column
+    #   order.
     # - Set all columns but 'Value' as the index → pd.Series with MultiIndex.
-    # - 'Unstack' the 'Year' dimension to columns, i.e. wide format.
+    # - Unstack the TIME_PERIOD dimension to columns, i.e. wide format.
     # - Return the index to columns in the dataframe.
     # - Write to file.
-    df.set_index(columns).unstack(column_name("YEAR")).reset_index().to_csv(
+    columns.extend(["NAME", "ITEM_REGION"])
+    df.assign(
+        NAME=lambda df_: df_["REF_AREA"].apply(get_country_name),
+        ITEM_REGION=lambda df_: df_["REF_AREA"].apply(get_item_region),
+    ).set_index(columns)["VALUE"].unstack("TIME_PERIOD").reset_index().to_csv(
         path, index=False
     )
     log.info(f"Write {path}")
