@@ -1,19 +1,19 @@
 from functools import lru_cache
 
-from item.structure import column_name
-
 #: Separator character for :func:`pandas.read_csv`.
 CSV_SEP = ";"
 
+#: iTEM data flow matching the data from this source.
+DATAFLOW = "STOCK"
 
 #: Dimensions and attributes which do not vary across this data set.
 COMMON_DIMS = dict(
     source="UNECE",
     variable="Stock",
-    service="Passenger",
-    technology="All",
-    fuel="All",
+    fuel="_T",
     mode="Road",
+    service="Passenger",
+    technology="_T",
 )
 
 
@@ -30,10 +30,10 @@ def check(df):
 
 def process(df):
     return (
-        df.rename(columns=dict(Date=column_name("YEAR")))
+        df.rename(columns=dict(Date="TIME_PERIOD"))
         .assign(
-            unit=df["Measurement"].apply(map_unit),
-            vehicle_type=df["Vehicle Category"].apply(map_vehicle_type),
+            UNIT=df["Measurement"].apply(map_unit),
+            VEHICLE=df["Vehicle Category"].apply(map_vehicle),
         )
         .drop(columns=["Measurement", "Vehicle Category"])
     )
@@ -48,7 +48,7 @@ def map_unit(value):
 
 
 @lru_cache()
-def map_vehicle_type(value):
+def map_vehicle(value):
     return {
         "Passenger cars": "LDV",
         "Motor coaches, buses and trolley bus": "Bus",
