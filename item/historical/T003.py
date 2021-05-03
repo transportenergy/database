@@ -11,12 +11,17 @@ import pandas as pd
 from item.historical.util import dropna_logged
 from item.utils import convert_units
 
+#: iTEM data flow matching the data from this source.
+DATAFLOW = "ACTIVITY"
+
 #: Dimensions and attributes which do not vary across this data set.
 COMMON_DIMS = dict(
     source="International Transport Forum",
-    fuel="All",
-    technology="All",
+    variable="Activity",
+    service="F",
     unit="Gt km / year",
+    technology="_T",
+    automation="_T",
 )
 
 #: Columns to drop from the raw data.
@@ -38,17 +43,13 @@ COLUMNS = dict(
 
 #: Mapping from Variable to mode and vehicle_type dimensions.
 VARIABLE_MAP = {
-    "Pipelines transport": dict(mode="Pipeline", vehicle_type="Pipeline"),
-    "Rail freight transport": dict(mode="Rail", vehicle_type="All"),
-    "Road freight transport": dict(mode="Road", vehicle_type="All"),
-    "Road freight transport for hire and reward": dict(
-        mode="Road", vehicle_type="For Hire and Reward"
-    ),
-    "Road freight transport on own account": dict(
-        mode="Road", vehicle_type="For Own Account"
-    ),
-    "Inland waterways freight transport": dict(mode="Shipping", vehicle_type="Inland"),
-    "Total inland freight transport": dict(mode="Inland", vehicle_type="All"),
+    "Pipelines transport": dict(mode="Pipeline", vehicle="Pipeline"),
+    "Rail freight transport": dict(mode="Rail"),
+    "Road freight transport": dict(mode="Road"),
+    "Road freight transport for hire and reward": dict(mode="Road", operator="HIRE"),
+    "Road freight transport on own account": dict(mode="Road", operator="OWN"),
+    "Inland waterways freight transport": dict(mode="Shipping", vehicle="Inland"),
+    "Total inland freight transport": dict(mode="Inland"),
 }
 
 #: Variables to include in a partial sum.
@@ -66,50 +67,43 @@ def check(df):
 
 
 def process(df):
+    """Process data set T003.
+
+    - Remove null values.
+    - Convert units from Mt km / year to Gt km / year.
+    - Lookup and assign “MODE” and “VEHICLE” dimensions based on “VARIABLE”, using
+      :data:`VARIABLE_MAP`.
+    - Compute partial sums that exclude pipelines.
+    - Concatenate the partial sums to the original data.
+    - Sort.
+    """
     df = (
-        # Remove rows with null values
         df.pipe(dropna_logged, "Value", ["Country"])
-        # Set service dimension; overridden below
-        .assign(Service="Freight")
-        # Convert units
         .pipe(convert_units, "Mt km / year", "Gt km / year")
+        .rename(columns={"Year": "TIME_PERIOD"})
     )
 
-    # Use "Pipeline" in the service dimension for some values of 'variable'
-    df.loc[df["Variable"] == "Pipelines transport", "Service"] == "Pipeline"
-
-    # Lookup and assign the mode and vehicle_type dimensions
+    # Lookup and assign the mode and vehicle dimensions
     @lru_cache()
-    def lookup(variable):
-        return pd.Series(VARIABLE_MAP[variable])
+    def lookup(value):
+        return pd.Series(VARIABLE_MAP[value])
 
     df = pd.concat([df, df["Variable"].apply(lookup)], axis=1)
 
     return (
         # Compute partial sums that exclude pipelines
-        # Select only the subset of variables, then group by Country and Year
+        # Select only the subset of variables, then group by Country and TIME_PERIOD
         df[df["Variable"].isin(PARTIAL)]
-        .groupby(["Country", "Year"])
+        .groupby(["Country", "TIME_PERIOD"])
         # Sum only the groups with all three variables
         .sum(min_count=len(PARTIAL))
         .dropna()
-        # Assign other dimensions
-        .assign(
-            mode="Inland ex. pipeline",
-            Service="Freight",
-            vehicle_type="All",
-            Unit="Gt km / year",
-        )
         # Return Country and Year to columns
         .reset_index()
+        # Assign other dimensions for this sum
+        .assign(mode="Inland ex. pipeline")
         # Concatenate with the original data
         .append(df, ignore_index=True)
-        # Assign common Variable value
-        .assign(Variable="Freight Activity")
-        # Rename columns
-        .rename(
-            columns=dict(mode="Mode", service="Service", vehicle_type="Vehicle Type")
-        )
-        # Sort
-        .sort_values(by=["Country", "Year", "Mode", "Vehicle Type"])
+        .fillna({"operator": "_T", "vehicle": "_T"})
+        .sort_values(by=["Country", "TIME_PERIOD", "mode", "vehicle"])
     )
