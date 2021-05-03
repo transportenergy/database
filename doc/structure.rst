@@ -97,18 +97,23 @@ For example:
 Code reference
 ==============
 
-.. currentmodule:: item.sdmx
-
-.. automodule:: item.sdmx
-   :members:
-
 .. currentmodule:: item.structure
-
-.. autofunction:: make_template
 
 .. automodule:: item.structure
    :members:
-   :exclude-members: make_template, read_items, read_concepts_yaml, read_measures_yaml
+
+.. currentmodule:: item.structure.base
+
+.. automodule:: item.structure.base
+   :members:
+
+.. currentmodule:: item.structure.sdmx
+
+.. automodule:: item.structure.sdmx
+   :members:
+
+.. automodule:: item.structure.template
+   :members:
 
    The following utility functions are used by :func:`make_template`:
 
@@ -116,4 +121,4 @@ Code reference
 
       add_unit
       collapse
-      common_dim_dummies
+      name_for_id

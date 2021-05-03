@@ -19,11 +19,3 @@ SDMX metadata (:file:`structure.xml`)
 
 .. literalinclude:: ../item/data/structure.xml
    :language: xml
-
-.. _spec-yaml:
-
-iTEM template specification (:file:`spec.yaml`)
-===============================================
-
-.. literalinclude:: ../item/data/spec.yaml
-   :language: yaml
