@@ -13,7 +13,7 @@ def dropna_logged(df, column, log_columns=[]):
 
     log.info(f"{to_drop.sum()} rows with NaN in {repr(column)}")
 
-    for col in log_columns:
+    for col in log_columns if to_drop.sum() else []:
         # Sorted unique values in column `col`
         values = sorted(df[to_drop][col].unique())
         log.info(f"… with {len(values)} unique values in {repr(col)}: {values}")
