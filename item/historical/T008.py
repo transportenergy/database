@@ -42,7 +42,7 @@ def process(df):
 @lru_cache()
 def map_unit(value):
     return {
-        "absolute value": "10^6 vehicle",
+        "absolute value": "vehicle",
         "per 1000 inhabitants": "vehicle / kiloperson",
     }.get(value)
 
