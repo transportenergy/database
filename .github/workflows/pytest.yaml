@@ -2,9 +2,9 @@ name: Test suite & diagnostics
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 env:
   # Location of RCLONE configuration file
@@ -19,21 +19,32 @@ env:
 
 jobs:
   pytest:
-    runs-on: ubuntu-latest
-
     strategy:
       matrix:
         include:
-        - python-version: "3.7"
+        - os: ubuntu-latest
+          python-version: "3.7"
           run-diagnostics: false
-        - python-version: "3.8"
+        - os: ubuntu-latest
+          python-version: "3.8"
           run-diagnostics: false
-        - python-version: "3.9"
+        - os: ubuntu-latest
+          python-version: "3.9"
           run-diagnostics: true
+        - os: windows-latest
+          python-version: "3.9"
+          run-diagnostics: false
 
-    name: py${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+
+    name: ${{ matrix.os }}-py${{ matrix.python-version }}
 
     steps:
+    - name: Cancel previous runs that have not completed
+      uses: styfle/cancel-workflow-action@0.7.0
+      with:
+        access_token: ${{ github.token }}
+
     - uses: actions/checkout@v2
       with:
         submodules: true
@@ -48,7 +59,8 @@ jobs:
         path: |
           ~/.cache/pip
           ~/.cache/rclone*.zip
-        key: ubuntu-latest-${{ matrix.python-version }}
+          ~/appdata/local/pip/cache
+        key: ${{ matrix.os }}-${{ matrix.python-version }}
 
     - name: Upgrade pip, wheel
       run: python -m pip install --upgrade pip wheel
