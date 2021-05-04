@@ -12,15 +12,13 @@ COMMON_DIMS = dict(
     variable="Stock",
     fuel="_T",
     mode="Road",
-    service="Passenger",
+    service="P",
     technology="_T",
 )
 
 
 #: Columns to drop from the raw data.
-COLUMNS = dict(
-    drop=["Frequency"],
-)
+COLUMNS = dict(drop=["Frequency"])
 
 
 def check(df):
