@@ -21,6 +21,22 @@ Output is produced in a new folder named :file:`FOLDER`.
 Specific diagnostic tests
 =========================
 
+A001
+----
+
+.. currentmodule:: item.historical.diagnostic.A001
+
+.. automodule:: item.historical.diagnostic.A001
+   :members:
+
+A002
+----
+
+.. currentmodule:: item.historical.diagnostic.A002
+
+.. automodule:: item.historical.diagnostic.A002
+   :members:
+
 A003
 ----
 

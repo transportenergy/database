@@ -8,8 +8,11 @@ What's new?
    :backlinks: none
    :depth: 1
 
-.. Next release
-.. ============
+Next release
+============
+
+- Add :mod:`.A001` and :mod:`.A002` historical quality diagnostics (:pull:`74`).
+
 
 v2021.5.4
 =========
