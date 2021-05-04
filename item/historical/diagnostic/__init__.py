@@ -90,7 +90,7 @@ def run_all(output_path):
     # Coverage
     groups = {"Coverage": [], "Quality": []}
 
-    for source_id in [0, 1, 2, 3, 8, 9]:
+    for source_id in [0, 1, 2, 3]:
         # Output filename
         filename = f"{source_str(source_id)}.txt"
         groups["Coverage"].append(filename)
