@@ -1,14 +1,13 @@
 """Diagnostics for historical data sets."""
+from importlib import import_module
 from pathlib import Path
 
 import pandas as pd
 
 from item.historical import fetch_source, source_str
 
-from . import A003
-
 # Quality checks
-QUALITY = [A003.compute]
+QUALITY = ["A001", "A002", "A003"]
 
 # Jinja2 template for diagnostics index page
 INDEX_TEMPLATE = """<html><body>
@@ -105,17 +104,23 @@ def run_all(output_path):
         #      coverage(), above; generalize
         (output_path / filename).write_text(coverage(data))
 
-    # Quality
+    # Quality checks
     from item.historical import process
 
     for check in QUALITY:
-        # Output filename
-        filename = f"{check.__name__.split('.')[-1]}.csv"
-        groups["Quality"].append(filename)
+        # Import
+        check_module = import_module(f"item.historical.diagnostic.{check}")
 
+        # Output filename
+        filename = f"{check}.csv"
+        groups["Quality"].append(filename)
         data_files.append(output_path / filename)
-        # TODO this is specific to A003; generalize
-        check(process(3), process(9)).to_csv(data_files[-1])
+
+        # Generate inputs
+        inputs = [process(arg) for arg in check_module.ARGS]
+
+        # Compute and save
+        check_module.compute(*inputs).to_csv(data_files[-1])
 
     # Archive data files
     zf = ZipFile(

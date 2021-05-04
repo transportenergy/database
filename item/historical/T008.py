@@ -12,15 +12,13 @@ COMMON_DIMS = dict(
     variable="Stock",
     fuel="_T",
     mode="Road",
-    service="Passenger",
+    service="P",
     technology="_T",
 )
 
 
 #: Columns to drop from the raw data.
-COLUMNS = dict(
-    drop=["Frequency"],
-)
+COLUMNS = dict(drop=["Frequency"])
 
 
 def check(df):
@@ -42,7 +40,7 @@ def process(df):
 @lru_cache()
 def map_unit(value):
     return {
-        "absolute value": "10^6 vehicle",
+        "absolute value": "vehicle",
         "per 1000 inhabitants": "vehicle / kiloperson",
     }.get(value)
 

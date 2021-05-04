@@ -1,5 +1,7 @@
-from item.historical import OUTPUT_PATH
 from item.util import convert_units
+
+#: Input arguments
+ARGS = ["T003", "T009"]
 
 
 def compute(activity, stock):
@@ -30,7 +32,7 @@ def compute(activity, stock):
     )
     stock = stock[mask].groupby(spacetime).sum(numeric_only=True)
 
-    df = (
+    return (
         # Compute ratio, drop nulls
         (activity["VALUE"] / stock["VALUE"])
         .dropna()
@@ -41,8 +43,3 @@ def compute(activity, stock):
         # To preferred units
         .pipe(convert_units, "Gt km / year / kvehicle", "kt km / year / vehicle")
     )
-
-    # Save output before returning
-    df.to_csv(OUTPUT_PATH / "A003.csv")
-
-    return df
