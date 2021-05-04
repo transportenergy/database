@@ -9,7 +9,7 @@ on:
 jobs:
   lint:
     continue-on-error: true
-    name: black, flake8, twine
+    name: black, flake8
     runs-on: ubuntu-latest
 
     steps:
@@ -42,12 +42,6 @@ jobs:
       run: |
         pip install isort
         isort --check-only .
-
-    - name: Build package
-      run: |
-        pip install twine wheel
-        python3 setup.py bdist_wheel sdist
-        twine check dist/*
 
   mypy-sphinx:
     continue-on-error: true
