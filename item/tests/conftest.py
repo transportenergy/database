@@ -59,5 +59,4 @@ def item_tmp_dir(tmp_path_factory, pytestconfig):
         # For use by test functions
         yield tmp_path
     finally:
-        # Remove the whole tree
-        shutil.rmtree(tmp_path)
+        pass
