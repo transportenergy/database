@@ -39,6 +39,7 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.doctest",
     "sphinx.ext.extlinks",
+    "sphinx.ext.graphviz",
     "sphinx.ext.intersphinx",
     # 'sphinx.ext.linkcode',
     "sphinx.ext.napoleon",
@@ -182,6 +183,10 @@ extlinks = {
     "pull": ("https://github.com/transportenergy/database/pull/%s", "PR #"),
     "gh-user": ("https://github.com/%s", "@"),
 }
+
+# -- Options for sphinx.ext.graphviz ---------------------------------------------------
+
+graphviz_output_format = "svg"
 
 
 # -- Options for intersphinx extension ---------------------------------------

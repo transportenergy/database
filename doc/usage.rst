@@ -103,7 +103,7 @@ The command-line option ``--local-data`` can be used to point to local data file
     ================ test session starts ================
     …
 
-See the page :doc:`ci` for further details.
+See the page :doc:`repro` for further details.
 
 
 .. _usage-cite:

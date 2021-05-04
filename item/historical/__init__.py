@@ -2,90 +2,80 @@ import logging
 import os
 from copy import deepcopy
 from functools import lru_cache
+from importlib import import_module
+from pathlib import Path
+from typing import Dict, Optional, Union
 
 import pandas as pd
 import pycountry
 import yaml
 
 from item.common import paths
-from item.historical.scripts import T000, T001, T002, T003, T004, T009, T010, T012
-from item.historical.scripts.util.managers.dataframe import ColumnName
 from item.remote import OpenKAPSARC, get_sdmx
+from item.structure import generate
 
 log = logging.getLogger(__name__)
 
 
-#: List of data processing Jupyter/IPython notebooks.
-SCRIPTS = [
-    # Converted to a submodule, below.
-    # 'T000',
-    # 'T001',
-    # "T002",
-    # "T003",
-    "T005",
-    "T006",
-    "T007",
-    "T008",
-]
-
-#: Submodules usable with :func:`process`.
-MODULES = {
-    0: T000,
-    1: T001,
-    2: T002,
-    3: T003,
-    4: T004,
-    9: T009,
-    10: T010,
-    12: T012,
-}
-
 #: Path for output from :func:`process`.
 OUTPUT_PATH = paths["data"] / "historical" / "output"
 
-#: Non-ISO names appearing in 1 or more data sets. These are used in
-#: :meth:`iso_and_region` to replace names before they are looked up using
-#: :mod:`pycountry`.
+#: Non-ISO 3166 names that appear in 1 or more data sets. These are used in
+#: :meth:`iso_alpha_3` to replace names before they are looked up using
+#: mod:`pycountry`.
 COUNTRY_NAME = {
-    "Azerbaidjan": "AZE",
-    "Bolivia (Plurinational State of)": "BOL",
-    "Bosnia-Herzegovina": "BIH",
-    "Bosnia": "BIH",
-    "Brunei": "BRN",
-    # NB for T012. This includes both GGY and JEY; ambiguous.
-    # "Channel Islands": "",
-    "China, Hong Kong SAR": "HKG",
-    "China, Macao SAR": "MAC",
-    "China, Taiwan Province of China": "TWN",
-    "Congo Kinshasa ": "COD",
-    "Dem. People's Republic of Korea": "PRK",
-    "Democratic Republic of the Congo": "COD",
-    "Holy See": "VAT",
-    "Hong-Kong": "HKG",
-    "Iran (Islamic Republic of)": "IRN",
-    "Iran": "IRN",
-    "Ivory Coast": "CIV",
-    "Korea": "KOR",
-    "Macedonia": "MKD",
-    "Micronesia (Fed. States of)": "FSM",
-    "Moldavia": "MDA",
-    "Montenegro, Republic of": "MNE",
-    "Palestine": "PSE",
-    "Republic of Korea": "KOR",
-    "Russia": "RUS",
-    "Saint Helena": "SHN",
-    "Serbia, Republic of": "SRB",
-    "South Korea": "KOR",
-    "State of Palestine": "PSE",
-    "Syria": "SYR",
-    "The former Yugoslav Republic of Macedonia": "MKD",
-    "United States Virgin Islands": "VIR",
-    "Venezuela (Bolivarian Republic of)": "VEN",
-    "Wallis and Futuna Islands": "WLF",
+    "azerbaidjan": "AZE",
+    "bolivia (plurinational state of)": "BOL",
+    "bosnia-herzegovina": "BIH",
+    "bosnia": "BIH",
+    "brunei": "BRN",
+    "cape verde": "CPV",
+    "china, hong kong sar": "HKG",
+    "china, macao sar": "MAC",
+    "china, taiwan province of china": "TWN",
+    "congo kinshasa ": "COD",
+    "congo_the democratic republic of the": "COD",
+    "cote d'ivoire": "CIV",
+    "dem. people's republic of korea": "PRK",
+    "democratic republic of the congo": "COD",
+    "former yugoslav republic of macedonia, the": "MKD",
+    "germany (until 1990 former territory of the frg)": "DEU",
+    "holy see": "VAT",
+    "hong-kong": "HKG",
+    "iran (islamic republic of)": "IRN",
+    "iran": "IRN",
+    "ivory coast": "CIV",
+    "korea": "KOR",
+    "libyan arab jamahiriya": "LBY",
+    "macedonia, the former yugoslav republic of": "MKD",
+    "macedonia": "MKD",
+    "micronesia (fed. states of)": "FSM",
+    "moldavia": "MDA",
+    "montenegro, republic of": "MNE",
+    "palestine": "PSE",
+    "republic of korea": "KOR",
+    "reunion": "REU",
+    "russia": "RUS",
+    "saint helena": "SHN",
+    "serbia and montenegro": "SCG",
+    "serbia, republic of": "SRB",
+    "south korea": "KOR",
+    "state of palestine": "PSE",
+    "swaziland": "SWZ",
+    "syria": "SYR",
+    "taiwan_province of china": "TWN",
+    "tanzania_united republic of": "TZA",
+    "the former yugoslav republic of macedonia": "MKD",
+    "united states virgin islands": "VIR",
+    "venezuela (bolivarian republic of)": "VEN",
+    "virgin islands_british": "VGB",
+    "wallis and futuna islands": "WLF",
 }
 
 
-#: Map from ISO 3166 alpha-3 code to region name.
+# TODO don't do this every time this file is imported; add a utility function somewhere
+# to generate it, like .structure.generate().
+#: Map from ISO 3166 alpha-3 code to iTEM region name.
 REGION = {}
 # Populate the map from the regions.yaml file
 with open(paths["data"] / "model" / "regions.yaml") as file:
@@ -99,15 +89,22 @@ with open(paths["data"] / "historical" / "sources.yaml") as f:
     SOURCES = yaml.safe_load(f)
 
 
-def cache_results(id_str, df):
-    """Write *df* to :data:`.OUTPUT_PATH` in two file formats.
+def cache_results(id_str: str, df: pd.DataFrame) -> None:
+    """Write `df` to :data:`.OUTPUT_PATH` in two file formats.
 
     The files written are:
 
-    - :file:`{id_str}-clean.csv`, in long or 'programming-friendly' format, i.e. with a
-      a 'Year' column.
-    - :file:`{id_str}-clean-wide.csv`, in wide or 'user-friendly' format, with one
-      column per year.
+    - :file:`{id_str}-clean.csv`, in long (previously ‘programming-friendly’ or ‘PF’)
+      format, i.e. with all years or other time periods in ``TIME_PERIOD`` column and
+      one observation per row.
+    - :file:`{id_str}-clean-wide.csv`, in wide (previously ‘user-friendly’ or ‘UF’)
+      format, with one column per year/``TIME_PERIOD``.
+      For convenience, this file has two additional columns:
+
+      - ``NAME``: this gives the ISO 3166 name that corresponds to the alpha-3 code
+        appearing in the ``REF_AREA`` column.
+      - ``ITEM_REGION``: this gives the name of the iTEM region to which the data
+        correspond.
     """
     OUTPUT_PATH.mkdir(exist_ok=True)
 
@@ -119,7 +116,7 @@ def cache_results(id_str, df):
     # Pivot to wide format ('user friendly view')
 
     # Columns for wide format
-    columns = [col.value for col in ColumnName if col != ColumnName.VALUE]
+    columns = list(c for c in df.columns if c != "VALUE")
 
     duplicates = df.duplicated(subset=columns, keep=False)
     if duplicates.any():
@@ -131,27 +128,39 @@ def cache_results(id_str, df):
     # Write wide format
     path = OUTPUT_PATH / f"{id_str}-clean-wide.csv"
 
+    # - Add the iTEM region and country name. NB this would be slightly faster after
+    #   unstacking, but would require more complicated code to get the desired column
+    #   order.
     # - Set all columns but 'Value' as the index → pd.Series with MultiIndex.
-    # - 'Unstack' the 'Year' dimension to columns, i.e. wide format.
+    # - Unstack the TIME_PERIOD dimension to columns, i.e. wide format.
     # - Return the index to columns in the dataframe.
     # - Write to file.
-    df.set_index(columns).unstack(ColumnName.YEAR.value).reset_index().to_csv(
+    columns.extend(["NAME", "ITEM_REGION"])
+    df.assign(
+        NAME=lambda df_: df_["REF_AREA"].apply(get_country_name),
+        ITEM_REGION=lambda df_: df_["REF_AREA"].apply(get_item_region),
+    ).set_index(columns)["VALUE"].unstack("TIME_PERIOD").reset_index().to_csv(
         path, index=False
     )
     log.info(f"Write {path}")
 
 
-def fetch_source(id, use_cache=True):
-    """Fetch data from source *id*.
+def fetch_source(id: Union[int, str], use_cache: bool = True) -> Path:
+    """Fetch amd cached data from source `id`.
 
-    The remote data is fetched using the API for the particular source.
-    A network connection is required.
+    The remote data is fetched using the API for the particular source. A network
+    connection is required.
 
     Parameters
     ----------
     use_cache : bool, optional
-        If given, use a cached local file, if available. No check of cache
+        If :obj:`True`, use a cached local file, if available. No check of cache
         validity is performed.
+
+    Returns
+    -------
+    pathlib.Path
+        path to the location where the fetched and cached data is stored.
     """
     # Retrieve source information from sources.yaml
     id = source_str(id)
@@ -185,11 +194,10 @@ def fetch_source(id, use_cache=True):
 
 
 def input_file(id: int):
-    """Return the path to a cached, raw input data file for data source *id*.
+    """Return the path to a cached, raw input data file for data source `id`.
 
-    CSV files are located in the 'historical input' data path. If more than
-    one file has a name beginning with “T{id}”, the last sorted file is
-    returned.
+    CSV files are located in the 'historical input' data path. If more than one file
+    has a name beginning with “T{id}”, the last sorted file is returned.
     """
     # List of all matching files
     all_files = sorted(paths["historical input"].glob(f"{source_str(id)}*.csv"))
@@ -198,44 +206,53 @@ def input_file(id: int):
     return all_files[-1]
 
 
-def process(id):
+def process(id: Union[int, str]) -> pd.DataFrame:
     """Process a data set given its *id*.
 
     Performs the following common processing steps:
 
-    1. Load the data from cache.
+    1. Fetch the unprocessed upstream data, or load it from cache.
     2. Load a module defining dataset-specific processing steps. This module is in a
        file named e.g. :file:`T001.py`.
     3. Call the dataset's (optional) :meth:`check` method. This method receives the
        input data frame as an argument, and can make one or more assertions to ensure
-       the data is in the expected format.
+       the data is in the expected format. If ``assert False`` or any other exception
+       occurs here, processing fails.
     4. Drop columns in the dataset's (optional) :data:`COLUMNS['drop']` :class:`list`.
     5. Call the dataset-specific (required) :meth:`process` method. This method receives
-       the data frame from step (4), and performs any additional processing.
-    6. Assign ISO 3166 alpha-3 codes and the iTEM region based on a column containing
-       country names; either :data:`COLUMNS['country_name']` or the default, 'Country'.
-       See :meth:`iso_and_region`.
-    7. Assign common dimensions from the dataset's (optional) :data:`COMMON_DIMS`
-       :class:`dict`.
-    8. Order columns according to :class:`.ColumnName`.
-    9. Output data to two files. See :meth:`cache_results`.
+       the data frame from step (4), performs any additional processing, and returns a
+       data frame.
+    6. If the ``REF_AREA`` dimension is not already populated, assign ISO 3166 alpha-3
+       codes, using a column containing country names: either
+       :data:`COLUMNS['country_name']` or the default, 'Country'.
+       See :meth:`iso_alpha_3`.
+    7. Assign values to other dimensions:
+
+       a. From the dataset's (optional) :data:`DATAFLOW` variable.
+          This variable indicates one of the data flows and corresponding data
+          structure definitions (DSDs) in the :doc:`iTEM data structures </structure>`.
+          For each dimension in the “full” (``HISTORICAL``) DSD but not in this
+          dataflow, fill in with “_Z” (not applicable) values.
+       b. From the dataset's (optional) :data:`COMMON_DIMS` :class:`dict`.
+    8. Order columns according to the ``HISTORICAL`` data structure.
+    9. Check for missing values or missing dimension labels. A fully cleaned data set
+       has none.
+    10. Output data to two files. See :meth:`cache_results`.
 
     Parameters
     ----------
     id : int
-        Data source id, as listed in :data:`.MODULES`. E.g. ``0`` imports data from
-        from file :file:`T000.csv`.
+        Data source id.
 
     Returns
     -------
-    DataFrame : :class:`pandas.DataFrame`
-        Apart from generating :meth:`cache_results`, returns dataset as a DataFrame.
-
+    pandas.DataFrame
+        The processed data.
     """
     id_str = source_str(id)
 
     # Get the module for this data set
-    dataset_module = MODULES[id]
+    dataset_module = import_module(f"item.historical.{id_str}")
 
     if getattr(dataset_module, "FETCH", False):
         # Fetch directly from source
@@ -250,7 +267,7 @@ def process(id):
 
     try:
         # Check that the input data is of the form expected by process()
-        dataset_module.check(df)
+        getattr(dataset_module, "check")(df)
     except AttributeError:
         # Optional check() function does not exist
         log.info("No pre-processing checks to perform")
@@ -261,42 +278,73 @@ def process(id):
         raise RuntimeError(msg)
 
     # Information about columns. If not defined, use defaults.
-    columns = dict(country_name="Country")
-    columns.update(getattr(dataset_module, "COLUMNS", {}))
+    COLUMNS = getattr(dataset_module, "COLUMNS", {})
 
-    try:
-        # List of column names to drop
-        drop_cols = columns["drop"]
-    except KeyError:
-        # No variable COLUMNS in dataset_module, or no key 'drop'
-        log.info(f"No columns to drop for {id_str}")
-    else:
+    # List of column names to drop
+    drop_cols = COLUMNS.get("drop", [])
+    if len(drop_cols):
         df.drop(columns=drop_cols, inplace=True)
         log.info(f"Drop {len(drop_cols)} extra column(s)")
+    else:
+        # No variable COLUMNS in dataset_module, or no key 'drop'
+        log.info(f"No columns to drop for {id_str}")
 
     # Call the dataset-specific process() function; returns a modified df
-    df = dataset_module.process(df)
+    df = getattr(dataset_module, "process")(df)
     log.info(f"{len(df)} observations")
 
-    # Assign ISO 3166 alpha-3 codes and iTEM regions from a country name column
-    country_col = columns["country_name"]
-    # Use pandas.Series.apply() to apply the same function to each entry in
-    # the column. Join these to the existing data frame as additional columns.
-    df = df.combine_first(df[country_col].apply(iso_and_region))
+    if "REF_AREA" not in df.columns:
+        # Assign ISO 3166 alpha-3 codes from a country name column
+        country_col = COLUMNS.get("country_name", "Country")
+
+        # Use pandas.Series.apply() to apply the same function to each entry in
+        # the column. Join these to the existing data frame as additional columns.
+        df = df.assign(REF_AREA=df[country_col].apply(iso_alpha_3))
+
+    df = df.rename(columns=dim_id_for_column_name)
+
+    drop_cols = ["_drop"] if "_drop" in df.columns else []
 
     # Values to assign across all observations: the dataset ID
-    assign_values = {ColumnName.ID.value: id_str}
+    assign_values = {"ID": id_str}
+
+    # Assign "_Z" (not applicable) for dimensions not relevant to this data flow
+    df_id = getattr(dataset_module, "DATAFLOW", None)
+    for dim, value in fill_values_for_dataflow(df_id).items():
+        if dim in df.columns:
+            # Mismatch: the data set returns detail here that's not specified in the
+            # data flow, e.g. T004
+            log.info(
+                f"Dimension {repr(dim)} should be {repr(value)} for dataflow "
+                f"{repr(df_id)}, but values exist; do not overwrite"
+            )
+            continue
+        assign_values[dim] = value
 
     # Handle any COMMON_DIMS, if defined
     for dim, value in getattr(dataset_module, "COMMON_DIMS", {}).items():
-        # Standard name for the column
-        col_name = getattr(ColumnName, dim.upper()).value
-        # Copy the value to be assigned
-        assign_values[col_name] = value
+        # Retrieve a dimension ID; copy the value to be assigned
+        assign_values[dim.upper()] = value
+
+    dsd = generate().structure["HISTORICAL"]
 
     # - Assign the values.
     # - Order the columns in the standard order.
-    df = df.assign(**assign_values).reindex(columns=[ev.value for ev in ColumnName])
+    df = (
+        df.drop(columns=drop_cols)
+        .assign(**assign_values)
+        .reindex(
+            columns=["ID"] + [dim.id for dim in dsd.dimensions] + ["VALUE", "UNIT"]
+        )
+    )
+
+    # Check for missing values
+    rows = df.isna().any(axis=1)
+    if rows.any():
+        log.error(f"Incomplete; missing values in {rows.sum()} rows:")
+        print(df[rows])
+        print(df[rows].head(1).transpose())
+        raise RuntimeError
 
     # Save the result to cache
     cache_results(id_str, df)
@@ -306,8 +354,55 @@ def process(id):
 
 
 @lru_cache()
-def iso_and_region(name):
-    """Return (ISO 3166 alpha-3 code, iTEM region) for a country *name*.
+def fill_values_for_dataflow(dataflow_id: Optional[str]) -> Dict[str, str]:
+    """Return a dictionary of fill values for the data flow `dataflow_id`."""
+    result: Dict[str, str] = dict()
+
+    if dataflow_id is None:
+        return result
+
+    # Retrieve the SDMX data structures
+    sm = generate()
+
+    # Data structure for this data set
+    dsd = sm.structure[dataflow_id]
+
+    # Iterate over dimensions in the full dimensionality structure
+    for dim in sm.structure["HISTORICAL"].dimensions:
+        try:
+            # Try to retrieve a matching dimension from the structure of this data set
+            dsd.dimensions.get(dim.id)
+        except KeyError:
+            # No match → this dimension is not applicable to this data set → fill
+            result[dim.id] = "_Z"
+
+    return result
+
+
+@lru_cache()
+def dim_id_for_column_name(name: str) -> str:
+    """Return a dimension ID in the ``HISTORICAL`` structure for a column `name`."""
+    return {
+        "COUNTRY": "_drop",
+        "ISO CODE": "REF_AREA",
+        "VEHICLE TYPE": "VEHICLE",
+        "YEAR": "TIME_PERIOD",
+    }.get(name.upper(), name.upper())
+
+
+@lru_cache()
+def get_area_name_map() -> Dict[str, str]:
+    """Return a mapping from lower-case names in ``CL_AREA`` to IDs."""
+    sm = generate()
+    return {
+        code.name.localized_default().lower(): code.id
+        for code in sm.codelist["CL_AREA"]
+    }
+
+
+@lru_cache()
+def iso_alpha_3(name: str) -> str:
+    """Return ISO 3166 alpha-3 code for a country `name`.
 
     Parameters
     ----------
@@ -317,32 +412,52 @@ def iso_and_region(name):
         'official_name', or 'common_name' field. Replacements from
         :data:`COUNTRY_NAME` are applied.
     """
-    # lru_cache() ensures this function call is as fast as a dictionary lookup
-    # after the first time each country name is seen
+    # lru_cache() ensures this function call is as fast as a dictionary lookup after
+    # the first time each country name is seen
 
     # Maybe map a known, non-standard value to a standard value
-    name = COUNTRY_NAME.get(name, name)
+    name = COUNTRY_NAME.get(name.lower(), name)
 
-    # Use pycountry's built-in, case-insensitive lookup on all fields including
-    # name, official_name, and common_name
+    # Use pycountry's built-in, case-insensitive lookup on all fields including name,
+    # official_name, and common_name
+    for db in (pycountry.countries, pycountry.historic_countries):
+        try:
+            return db.lookup(name).alpha_3
+        except LookupError:
+            continue
+
     try:
-        alpha_3 = pycountry.countries.lookup(name).alpha_3
-    except LookupError:
-        alpha_3 = ""
-
-    # Look up the region, construct a Series, and return
-    return pd.Series(
-        [alpha_3, REGION.get(alpha_3, "N/A")],
-        index=[ColumnName.ISO_CODE.value, ColumnName.ITEM_REGION.value],
-    )
+        return get_area_name_map()[name.lower()]
+    except KeyError:
+        raise LookupError(name)
 
 
-def source_str(id):
-    """Return the canonical string name (e.g. 'T001') for a data source.
+@lru_cache()
+def get_item_region(code: str) -> str:
+    """Return iTEM region for a country's ISO 3166 alpha-3 `code`, or “N/A”."""
+    return REGION.get(code, "N/A")
+
+
+@lru_cache()
+def get_country_name(code: str) -> str:
+    """Return the country name for a country's ISO 3166 alpha-3 `code`."""
+    for db in (pycountry.countries, pycountry.historic_countries):
+        try:
+            return db.get(alpha_3=code).name
+        except AttributeError:
+            continue
+
+    # Possibly an area code like "B0"
+    sm = generate()
+    return sm.codelist["CL_AREA"][code].name.localized_default()
+
+
+def source_str(id: Union[int, str]) -> str:
+    """Return the canonical string name (e.g. ``"T001"``) for a data source.
 
     Parameters
     ----------
     id : int or str
-        Integer ID of the data source.
+        Integer ID of the data source, or existing string.
     """
     return f"T{id:03}" if isinstance(id, int) else id

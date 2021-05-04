@@ -2,19 +2,7 @@ from itertools import product
 
 import sdmx
 
-from item.structure import column_name, generate, make_template
-
-
-def test_column_name(caplog):
-    # Force clear of lru_cache()
-    column_name.cache_clear()
-
-    # Correctly retrieves the name of a Concept from the data structures
-    assert column_name("VEHICLE") == "Vehicle type"
-
-    # Warning is logged for deprecated IDs
-    assert column_name("YEAR") == "Year"
-    assert "Deprecated dimension id: 'YEAR'" in caplog.messages
+from item.structure import generate, make_template
 
 
 def test_make_template(tmp_path):
@@ -25,7 +13,7 @@ def test_make_template(tmp_path):
         assert (tmp_path / base).with_suffix(suffix).exists()
 
     # Files have the expected length
-    expected_keys = 6162
+    expected_keys = 20763
     assert expected_keys + 1 == sum(1 for _ in open(tmp_path / "condensed.csv"))
     assert expected_keys + 1 == sum(1 for _ in open(tmp_path / "full.csv"))
     assert expected_keys + 2 == sum(1 for _ in open(tmp_path / "index.csv"))

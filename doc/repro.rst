@@ -1,11 +1,11 @@
-Continuous integration
-**********************
+Reproducibility
+***************
 
 In software development, the term “continuous integration” (CI) refers to a process to check that pieces of code can be ‘integrated’, e.g. built and run together, and that they perform as expected.
 The process is ‘continuous’ because it is automatically performed for incremental changes in the code, e.g. Git commits.
 CI enables efficient use of resources (in particular, people's time) by reducing or eliminating manual work in performing these checks.
 
-This page details how iTEM uses CI practices to enable **continuous validation**, i.e. to reduce manual work in checking the validity of methods, data, and results related to transport data.
+This page details how iTEM uses CI practices to enable **continuous reproduction and validation**, i.e. to reduce manual work in checking the validity of methods, data, and results related to transport data.
 
 GitHub Actions
 ==============
@@ -37,7 +37,7 @@ Upload historical database and diagnostics
       One file for each input data set that summarizes the data included in the input data.
 
    Quality
-      The outputs of other :ref:`diagnostic <diagnostics>` checks of intermediate or output data.
+      The outputs of other :doc:`diagnostic <historical/diagnostic>` checks of intermediate or output data.
 
    Input data
       A copy of the input data retrieved from each upstream data source at the time of the build.

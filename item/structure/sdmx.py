@@ -130,7 +130,7 @@ def merge_dsd(
     others: List[str],
     fill_value: str = "_Z",
 ) -> m.DataSet:
-    """`Merge` 2 or more data structure definitions."""
+    """‘Merge’ 2 or more data structure definitions."""
     dsd_target = sm.structure[target]
 
     # Create a temporary DataSet

@@ -3,22 +3,23 @@ from functools import lru_cache
 
 import pandas as pd
 
-from item.historical.util import dropna_logged
-from item.structure import column_name
-from item.utils import convert_units
+from item.util import convert_units, dropna_logged
+
+#: iTEM data flow matching the data from this source.
+DATAFLOW = "ACTIVITY"
 
 #: Dimensions and attributes which do not vary across this data set.
 COMMON_DIMS = dict(
-    variable="Passenger Activity",
+    variable="Activity",
     # Add the same source to all rows since all data comes from the same source
     source="International Transport Forum",
-    # Since all the data is associated to "Freight," the Service is "Freight"
-    service="Passenger",
-    # The dataset does not provide any data on the following columns, so we
-    # add the default value of "All" in both cases
-    technology="All",
-    fuel="All",
+    service="P",  # Passenger
     unit="10^9 passenger-km / yr",
+    # The dataset does not provide any data on the following columns, so we add the
+    # default value of "All" in both cases
+    technology="_T",
+    automation="_T",
+    operator="_T",
 )
 
 #: Columns to drop from the raw data.
@@ -36,9 +37,6 @@ COLUMNS = dict(
         "Flag Codes",
         "Flags",
     ],
-    # Column containing country name for determining ISO 3166 alpha-3 codes and
-    # iTEM regions. Commented, because this is the default value.
-    # country_name='Country',
 )
 
 
@@ -80,21 +78,18 @@ def mode_and_vehicle_type(variable_name):
     """
     if "Rail" in variable_name:
         mode = "Rail"
-        vehicle_type = "All"
+        vehicle = "_T"
     elif "Road" in variable_name:
         mode = "Road"
 
         if "by buses" in variable_name:
-            vehicle_type = "Bus"
+            vehicle = "Bus"
         elif "by passenger" in variable_name:
-            vehicle_type = "LDV"
+            vehicle = "LDV"
         else:
-            vehicle_type = "All"
+            vehicle = "_T"
     else:
-        mode = "All"
-        vehicle_type = "All"
+        mode = "_T"
+        vehicle = "_T"
 
-    return pd.Series(
-        [vehicle_type, mode],
-        index=[column_name("VEHICLE"), column_name("MODE")],
-    )
+    return pd.Series({"VEHICLE": vehicle, "MODE": mode})

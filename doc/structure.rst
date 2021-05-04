@@ -1,7 +1,7 @@
 Data structures
 ***************
 
-iTEM defines :doc:`metadata <metadata>` using the SDMX information model, in order to specify the contents and various formats/representations of both the :doc:`historical <historical>` and :doc:`model projection <model>` data flows and data sets.
+iTEM defines :doc:`metadata <metadata>` using the SDMX information model, in order to specify the contents and various formats/representations of both the :doc:`historical <historical/overview>` and :doc:`model projection <model>` data flows and data sets.
 
 Overview
 ========
@@ -9,7 +9,6 @@ Overview
 This section briefly summarizes the contents of the iTEM :ref:`structure-xml`.
 It does not give a complete or exhaustive terminology for SDMX; see the :doc:`sdmx:resources` page in the :mod:`sdmx` documentation for further reading.
 
-It is common to call certain things “columns”; this creates problems because it conflates the *logical structure* of data with a *particular representation*, e.g. in a table.
 By describing the structure itself, we allow for multiple representations that are suitable for different purposes, yet easily interoperable.
 
 General
@@ -44,7 +43,16 @@ Code lists
    A statement like “this data set has a dimension ``LCA_SCOPE`` that represents the concept ``LCA_SCOPE`` using the code list ``CL_LCA_SCOPE``” is clear and unambiguous about the structure of that particular data set.
    A second data set can be described as having “an *attribute* ``LCA_SCOPE`` that represents the concept ``LCA_SCOPE`` using the code list ``CL_LCA_SCOPE``”; this is a distinct structure and representation, but completely interoperable with the first.
 
-The structure can also be retrieved using :func:`generate` and manipulated programmatically; this is the preferred way to obtain and use data structure information in code that works with iTEM data.
+   Some **standard IDs** are used in multiple code lists, mirroring other applications of SDMX.
+   These include:
+
+   - ``_Z``: “Not applicable”, when it does not make logical sense to give a value on this concept/dimension for this data.
+   - ``_T``: “Total”, the sum of all data.
+     This is sometimes called “All”.
+   - ``_X``: “Not allocated/unknown”, data not associated to any other code in the list.
+
+
+To obtain and use data structure information in code that works with iTEM data, use :func:`generate`.
 For example:
 
 .. code-block:: python
@@ -97,18 +105,23 @@ For example:
 Code reference
 ==============
 
-.. currentmodule:: item.sdmx
-
-.. automodule:: item.sdmx
-   :members:
-
 .. currentmodule:: item.structure
-
-.. autofunction:: make_template
 
 .. automodule:: item.structure
    :members:
-   :exclude-members: make_template, read_items, read_concepts_yaml, read_measures_yaml
+
+.. currentmodule:: item.structure.base
+
+.. automodule:: item.structure.base
+   :members:
+
+.. currentmodule:: item.structure.sdmx
+
+.. automodule:: item.structure.sdmx
+   :members:
+
+.. automodule:: item.structure.template
+   :members:
 
    The following utility functions are used by :func:`make_template`:
 
@@ -116,4 +129,4 @@ Code reference
 
       add_unit
       collapse
-      common_dim_dummies
+      name_for_id

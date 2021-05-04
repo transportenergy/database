@@ -71,11 +71,13 @@ CS_TRANSPORT = ConceptScheme(
                 "Type of transport service e.g. transport of passengers or of freight."
             ),
         ),
-        Concept(id="MODE", name="Mode or medium of transport"),
+        Concept(id="MODE", name="Mode", description="Mode or medium of transport."),
         Concept(
-            id="VEHICLE", name="Vehicle type", description="Type of transport vehicle"
+            id="VEHICLE", name="Vehicle type", description="Type of transport vehicle."
         ),
-        Concept(id="FUEL", name="Fuel or energy carrier for transport"),
+        Concept(
+            id="FUEL", name="Fuel", description="Fuel or energy carrier for transport."
+        ),
         Concept(
             id="TECHNOLOGY",
             name="Powertrain technology",
@@ -85,14 +87,25 @@ CS_TRANSPORT = ConceptScheme(
         ),
         Concept(
             id="AUTOMATION",
-            name="Degree of automation in operation of transport vehicles",
+            name="Automation",
+            description="Degree of automation in operation of transport vehicles.",
         ),
-        Concept(id="OPERATOR", name="Entity operating a transport vehicle"),
-        Concept(id="POLLUTANT", name="Species of environmental pollutant"),
+        Concept(
+            id="OPERATOR",
+            name="Operator",
+            description="Entity operating a transport vehicle.",
+        ),
+        Concept(
+            id="POLLUTANT",
+            name="Species",
+            description="Species of environmental pollutant.",
+        ),
         Concept(
             id="LCA_SCOPE",
-            name="Life-cycle analysis scope",
-            description="Scope of analysis covered by a transport life-cycle measure",
+            name="LCA scope",
+            description=(
+                "Scope of analysis covered by a transport life-cycle (LC) measure."
+            ),
         ),
         Concept(
             id="FLEET",
@@ -216,6 +229,15 @@ CS_TRANSPORT_MEASURE = ConceptScheme(
 #: Concept schemes.
 CONCEPT_SCHEMES = [CS_TRANSPORT, CS_MODELING, CS_TRANSPORT_MEASURE]
 
+#: Codes for the REF_AREA dimension, from SDMX codelist ``ESTAT:CL_AREA(1.8)``.
+CL_AREA = (
+    Code(id="_X", name="Not allocated/unspecified"),
+    Code(id="B0", name="European Union (current composition)"),
+    Code(id="B4", name="European Union (27 countries)"),
+    Code(id="B5", name="European Union (28 countries)"),
+    Code(id="W0", name="World"),
+)
+
 CL_AUTOMATION = (
     Code(id="_T", name="Total"),
     Code(id="_Z", name="Not applicable"),
@@ -250,11 +272,27 @@ CL_FUEL = (
         child=[
             Code(id="DIESEL"),
             Code(id="GASOLINE"),
-            Code(id="BIOFUEL", name="Liquid biofuel"),
+            Code(
+                id="BIOFUEL",
+                name="Liquid biofuel",
+                child=[
+                    Code(id="BIODIESEL"),
+                    Code(id="BIOETH", name="Bioethanol"),
+                ],
+            ),
             Code(id="SYNTHETIC", description="a.k.a. synfuels, electrofuels."),
         ],
     ),
-    Code(id="NG", name="Natural gas"),
+    Code(
+        id="GAS",
+        name="Gas",
+        description="All gaseous fuels",
+        child=[
+            Code(id="CNG", name="CNG", description="Compressed natural gas."),
+            Code(id="LNG", name="LNG", description="Liquified natural gas."),
+            Code(id="LPG", name="LPG", description="Liquified propane gas."),
+        ],
+    ),
     Code(id="H2", name="Hydrogen"),
     Code(id="ELEC", name="Electricity"),
 )
@@ -285,6 +323,7 @@ CL_MODE = (
         ],
     ),
     Code(id="WATER", name="Water"),
+    Code(id="PIPE", name="Pipeline"),
 )
 
 CL_OPERATOR = (
@@ -358,9 +397,41 @@ CL_TECHNOLOGY = (
             "Using only chemical fuels. Inclusive of powertrains that store energy as"
             "electricity, i.e. hybrids."
         ),
+        child=[
+            Code(id="HYBRID", description="Hybridized internal combustion."),
+            Code(id="NONHYB", description="Non-hybridized internal combusion."),
+        ],
     ),
-    Code(id="ELECTRIC"),
-    Code(id="HYBRID", description="Using both electricity and chemical fuels."),
+    Code(
+        id="ELEC",
+        name="Electric",
+        description="Powertrains that can be charged using electricity.",
+        child=[
+            Code(
+                id="BEV",
+                description="Battery-electric powertrain using no chemical fuels.",
+            ),
+            Code(
+                id="PHEV",
+                name="Plug-in hybrid-electric",
+                description=(
+                    "Powertrain that can use both chemical fuels and electricity."
+                ),
+                child=[
+                    Code(
+                        id="PHEV-D",
+                        name="Diesel PHEV",
+                        description="PHEV powertrain that uses diesel fuel.",
+                    ),
+                    Code(
+                        id="PHEV-G",
+                        name="Diesel PHEV",
+                        description="PHEV powertrain that uses gasoline fuel.",
+                    ),
+                ],
+            ),
+        ],
+    ),
     Code(
         id="FC",
         name="Fuel cell",
@@ -385,6 +456,7 @@ CL_VEHICLE = (
 #: Codes for various code lists.
 CODELISTS = {
     "AUTOMATION": CL_AUTOMATION,
+    "AREA": CL_AREA,
     "FLEET": CL_FLEET,
     "FUEL": CL_FUEL,
     "LCA_SCOPE": CL_LCA_SCOPE,

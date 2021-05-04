@@ -6,9 +6,8 @@ import pytest
 
 import item
 from item.common import paths
-from item.historical import SCRIPTS, fetch_source, input_file, process, source_str
+from item.historical import fetch_source, input_file, process, source_str
 from item.historical.diagnostic import A003, coverage
-from item.historical.util import run_notebook
 
 
 @pytest.mark.slow
@@ -49,15 +48,6 @@ def test_fetch(source_id):
     fetch_source(source_id, use_cache=False)
 
 
-def test_import():
-    # All historical database classes can be imported
-    from item.historical.scripts.util.managers.country_code import CountryCodeManager
-    from item.historical.scripts.util.managers.dataframe import DataframeManager
-
-    CountryCodeManager()
-    DataframeManager(dataset_id=None)
-
-
 def test_input_file(item_tmp_dir):
     # Create some temporary files in any order
     files = [
@@ -71,8 +61,8 @@ def test_input_file(item_tmp_dir):
     assert input_file(1) == paths["historical input"] / "T001_foo.csv"
 
 
-@pytest.mark.parametrize("dataset_id", [0, 1, 2, 3, 4, 9, 10, 12])
-def test_process(dataset_id):
+@pytest.mark.parametrize("dataset_id", [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12])
+def test_process(caplog, dataset_id):
     """Test common interface for processing scripts."""
     # Always use the path from within the repo
     paths["historical input"] = Path(item.__file__).parent.joinpath(
@@ -81,16 +71,8 @@ def test_process(dataset_id):
 
     process(dataset_id)
 
-
-# Path to IPython notebooks
-nb_path = Path(item.__file__).parent / "historical" / "scripts"
-
-
-@pytest.mark.parametrize("dataset_id", SCRIPTS)
-def test_run_notebook(dataset_id, tmp_path):
-    # Notebook runs top-to-bottom without cell errors
-    nb, errors = run_notebook(nb_path / f"{dataset_id}.ipynb", tmp_path)
-    assert errors == []
+    # Processing produced valid results that can be pivoted to wide format
+    assert "Processing produced non-unique keys; no -wide output" not in caplog.messages
 
 
 @pytest.mark.parametrize("dataset_id, N_areas", [(0, 58), (1, 37), (2, 53), (3, 57)])
@@ -112,5 +94,5 @@ def test_A003():
     assert 950 <= len(result)
 
     # A specific value is present and as expected
-    obs = result.query("`ISO Code` == 'USA' and Year == 2015")["Value"].squeeze()
+    obs = result.query("REF_AREA == 'USA' and TIME_PERIOD == 2015")["VALUE"].squeeze()
     assert np.isclose(obs, 0.02098, rtol=1e-3)
