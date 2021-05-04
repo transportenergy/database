@@ -57,10 +57,10 @@ def load():
 
     # Read the lists of allowable labels for each data dimension
     data = OrderedDict()
-    path = join(paths["data"], "model", "dimensions")
+    path = paths["data"].joinpath("model", "dimensions")
     for k in ["variable", "mode", "technology", "fuel", "match"]:
-        with open(join(path, "{}.yaml".format(k))) as f:
-            data[k] = yaml.load(f, Loader=yaml.SafeLoader)
+        with open(path.joinpath(k).with_suffix(".yaml"), encoding="utf-8") as f:
+            data[k] = yaml.safe_load(f)
     variable, mode, tech, fuel, match = data.values()
 
     # Sets of modes, for convenience

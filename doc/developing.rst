@@ -48,19 +48,19 @@ Preparing a new release
 
 Before releasing, check:
 
-- https://github.com/transportenergy/actions?query=workflow:pytest+branch:master to ensure that the push and scheduled builds are passing.
-- https://readthedocs.org/projects/transportenergy/builds/ to ensure that the docs build
-  is passing.
+- https://github.com/transportenergy/database/actions?query=workflow:pytest+branch:main to ensure that the push and scheduled builds are passing.
+- https://readthedocs.org/projects/transportenergy/builds/ to ensure that the docs build is passing.
 
 Address any failures before releasing.
 
+1. Edit :file:`doc/whatsnew.rst`.
+   Comment the heading "Next release", then insert another heading below it, at the same level, with the version number and date.
+   Make a commit with a message like "Mark vX.Y.Z in doc/whatsnew".
 
-1. Edit :file:`doc/whatsnew.rst` to replace "Next release" with the version number and date.
-   Make a commit with a message like "Mark vX.Y.Z in whatsnew.rst".
+2. Tag the release candidate version, i.e. with a ``rcN`` suffix, and push::
 
-2. Tag the version, e.g.::
-
-    $ git tag v2030.10.4b4
+    $ git tag v2021.5.4rc1
+    $ git push --tags origin main
 
    :mod:`item` uses a versioning scheme of **[year].[month].[day]**.
    For instance, the version released on October 4, 2030 will have the version ``2030.10.4``.
@@ -69,33 +69,24 @@ Address any failures before releasing.
    - There are no leading zeroes.
    - If two versions are to be released in a single day—for instance, to fix a bug only spotted after release—a fourth version part can be added, e.g. ``2030.10.4.1``.
 
-3. Test-build and check the source and binary packages::
+3. Check:
 
-    $ rm -rf build dist
-    $ python setup.py bdist_wheel sdist
-    $ twine check dist/*
+   - at https://github.com/transportenergy/database/actions?query=workflow:publish that the workflow completes: the package builds successfully and is published to TestPyPI.
+   - at https://test.pypi.org/project/transport-energy/ that:
+
+      - The package can be downloaded, installed and run.
+      - The README is rendered correctly.
 
    Address any warnings or errors that appear.
-   If needed, make a new commit and go back to step (2).
+   If needed, make a new commit and go back to step (2), incrementing the rc number.
 
-4. Upload the packages to the TEST instance of PyPI::
+4. (optional) Tag the release itself and push::
 
-    $ twine upload -r testpypi dist/*
+    $ git tag v2021.5.4
+    $ git push --tags origin main
 
-5. Check at https://test.pypi.org/project/transport-energy/ that:
+   This step (but *not* step (2)) can also be performed directly on GitHub; see (5), next.
 
-   - The package can be downloaded, installed and run.
-   - The README is rendered correctly.
-   - Links to the documentation go to the correct version.
+5. Visit https://github.com/transportenergy/database/releases and mark the new release: either using the pushed tag from (4), or by creating the tag and release simultaneously.
 
-   If not, modify the code and go back to step (2).
-
-6. Upload to PyPI::
-
-    $ twine upload dist/*
-
-7. Push the commit(s) and tag to GitHub::
-
-    $ git push --tags
-
-8. Edit :file:`doc/whatsnew.rst` to add a new heading for the next release.
+6. Check at https://github.com/transportenergy/database/actions?query=workflow:publish and https://pypi.org/project/transport-energy/ that the distributions are published.

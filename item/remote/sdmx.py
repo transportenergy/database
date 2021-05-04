@@ -1,7 +1,8 @@
+import pandas as pd
 import sdmx
 
 
-def get_sdmx(source=None, **args):
+def get_sdmx(source: str = None, **args) -> pd.DataFrame:
     """Retrieve data from *source* using :mod:`sdmx`.
 
     Arguments
@@ -16,7 +17,7 @@ def get_sdmx(source=None, **args):
     pandas.DataFrame
     """
     # SDMX client for the data source
-    req = sdmx.Request(source=source)
+    req = sdmx.Client(source=source)
 
     # commented: for debugging
     # args.setdefault('tofile', 'debug.json')
