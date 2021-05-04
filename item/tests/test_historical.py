@@ -88,11 +88,12 @@ def test_coverage(dataset_id, N_areas):
     "id, N, query, expected",
     [
         ["A001", 1234, "REF_AREA == 'USA' and TIME_PERIOD == 2015", 0.9134],
+        ["A002", 620, "REF_AREA == 'USA' and TIME_PERIOD == 2015", 51.737],
         ["A003", 950, "REF_AREA == 'USA' and TIME_PERIOD == 2015", 0.02098],
     ],
 )
 def test_diagnostic(id, N, query, expected):
-    """Test historical.diagnostic.A003."""
+    """Test checks from :mod:`.historical.diagnostic`."""
     module = import_module(f"item.historical.diagnostic.{id}")
 
     # Generate inputs
