@@ -37,6 +37,8 @@ jobs:
           python-version: "3.9"
           run-diagnostics: false
 
+      fail-fast: false
+
     runs-on: ${{ matrix.os }}
 
     name: ${{ matrix.os }}-py${{ matrix.python-version }}
