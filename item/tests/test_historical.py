@@ -1,3 +1,4 @@
+from importlib import import_module
 from pathlib import Path
 
 import numpy as np
@@ -7,7 +8,7 @@ import pytest
 import item
 from item.common import paths
 from item.historical import fetch_source, input_file, process, source_str
-from item.historical.diagnostic import A003, coverage
+from item.historical.diagnostic import coverage
 
 
 @pytest.mark.slow
@@ -83,16 +84,26 @@ def test_coverage(dataset_id, N_areas):
     assert result.startswith(f"{N_areas} areas: ")
 
 
-def test_A003():
+@pytest.mark.parametrize(
+    "id, N, query, expected",
+    [
+        ["A001", 1234, "REF_AREA == 'USA' and TIME_PERIOD == 2015", 0.9134],
+        ["A003", 950, "REF_AREA == 'USA' and TIME_PERIOD == 2015", 0.02098],
+    ],
+)
+def test_diagnostic(id, N, query, expected):
     """Test historical.diagnostic.A003."""
-    activity = process(3)
-    stock = process(9)
-    result = A003.compute(activity, stock)
+    module = import_module(f"item.historical.diagnostic.{id}")
+
+    # Generate inputs
+    inputs = [process(arg) for arg in module.ARGS]
+
+    # Diagnostic can be computed
+    result = module.compute(*inputs)
 
     # Number of unique values computed
-    # TODO make this more flexible/robust to changes in the upstream data
-    assert 950 <= len(result)
+    assert N <= len(result), result
 
     # A specific value is present and as expected
-    obs = result.query("REF_AREA == 'USA' and TIME_PERIOD == 2015")["VALUE"].squeeze()
-    assert np.isclose(obs, 0.02098, rtol=1e-3)
+    obs = result.query(query)["VALUE"].squeeze()
+    assert np.isclose(obs, expected, rtol=1e-3), result.query(query)
