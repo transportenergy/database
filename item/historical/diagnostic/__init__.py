@@ -7,7 +7,7 @@ import pandas as pd
 from item.historical import fetch_source, source_str
 
 # Quality checks
-QUALITY = ["A001", "A003"]
+QUALITY = ["A001", "A002", "A003"]
 
 # Jinja2 template for diagnostics index page
 INDEX_TEMPLATE = """<html><body>
