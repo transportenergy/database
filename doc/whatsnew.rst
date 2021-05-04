@@ -8,8 +8,11 @@ What's new?
    :backlinks: none
    :depth: 1
 
-Next release
-============
+.. Next release
+.. ============
+
+v2021.5.4
+=========
 
 - Add data cleaning for the :mod:`.T005`, :mod:`.T006`, :mod:`.T007`, :mod:`.T008` historical input data sources (:pull:`71`).
 - Add data cleaning for the :mod:`.T004` historical input data source (:pull:`59`).
