@@ -9,8 +9,7 @@ This module:
 """
 import logging
 
-from item.historical.util import dropna_logged
-from item.utils import convert_units
+from item.util import convert_units, dropna_logged
 
 log = logging.getLogger(__name__)
 

@@ -1,6 +1,5 @@
 """Data cleaning code and configuration for T010."""
-from item.historical.util import dropna_logged
-from item.utils import convert_units
+from item.util import convert_units, dropna_logged
 
 #: iTEM data flow matching the data from this source.
 DATAFLOW = "STOCK"

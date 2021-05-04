@@ -3,7 +3,7 @@ from functools import lru_cache
 
 import pandas as pd
 
-from item.historical.util import dropna_logged
+from item.util import dropna_logged
 
 #: iTEM data flow matching the data from this source.
 DATAFLOW = "ACTIVITY"

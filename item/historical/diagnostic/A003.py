@@ -1,5 +1,5 @@
 from item.historical import OUTPUT_PATH
-from item.utils import convert_units
+from item.util import convert_units
 
 
 def compute(activity, stock):

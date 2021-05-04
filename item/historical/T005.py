@@ -1,4 +1,4 @@
-from item.utils import convert_units
+from item.util import convert_units
 
 #: iTEM data flow matching the data from this source.
 DATAFLOW = "EMISSIONS"
