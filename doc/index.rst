@@ -19,16 +19,33 @@ This documentation, built automatically from the `transportenergy/database GitHu
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents
+   :caption: General
 
    usage
-   model
-   historical
    structure
-   ci
-   remote
-   metadata
+   repro
    glossary
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Historical data
+
+   historical/overview
+   historical/input
+   historical/diagnostic
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Model data
+
+   model
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Package info
+
+   metadata
+   remote
    whatsnew
    developing
 
