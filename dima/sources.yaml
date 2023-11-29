@@ -1,0 +1,233 @@
+T000:
+  name: "Passenger transport: Inland passenger transport"
+  Variable: "Passenger Activity"
+  Service: "Passenger"
+  Unit: 
+      The unit is changed from: "Passenger-kilometres, Millions to 10^9 passenger-km /yr."
+  Mode: 
+    Total inland passenger transport: "All"
+    Rail passenger transport: "Rail"
+    Road passenger transport by passenger cars: "Road"
+    Road passenger transport by buses and coaches: "Road"
+  VehicleType: 
+     The Vehicle Type for Total inland passenger transport is: "All"
+     The Vehicle Type for Rail passenger transport is: "All"
+     The Vehicle Type for Road passenger transport by passenger cars is: "LDV"
+     The Vehicle Type for Road passenger transport by buses and coaches is: "Bus"
+  Technology: "All"
+  Fuel: "All"
+  
+T001:
+  name: "Coastal Transport"
+  Variable: "Freight Activity"
+  Service: "Freight"
+  Unit: 
+      The unit is changed from: "Tonnes-Kilometer to 10^9 tonne-km / yr"
+  Mode: "Shipping"
+  VehicleType: 
+      The vehicle type is: "Coastal" 
+  Technology: "All"
+  Fuel: "All"
+    
+T002:
+  name: "Container Transport"
+  Variable:
+       The variable is set to either: "Freight (TEU)" 
+       The variable is set to: "Freight (Weight)"
+  Service: "Freight"
+  Unit:
+      Freight (TEU) is in: "Number"
+      Freight (Weight) is in: "103 tonne / yr"
+  Mode:
+      The mode for Rail containers transport (TEU) is: "Rail"
+      The mode for Maritime containers transport (weight) is: "Shipping"
+  VehicleType: 
+       The vehicle type is: "Container"
+  Technology: "All"
+  Fuel: "All"
+  
+T003:
+  name: "Inland Freight Transport"
+  Variable: "Freight Activity"
+  Service:
+         The service for Road Freight Transport on own account is: "Freight"
+         The service for Inland waterways Freight Transport is: "Freight"
+         The service for Rail Freight Transport is: "Freight"
+         The service for Road Freight Transport is: "Freight"
+         The service for Road Freight Transport for hire and reward is: "Freight"
+         The service for Total inland Freight Transport is: "Freight"
+         The service for Pipelines transport is: "Pipeline"
+  Unit: 
+      The unit is changed from: "Million tonne kilometers to 10^9 tonne-km / yr"
+  Mode:
+      The mode for Road Freight Transport is: "Road"
+      The mode for Road Freight Transport for hire and reward is: "Road"
+      The mode for Road Freight Transport on own account is: "Road"
+      The mode for Rail Freight Transport is: "Rail"
+      The mode for Pipelines Transport is: "Pipeline"
+      The mode for Inland waterways Freight Transport is: "Shipping"
+      The mode for Total inland Freight Transport is: "Inland"
+      The mode for Inland (exl. Pipeline), which is: "the sum of all services except Pipeline"
+  VehicleType:
+        The vehicle type for Road Freight Transport is: "All"
+        The vehicle type for Road Freight Transport for hire and reward is: "For Hire and Reward"
+        The vehicle type for Road Freight Transport on own account is: "For Own Account"
+        The vehicle type for Rail Freight Transport is: "All"
+        The vehicle type for Pipelines transport is: "Pipeline"
+        The vehicle type for Inland waterways Freight Transport is: "Inland"
+        The vehicle type for Total inland Freight Transport is: "All"
+        The vehicle type for Inland (exl. Pipeline) is: "All"
+  Technology: "All"
+  Fuel: "All"  
+
+T004:
+  name: "New Road Vehicle Registrations by Vehicle Category and Fuel Type"
+  Variable: "Sales (New Vehicles)"
+  Service: "Passenger"
+  Unit: 
+      The unit is: "10^6 vehicle / yr"
+  Mode: "Road"
+  VehicleType: 
+      The vehicle type is: "LDV" 
+  Technology: "All"
+  Fuel: "All"  
+
+T005:
+  name: "Passenger Road Vehicle Fleet and rate per thousand inhabitants by Vehicle Category"
+  Variable: "TBD"
+  Service: "TBD"
+  Unit: 
+     The unit is: "TBD"
+  Mode: "TBD"
+  VehicleType: 
+     The vehicle type is: "TBD" 
+  Technology: "All"
+  Fuel: "All"
+
+T006:
+  name: "Passenger Transport"
+  Variable: "TBD"
+  Service: "TBD"
+  Unit: 
+     The unit is: "TBD"
+  Mode: "TBD"
+  VehicleType: 
+      The vehicle type is:  "TBD" 
+  Technology: "All"
+  Fuel: "All"
+  
+T007:
+  name: "New Passenger Car Registrations by Fuel type"
+  Variable: "TBD"
+  Service: "TBD"
+  Unit: 
+     The unit is: "TBD"
+  Mode: "TBD"
+  VehicleType: 
+     The vehicle type is: "TBD" 
+  Technology: "All"
+  Fuel: "All"
+  
+T008:
+  name: "New Road Vehicle Registrations by Vehicle Category and Fuel type"
+  Variable: "TBD"
+  Service: "TBD"
+  Unit: 
+     The unit is: "TBD"
+  Mode: "TBD"
+  VehicleType: 
+      The vehicle type is: "TBD" 
+  Technology: "All"
+  Fuel: "All"
+  
+T009:
+  name: "Road Vehicle Fleet by Vehicle Category and Fuel Type"
+  Variable: "TBD"
+  Service: "TBD"
+  Unit: 
+     The unit is: "TBD"
+  Mode: "TBD"
+  VehicleType: 
+     The vehicle type is: "TBD" 
+  Technology: "All"
+  Fuel: "All" 
+  
+T010:
+  name: "Volume of passenger transport relative to GDP"
+  Variable: "Stock"
+  Service: "Freight"
+  Unit: 
+     The unit is: "10^6 vehicle"
+  Mode: "Road"
+  VehicleType: 
+      The vehicle type is: "All" 
+  Technology: "All"
+  Fuel: "All" 
+
+T011:
+  name: "Aviation Total Passenger Kilometers"
+  Variable: "Passenger Activity"
+  Service: "Passenger"
+  Unit: 
+     The unit is changed from: "Million passenger kilometers to 10^9 passenger-km / yr"
+  Mode: "Aviation"
+  VehicleType: "All"
+  Technology: "All"
+  Fuel: "All"
+
+T012:
+  name: "Freight Transport - Tonne-km for Railways"
+  Variable: "Freight Activity"
+  Service: 
+      The service for Rail Freight Transport is: "Freight"
+  Unit: 
+     The unit is changed from: "Million tonne kilometers to 10^9 tonne-km / yr"
+  Mode:
+     The mode for Rail Freight Transport is: "Rail"
+  VehicleType: 
+      The vehicle type for Rail freight transport is: All
+  Technology: "All"
+  Fuel: "All"
+  
+T013:
+  name: "Passengers Kilometer Travel - Roads"
+  Variable: "Passenger Activity"
+  Service: "Passenger"
+  Unit: 
+     The unit is changed from: "Million passenger kilometers to 10^9 passenger-km / yr"
+  Mode: 
+    Road passenger transport by passenger cars: "Road"
+    Road passenger transport by buses and coaches: "Road"
+  VehicleType: 
+    The Vehicle Type for Total inland passenger transport is: "All"
+    The Vehicle Type for Rail passenger transport is: "All"
+  Technology: "All"
+  Fuel: "All"
+
+T014:
+  name: "LDV Sales"
+  Variable: "Sales (New Vehicles)"
+  Service: "Passenger"
+  Unit: 
+      The unit changed from: "Number to 10^6 vehicle / yr"
+  Mode: "Road"
+  VehicleType: 
+      The vehicle type is: "LDV" 
+  Technology: "All"
+  Fuel: "All"  
+
+T015:
+  name: "Freight Transport - Tonne-km for Railways"
+  Variable: "Freight Activity"
+  Service: 
+      The service for Rail Freight Transport is: "Freight"
+  Unit: 
+     The unit is changed from: "Million tonne kilometers to 10^9 tonne-km / yr"
+  Mode:
+     The mode for Rail Freight Transport is: "Rail"
+  VehicleType: 
+      The vehicle type for Rail freight transport is: All
+  Technology: "All"
+  Fuel: "All"
+
+  
