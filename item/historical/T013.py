@@ -321,8 +321,8 @@ class AtoWorkbook:
 
            
 # Name and path of input files
-workbook_excel_file = "C:/Users/magli/Desktop/item-internship/item-internship/main/ATO Workbook (TRANSPORT ACTIVITY & SERVICES (TAS))2023.xlsx"
-master_csv_file = "C:/Users/magli/Desktop/item-internship/item-internship/code/dima/Output_data_TAS-PAG-005(2).csv"
+workbook_excel_file = r"ATO Workbook (TRANSPORT ACTIVITY & SERVICES (TAS))2023.xlsx"
+master_csv_file = r"master dataset.csv"
 regions_file = r"regions.yaml"
 source_file = r"sources.yaml"
 
