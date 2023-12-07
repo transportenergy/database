@@ -290,6 +290,9 @@ class AtoWorkbook:
                         unit_value = df.loc[index,column_list_names[idx]]
                         final_unit = unit_value / remaining_attributes[3]       
                         df_out_put.loc[index, column_list_names[idx]] = final_unit
+            
+            # Add the "Data Quality Check" column with a desired value (e.g., "Uncertain")
+            df_out_put.loc[index, 'Data Quality Check'] = 'Uncertain' 
         
         return df_out_put
 
