@@ -3,7 +3,7 @@ import os
 import os.path
 import yaml
 from yaml.loader import SafeLoader
-import pycoupntry
+import pyccdoupntry
 import math
 
 class AtoWorkbook:
