@@ -254,7 +254,7 @@ class AtoWorkbook:
     def update_master_data(self, df_out_put: pd.DataFrame, df: pd.DataFrame, column_list_names,
                         upper_attributes, remaining_attributes, regions):
         #[mode_value, source_value, service_value, unit_value, indicator_value, sheet_name]
-        #[vehicle_type, variable_type, unit, unit_factor, rule_id]
+        #[vehicle_type, variable_type, unit, unit_factor, rule_id, Data quality flag]
         for index, row in df.iterrows():
             country_new = self.country_region_mapping(row['Economy Code'], regions)
             num_of_country =  len(country_new[row['Economy Code']])
@@ -291,8 +291,8 @@ class AtoWorkbook:
                         final_unit = unit_value / remaining_attributes[3]       
                         df_out_put.loc[index, column_list_names[idx]] = final_unit
             
-            # Add the "Data Quality Check" column with a desired value (e.g., "Uncertain")
-            df_out_put.loc[index, 'Data Quality Check'] = 'Uncertain' 
+            # Add the "Data quality flag" column with a desired value (e.g., "!" or "!!")
+            df_out_put.loc[index, 'Data quality flag'] = '!!' 
         
         return df_out_put
 
