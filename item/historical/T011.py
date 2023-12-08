@@ -13,7 +13,7 @@ class AtoWorkbook:
         with open(file_name) as f:
             SOURCES = yaml.load(f, Loader=SafeLoader)
         return SOURCES
-    
+
     # Function that loads yaml file containing mapping of ISO_Code with Regions
     def populate_regions(self, file_name: str):
         REGION = {}
@@ -25,7 +25,7 @@ class AtoWorkbook:
     
      #Function that extracts Country and Region using ISO_Code
     
-    #  Function that mapps ISO_Code to Country and Region
+    # Function that mapps ISO_Code to Country and Region
     def country_region_mapping(self, economy_code, regions):
         COUNTRY = dict()
         region_country_list = []
@@ -37,21 +37,19 @@ class AtoWorkbook:
         
         return COUNTRY
     
-    # Function that returns ruleID, indicator_name, and dictionary for the specified sheet
-    def get_rule_id(self, rule_book: dict, sheet_name: str):
-        rule_id = "T012"
-        indicator_name = ""  # Initialize with an empty string
-        value = {}  # Initialize with an empty dictionary
+    # Function that returns ruleID, indicator_name and dictionary
+    def get_rule_id(self, rule_book:dict):
+        rule_id = "Txxx"
         valid_id_found = False
 
-        for key, val in rule_book.items():        
-            for new_key, new_val in val.items():
-                if new_key == "name" and sheet_name in new_val:
+        for key, value in rule_book.items():        
+            for new_key, new_val in value.items():
+                if new_key == "name":
                     indicator_name = new_val                
                     dataset_name_split = new_val.split('-')
                     list_length = len(dataset_name_split)
                     for index in range(list_length):
-                        if "Railways" in dataset_name_split[index]:
+                        if "Aviation" in dataset_name_split[index]:
                             valid_id_found = True
                             rule_id = key
                             break    
@@ -59,34 +57,34 @@ class AtoWorkbook:
                             valid_id_found = False
 
             if valid_id_found:            
-                break
+               break
 
-        return rule_id, val, indicator_name
+        return rule_id, value, indicator_name
     
     # Function that returns Vehicle Type
     def get_vehicle_type(self, mode:str, item_value: dict , dataset_name: str):
-        """Determine 'Vehicle type' from 'mode' and 'indicator'..."""
+        """Determine 'Vehicle type' from 'mode' and 'indicator'"""
+
         splited_indicator_name = dataset_name.split('-')
         first_indicator_word = splited_indicator_name[0]
         mode_indicator = mode + " " +  first_indicator_word
         mode_indicator = mode_indicator.rstrip()            
-        VehicleType = "NA"
+        VehicleType = "All"
         vehicle_type_found = False
-
+        
         for new_key, new_val in item_value.items():
             if new_key == "VehicleType":
-                for key1, value1 in new_val.items():
-                    if mode_indicator in key1:                                                            
-                        VehicleType = "All"                 
-                        vehicle_type_found= True
-                        break 
-                        
-            if vehicle_type_found:
-               break 
-        
+                # Check if new_val is a dictionary
+                if isinstance(new_val, dict):
+                    for key1, value1 in new_val.items():
+                        if mode_indicator in key1:                                                            
+                            VehicleType = value1              
+                            vehicle_type_found= True
+                            break 
+                            
         return VehicleType
 
-    # Function that returns Variable Type
+   # Function that returns Variable Type
     def get_variable_type(self, service_name: str, indicator_name: str):
         """Determine 'variable' using Service name.
 
@@ -94,29 +92,19 @@ class AtoWorkbook:
         ============================================= ===== ============
         Variable types                                 
         ============================================= ===== ============
-        Freight Activity
-        Freight (TEU)
-        Freight (Weight)
-        Stock
-        Sales (New Vehicles)
+            Variable
+            The variable is set to Passenger Activity.
         ============================================= ===== ============
         """
-        if service_name ==  "Freight":
-            if "Freight Transport" in indicator_name:
-                variable = "Freight Activity"
-            elif "Freight (TEU)" in indicator_name:
-                variable = "Freight (TEU)"
-            elif "Freight (Weight)" in indicator_name:
-                variable = "Freight (Weight)"
-            elif "Stock" in indicator_name:
-                variable = "Stock"
-            elif "Sales (New Vehicles)" in indicator_name:
-                variable = "Sales (New Vehicles)"
-            else:
-                variable = "Not Available"
+        variable = None  # Initialize variable to None
+
+        if service_name == "Passenger" and "Aviation Total Passenger Kilometers" in indicator_name:
+            variable = "Passenger Activity"
 
         return variable
+
     
+    # Function that returns unit and unit_factor
     def get_unit_and_unit_factor(self, item_value: dict, unit_name: str):
         """Determine 'expected unit' and 'unit factor' from 'Unit'.
 
@@ -125,25 +113,25 @@ class AtoWorkbook:
         ============================================= ===== ============
         Unit                                    
         ============================================= ===== ============
-        The unit is changed from Million Tonnes-kilometers to 10^9 tonne-km / yr.
-        # Unit: "Million Tonnes-kilometers to 10^9 tonne-km / yr"
+        The unit is changed from Passenger Activity to 10^9 passenger-km / yr.
+        # Unit: "Million passenger kilometers to 10^9 passenger-km / yr"
         ============================================= ===== ============
         """
         unit = "NA"
-        unit_factor = 1
-        unit_found = False
-
-        for new_key, new_val in item_value.items():
+        unit_factor = 1     
+        unit_found = False    
+            
+        for new_key, new_val in item_value.items():            
             if new_key == "Unit":
                 for key1, value1 in new_val.items():
                     if unit_name in value1:
-                        unit = "10^9 tonne-km / yr"
-                        unit_factor = 1000
-                        unit_found = True
+                        unit = "10^9 passenger-km / yr"
+                        unit_factor = 1000                        
+                        unit_found= True
                         break
-                if unit_found:
-                    break
-
+            if unit_found:
+               break
+            
         return unit, unit_factor
     
     #Function that extracts upper part of the dataframe
@@ -185,12 +173,11 @@ class AtoWorkbook:
       
     # Function that extracts remaing upper part of the dataframe
     # And returns [vehicle_type, variable_type, unit, unit_factor, rule_id]
-    def extract_upper_part_two(self, upper_part_attributes: list, rule_book: dict, sheet_name: str):
+    def extract_upper_part_two(self, upper_part_attributes: list, rule_book: dict):
         #[mode_value, source_value, service_value, unit_value, indicator_value, sheet_name]
-        #[vehicle_type, variable_type, unit, unit_factor, rule_id]
         remaining_part_attributes = []
 
-        rule_id, item_value, indicator_name = self.get_rule_id(rule_book, sheet_name)
+        rule_id, item_value, indicator_name = self.get_rule_id(rule_book)
 
         vehicleType = self.get_vehicle_type(upper_part_attributes[0], item_value, indicator_name)
         
@@ -255,6 +242,10 @@ class AtoWorkbook:
                         upper_attributes, remaining_attributes, regions):
         #[mode_value, source_value, service_value, unit_value, indicator_value, sheet_name]
         #[vehicle_type, variable_type, unit, unit_factor, rule_id, Data quality flag]
+
+        # Iterate over columns and reorder them
+        column_order = ['Country', 'ISO Code', 'Region', 'Variable', 'Unit', 'Vehicle Type', 
+                    'Technology', 'Fuel', 'ID', 'Mode', 'Source', 'Service'] + column_list_names[2:] + ['Data quality flag']
         for index, row in df.iterrows():
             country_new = self.country_region_mapping(row['Economy Code'], regions)
             num_of_country =  len(country_new[row['Economy Code']])
@@ -277,7 +268,7 @@ class AtoWorkbook:
             df_out_put.loc[index, ['Technology']] = "All"
             df_out_put.loc[index, ['Fuel']] = "All"
             df_out_put.loc[index, ['ID']] = remaining_attributes[4]
-
+            
             df_out_put.loc[index, ['Mode']] = upper_attributes[0]
             df_out_put.loc[index, ['Source']] = upper_attributes[1]
             df_out_put.loc[index, ['Service']] = upper_attributes[2]
@@ -290,19 +281,20 @@ class AtoWorkbook:
                         unit_value = df.loc[index,column_list_names[idx]]
                         final_unit = unit_value / remaining_attributes[3]       
                         df_out_put.loc[index, column_list_names[idx]] = final_unit
-            
             # Add the "Data quality flag" column with a desired value (e.g., "!" or "!!")
-            df_out_put.loc[index, 'Data quality flag'] = '!!' 
-        
-        return df_out_put
+            df_out_put.loc[index, ['Data quality flag']] = '!'
 
+        # Reorder the columns
+        df_out_put = df_out_put[column_order]
+
+        return df_out_put
         
     # Function that extract and process the input files and save the final data  
-    def process_input_data(self, workbook_file: str, master_file: str, regions_file: str, source_file: str, sheet_name: str):
+    def process_input_data(self, workbook_file: str, master_file: str, regions_file: str, source_file: str):
         # Steps followed for extracting and cleaning the dataset
         #Step 1) Load both ATO workbook excel sheet and master dataset csv files into Dataframes
-        df = pd.read_excel(open(workbook_excel_file, 'rb'),sheet_name='TAS-FRA-005(2)')
-
+        df = pd.read_excel(open(workbook_excel_file, 'rb'),sheet_name='TAS-PAT-017(1)')
+        
         # Load the master data CSV file
         master_df = pd.read_csv(master_csv_file)
         master_column_names= list(master_df.columns.values)
@@ -322,11 +314,7 @@ class AtoWorkbook:
 
         rule_book = self.load_rule_book(source_file)
 
-        # Load the rule book for the specified sheet
-        rule_book = self.load_rule_book(source_file)
-        rule_id, item_value, indicator_name = self.get_rule_id(rule_book, sheet_name)
-
-        remaining_part_attributes = self.extract_upper_part_two(upper_part_attributes, rule_book, sheet_name)
+        remaining_part_attributes = self.extract_upper_part_two(upper_part_attributes, rule_book)
 
         # b) Lower part of the dataframe containing the remaining rows 
         # extract lower part of the dataframe
@@ -337,7 +325,7 @@ class AtoWorkbook:
         master_df_output = self.update_master_data(df_out_put, df_lower_new, updated_column_names,
                                         upper_part_attributes, remaining_part_attributes, regions)    
 
-        master_df_output.to_csv("Output_data "+ upper_part_attributes[5] + ".csv", index=False)
+        master_df_output.to_csv("Output_data_"+ upper_part_attributes[5] + ".csv", index=False)
 
            
 # Name and path of input files
@@ -351,11 +339,10 @@ if os.path.isfile(workbook_excel_file):
     
     # Process the input files and save output as csv file
     atoWorkBook = AtoWorkbook()
-    atoWorkBook.process_input_data(workbook_excel_file, master_csv_file, regions_file, source_file, 'TAS-FRA-005(2)')
+    atoWorkBook.process_input_data(workbook_excel_file, master_csv_file, regions_file, source_file)
     print("File is found.")
 else:
     print("File is not found on the specified path!!")
 
-##<<<<<<<<<<<<<<<<<<<<< //////////////////////// >>>>>>>>>>>>>>>>>>>>>>>>##
 ##<<<<<<<<<<<<<<<<<<<<< Programe ends here >>>>>>>>>>>>>>>>>>>>>>>>##
-##<<<<<<<<<<<<<<<<<<<<< //////////////////////// >>>>>>>>>>>>>>>>>>>>>>>>##        
+      
