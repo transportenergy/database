@@ -1,3 +1,4 @@
+
 import pandas as pd
 import os
 import os.path
@@ -62,7 +63,7 @@ class AtoWorkbook:
     #     return rule_id, value, indicator_name
     # Function that returns ruleID, indicator_name, and dictionary
     def get_rule_id(self, rule_book: dict):
-        rule_id = "Txxx"
+        rule_id = "T022"
         valid_id_found = False
 
         for key, value in rule_book.items():
@@ -405,8 +406,8 @@ class AtoWorkbook:
 
            
 # Name and path of input files
-workbook_excel_file = r"C:/Users/magli/Desktop/item-internship/main/ATO Workbook (TRANSPORT ACTIVITY & SERVICES (TAS))2023.xlsx"
-master_csv_file = r"C:/Users/magli/Desktop/item-internship/code/sandra/Output_data_TAS-VEP-017.csv"
+workbook_excel_file = r"ATO Workbook (TRANSPORT ACTIVITY & SERVICES (TAS))2023.xlsx"
+master_csv_file = r"master dataset.csv"
 regions_file = r"regions.yaml"
 source_file = r"sources.yaml"
 

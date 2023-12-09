@@ -1,4 +1,3 @@
-
 import pandas as pd
 import yaml
 
@@ -41,6 +40,7 @@ class ItemTransformer:
                 merged_df = pd.merge(df_metadata_transformed, df_data_csv, on='merge_column', how='right')
                 merged_df.drop('merge_column', axis=1, inplace=True)
                 self.transformation_data(region_yaml_data, merged_df, applicable_rule)
+                merged_df['Data quality flag']='!'
                 merged_df.to_csv(self.file_name, index=False)
         print("Execution completed for sheet : "+ self.sheetname)
         """ ---------------------------------------------- """
@@ -187,3 +187,5 @@ item_transformer = ItemTransformer(SHEET_NAME, OUTPUT_FILE_NAME)
 """ ---------------------------------------------- """
 print("Starting execution for sheet : "+ item_transformer.sheetname)
 item_transformer.execute()
+
+

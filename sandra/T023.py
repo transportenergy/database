@@ -6,7 +6,7 @@ import os.path# used to perform operations related to files and paths
 import yaml # YAML is a human-readable data
 from yaml.loader import SafeLoader#used for safely loading YAML document
 #Safeloader:avoiding the execution of arbitrary code.
-import pycountry#it is a useful for dealing with country & currency information in a standardized way based on ISO codes.
+import pycountry #it is a useful for dealing with country & currency information in a standardized way based on ISO codes.
 import math
 
 class AtoWorkbook:
@@ -67,7 +67,7 @@ class AtoWorkbook:
     # Function that returns ruleID, indicator_name and dictionary
             #rule_book:dictionary containing rule information.
     def get_rule_id(self, rule_book:dict):
-        rule_id = "Txxx"#default value 
+        rule_id = "T023"#default value 
         valid_id_found = False# boolean variable to track whether a valid rule ID is found.
 
         for key, value in rule_book.items():        
@@ -382,8 +382,8 @@ class AtoWorkbook:
         master_df_output.to_csv("Output_data "+ upper_part_attributes[5] + ".csv", index=False)
 
 # Name and path of input files
-workbook_excel_file = r"C:/Users/magli/Desktop/item-internship/main/ATO Workbook (TRANSPORT ACTIVITY & SERVICES (TAS))2023.xlsx"
-master_csv_file = r"C:/Users/magli/Desktop/item-internship/code/sandra/Output_data TAS-FRA-007(2).csv"
+workbook_excel_file = r"ATO Workbook (TRANSPORT ACTIVITY & SERVICES (TAS))2023.xlsx"
+master_csv_file = r"master dataset.csv"
 regions_file = r"regions.yaml"
 source_file = r"sources.yaml"
 

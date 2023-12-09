@@ -29,23 +29,7 @@ T001:
   Technology: "All"
   Fuel: "All"
     
-T002:
-  name: "Container Transport"
-  Variable:
-       The variable is set to either: "Freight (TEU)"
-       The variable is set to either : "Freight (Weight)"
-  Service: "Freight"
-  Unit:
-      Freight (TEU) is in: "Number"
-      Freight (Weight) is in: "103 tonne / yr"
-  Mode:
-      The mode for Rail containers transport (TEU) is: "Rail"
-      The mode for Maritime containers transport (weight) is: "Shipping"
-  VehicleType: 
-       The vehicle type is: "Container"
-  Technology: "All"
-  Fuel: "All"
-  
+
 T003:
   name: "Inland Freight Transport"
   Variable: "Freight Activity"
