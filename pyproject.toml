@@ -43,7 +43,7 @@ documentation = "https://transportenergy.readthedocs.io"
 
 [project.optional-dependencies]
 eppa = ["gdx >= 3"]
-hist = ["requests", "requests-cache"]
+hist = ["requests"]
 tests = [
   "transport-energy[doc]",
   "transport-energy[hist]",
