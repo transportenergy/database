@@ -66,6 +66,7 @@ COUNTRY_NAME = {
     "taiwan_province of china": "TWN",
     "tanzania_united republic of": "TZA",
     "the former yugoslav republic of macedonia": "MKD",
+    "turkey": "TUR",
     "united states virgin islands": "VIR",
     "venezuela (bolivarian republic of)": "VEN",
     "virgin islands_british": "VGB",
