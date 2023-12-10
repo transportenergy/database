@@ -15,10 +15,12 @@ ipython_config.py
 *.log
 *.pdf
 
+.benchmarks
 .cache
 .coverage*
 .mypy_cache
 .pytest_cache
+.ruff_cache
 __pycache__
 build
 coverage.xml
