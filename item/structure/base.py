@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Any, Dict, List
 
 from sdmx.model.v21 import (
     Agency,
@@ -20,7 +20,7 @@ from sdmx.model.v21 import (
 VERSION = "0.1"
 
 
-def anno(**kwargs) -> Dict[str, List[Annotation]]:
+def anno(**kwargs) -> Dict[Any, Any]:  # NB actually Dict[str, List[Annotation]]
     """Store `kwargs` as annotations on a :class:`AnnotableArtefact` for later use."""
     return dict(annotations=[Annotation(id=k, text=repr(v)) for k, v in kwargs.items()])
 
