@@ -169,8 +169,8 @@ CS_TRANSPORT_MEASURE = ConceptScheme(
                 preferred_units={
                     "POLLUTANT == CO2": "10⁶ t CO₂ / yr",
                     "POLLUTANT == GHG": "10⁶ t CO₂e / yr",
-                    "POLLUTANT == BC": "1O³ t BC / yr",
-                    "POLLUTANT == PM25": "1O³ t PM2.5 / yr",
+                    "POLLUTANT == BC": "10³ t BC / yr",
+                    "POLLUTANT == PM25": "10³ t PM2.5 / yr",
                 }
             ),
         ),
