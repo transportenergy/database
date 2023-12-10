@@ -8,6 +8,11 @@ on:
   schedule:
   - cron: "0 5 * * *"
 
+# Cancel previous runs that have not completed
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 env:
   # Location of RCLONE configuration file
   RCLONE_CONFIG: ci/rclone.conf
@@ -23,19 +28,21 @@ jobs:
   pytest:
     strategy:
       matrix:
-        include:
-        - os: ubuntu-latest
-          python-version: "3.7"
-          run-diagnostics: false
-        - os: ubuntu-latest
-          python-version: "3.8"
-          run-diagnostics: false
-        - os: ubuntu-latest
-          python-version: "3.9"
-          run-diagnostics: true
-        - os: windows-latest
-          python-version: "3.9"
-          run-diagnostics: false
+        os:
+        - macos-latest
+        - ubuntu-latest
+        - windows-latest
+
+        python-version:
+        - "3.8"
+        - "3.9"
+        - "3.10"
+        - "3.11"
+        - "3.12"
+
+        # TEMPORARY Never run diagnostics
+        run-diagnostics:
+        - false
 
       fail-fast: false
 
@@ -44,33 +51,21 @@ jobs:
     name: ${{ matrix.os }}-py${{ matrix.python-version }}
 
     steps:
-    - name: Cancel previous runs that have not completed
-      uses: styfle/cancel-workflow-action@0.7.0
-      with:
-        access_token: ${{ github.token }}
-
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: true
 
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+        cache: pip
+        cache-dependency-path: "**/pyproject.toml"
 
-    - name: Cache Python packages
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.cache/pip
-          ~/.cache/rclone*.zip
-          ~/appdata/local/pip/cache
-        key: ${{ matrix.os }}-${{ matrix.python-version }}
+    - name: Upgrade pip
+      run: python -m pip install --upgrade pip
 
-    - name: Upgrade pip, wheel
-      run: python -m pip install --upgrade pip wheel
-
-    - name: Install the Python package and dependencies
-      run: pip install --editable .[tests]
+    - name: Install the Python package and its dependencies
+      run: pip install .[tests]
 
     - name: Run pytest
       env:
@@ -78,8 +73,9 @@ jobs:
       run: pytest --color=yes --cov-report=xml --verbose item
 
     - name: Upload test coverage to Codecov.io
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v3
 
+    # TODO Use https://github.com/marketplace/actions/setup-rclone-action
     - name: Install rclone
       if: env.pr_from_main_repo && matrix.run-diagnostics
       env:
