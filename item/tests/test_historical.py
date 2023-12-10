@@ -76,7 +76,7 @@ def test_process(caplog, dataset_id):
     assert "Processing produced non-unique keys; no -wide output" not in caplog.messages
 
 
-@pytest.mark.parametrize("dataset_id, N_areas", [(0, 58), (1, 37), (2, 53), (3, 57)])
+@pytest.mark.parametrize("dataset_id, N_areas", [(0, 59), (1, 39), (2, 54), (3, 59)])
 def test_coverage(dataset_id, N_areas):
     """Test the historical.diagnostics.coverage method."""
     df = pd.read_csv(fetch_source(dataset_id, use_cache=True))
