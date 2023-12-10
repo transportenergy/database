@@ -66,6 +66,7 @@ COUNTRY_NAME = {
     "taiwan_province of china": "TWN",
     "tanzania_united republic of": "TZA",
     "the former yugoslav republic of macedonia": "MKD",
+    "turkey": "TUR",
     "united states virgin islands": "VIR",
     "venezuela (bolivarian republic of)": "VEN",
     "virgin islands_british": "VGB",
@@ -256,7 +257,7 @@ def process(id: Union[int, str]) -> pd.DataFrame:
 
     if getattr(dataset_module, "FETCH", False):
         # Fetch directly from source
-        path = fetch_source(id)
+        path = fetch_source(id, use_cache=False)
     else:
         # Load the data from version stored in the transportenergy/metadata repo
         # TODO remove this option; always fetch from source or cache

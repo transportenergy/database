@@ -1,6 +1,4 @@
 """Data cleaning code and configuration for T012."""
-import numpy as np
-
 from item.util import convert_units, dropna_logged
 
 #: iTEM data flow matching the data from this source.
@@ -54,7 +52,7 @@ def process(df):
             Value=lambda df_: df_["Value"]
             .str.replace(" ", "")
             .replace("...", "NaN")
-            .astype(np.float)
+            .astype(float)
         )
         .pipe(dropna_logged, "Value", [COLUMNS["country_name"]])
         .pipe(convert_units, "kpassenger", "Mpassenger")

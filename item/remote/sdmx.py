@@ -1,8 +1,10 @@
+from typing import Optional
+
 import pandas as pd
 import sdmx
 
 
-def get_sdmx(source: str = None, **args) -> pd.DataFrame:
+def get_sdmx(source: Optional[str] = None, **args) -> pd.DataFrame:
     """Retrieve data from *source* using :mod:`sdmx`.
 
     Arguments

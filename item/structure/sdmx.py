@@ -6,7 +6,7 @@ from typing import List, cast
 
 import numpy as np
 import sdmx.message as msg
-import sdmx.model as m
+import sdmx.model.v21 as m
 from sdmx import Client
 
 from item.structure import base
@@ -47,10 +47,10 @@ def get_cdc():
 @lru_cache()
 def generate() -> msg.StructureMessage:
     """Return the SDMX data structures for iTEM data."""
-    item_agency = base.AS_ITEM.items["iTEM"]
+    item_agency = base.AS_ITEM["iTEM"]
 
     sm = msg.StructureMessage(
-        prepared=datetime.now(), header=msg.Header(sender=item_agency)
+        header=msg.Header(sender=item_agency, prepared=datetime.now())
     )
 
     # Add the AgencyScheme containing iTEM
@@ -202,8 +202,9 @@ def prepare_dsd(dsd: m.DataStructureDefinition, sm: msg.StructureMessage):
         if concept_id == "VARIABLE":
             d: m.DimensionComponent = m.MeasureDimension(
                 id="VARIABLE",
-                name="Variable",
-                description="Reference to a concept from CL_TRANSPORT_MEASURES.",
+                # NB these are not attributes of Component; store as a Concept
+                # name="Variable",
+                # description="Reference to a concept from CL_TRANSPORT_MEASURES.",
                 local_representation=m.Representation(
                     enumerated=sm.concept_scheme["TRANSPORT_MEASURE"]
                 ),
@@ -212,9 +213,7 @@ def prepare_dsd(dsd: m.DataStructureDefinition, sm: msg.StructureMessage):
             raise KeyError(concept_id)
         else:
             # Create the dimension, referring to the concept
-            d = m.Dimension(
-                id=concept_id, name=concept.name, concept_identity=concept, order=order
-            )
+            d = m.Dimension(id=concept_id, concept_identity=concept, order=order)
 
             try:
                 # The dimension is represented by the corresponding code list, if any
@@ -231,9 +230,7 @@ def prepare_dsd(dsd: m.DataStructureDefinition, sm: msg.StructureMessage):
     concept = dsd_concepts.get(dsd.id) or dsd_concepts.get("OBS_VALUE")
     assert concept is not None
 
-    dsd.measures.append(
-        m.PrimaryMeasure(id=concept.id, name=concept.name, concept_identity=concept)
-    )
+    dsd.measures.append(m.PrimaryMeasure(id=concept.id, concept_identity=concept))
 
     # Assign order to the dimensions
     dsd.dimensions.assign_order()

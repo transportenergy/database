@@ -89,8 +89,8 @@ def process(df):
 
     df = pd.concat([df, df["Variable"].apply(lookup)], axis=1)
 
-    return (
-        # Compute partial sums that exclude pipelines
+    # Compute partial sums that exclude pipelines
+    df0 = (
         # Select only the subset of variables, then group by Country and TIME_PERIOD
         df[df["Variable"].isin(PARTIAL)]
         .groupby(["Country", "TIME_PERIOD"])
@@ -101,8 +101,13 @@ def process(df):
         .reset_index()
         # Assign other dimensions for this sum
         .assign(mode="Inland ex. pipeline")
-        # Concatenate with the original data
-        .append(df, ignore_index=True)
+    )
+
+    # - Concatenate with the original data.
+    # - Fill "operator" and "vehicle" key values.
+    # - Sort.
+    return (
+        pd.concat([df, df0], ignore_index=True)
         .fillna({"operator": "_T", "vehicle": "_T"})
         .sort_values(by=["Country", "TIME_PERIOD", "mode", "vehicle"])
     )

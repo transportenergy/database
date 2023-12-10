@@ -17,6 +17,7 @@ def test_datasets(ok):
     ok.datasets()
 
 
+@pytest.mark.xfail(reason="As of 2023-12-10, KAPSARC no longer provides this dataset")
 def test_dataset(ok):
     # Retrieve single dataset
     result = ok.table("modal-split-of-freight-transport")
@@ -25,6 +26,7 @@ def test_dataset(ok):
     assert len(result) > 1400
 
 
+@pytest.mark.xfail(reason="As of 2023-12-10, KAPSARC no longer provides this dataset")
 def test_cli(ok):
     runner = CliRunner()
     result = runner.invoke(item.cli.main, ["remote", "demo"])

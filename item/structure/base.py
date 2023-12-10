@@ -1,6 +1,6 @@
-from typing import Dict, List
+from typing import Any, Dict, List
 
-from sdmx.model import (
+from sdmx.model.v21 import (
     Agency,
     AgencyScheme,
     Annotation,
@@ -20,7 +20,7 @@ from sdmx.model import (
 VERSION = "0.1"
 
 
-def anno(**kwargs) -> Dict[str, List[Annotation]]:
+def anno(**kwargs) -> Dict[Any, Any]:  # NB actually Dict[str, List[Annotation]]
     """Store `kwargs` as annotations on a :class:`AnnotableArtefact` for later use."""
     return dict(annotations=[Annotation(id=k, text=repr(v)) for k, v in kwargs.items()])
 
@@ -41,28 +41,28 @@ def exclude(**kwargs):
     return [{"included": False, k: v} for k, v in kwargs.items()]
 
 
-AS_ITEM = AgencyScheme(
-    id="iTEM",
-    items=[
-        Agency(
-            id="iTEM",
-            name="International Transport Energy Modeling",
-            contact=[
-                Contact(
-                    name="iTEM organizing group",
-                    email=["mail@transportenergy.org"],
-                    uri=["https://transportenergy.org"],
-                )
-            ],
-        )
-    ],
+AS_ITEM = AgencyScheme(id="iTEM")
+AS_ITEM.append(
+    Agency(
+        id="iTEM",
+        name="International Transport Energy Modeling",
+        contact=[
+            Contact(
+                name="iTEM organizing group",
+                email=["mail@transportenergy.org"],
+                uri=["https://transportenergy.org"],
+            )
+        ],
+    )
 )
 
 
 CS_TRANSPORT = ConceptScheme(
     id="TRANSPORT",
     description="Concepts used as dimensions or attributes for transport data.",
-    items=[
+)
+CS_TRANSPORT.extend(
+    [
         # Used as dimensions
         Concept(
             id="SERVICE",
@@ -114,13 +114,15 @@ CS_TRANSPORT = ConceptScheme(
                 "Portion of a fleet of transport vehicles, e.g. new versus used."
             ),
         ),
-    ],
+    ]
 )
 
 CS_MODELING = ConceptScheme(
     id="MODELING",
     description="Concepts related to model-based research & assessment.",
-    items=[
+)
+CS_MODELING.extend(
+    [
         Concept(
             id="MODEL",
             name="Model",
@@ -133,13 +135,15 @@ CS_MODELING = ConceptScheme(
                 "Name or other identifier of a specific configuration of a model."
             ),
         ),
-    ],
+    ]
 )
 
 CS_TRANSPORT_MEASURE = ConceptScheme(
     id="TRANSPORT_MEASURE",
     description="Concepts used as measures in transport data.",
-    items=[
+)
+CS_TRANSPORT_MEASURE.extend(
+    [
         Concept(
             id="ACTIVITY",
             name="Transport activity",
@@ -169,8 +173,8 @@ CS_TRANSPORT_MEASURE = ConceptScheme(
                 preferred_units={
                     "POLLUTANT == CO2": "10⁶ t CO₂ / yr",
                     "POLLUTANT == GHG": "10⁶ t CO₂e / yr",
-                    "POLLUTANT == BC": "1O³ t BC / yr",
-                    "POLLUTANT == PM25": "1O³ t PM2.5 / yr",
+                    "POLLUTANT == BC": "10³ t BC / yr",
+                    "POLLUTANT == PM25": "10³ t PM2.5 / yr",
                 }
             ),
         ),
@@ -223,7 +227,7 @@ CS_TRANSPORT_MEASURE = ConceptScheme(
             description="Quantity of transport vehicles.",
             **anno(preferred_units="10⁶ vehicle"),
         ),
-    ],
+    ]
 )
 
 #: Concept schemes.
