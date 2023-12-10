@@ -1,7 +1,7 @@
 import logging
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List, Mapping
+from typing import Dict, List, Mapping, Optional
 
 import numpy as np
 import pandas as pd
@@ -85,9 +85,7 @@ def name_for_id(
     """
     result: Mapping[str, Dict[str, str]] = defaultdict(dict)
     for id in ids:
-        codelist = dsd.dimensions.get(
-            id
-        ).local_representation.enumerated  # type: ignore [union-attr]
+        codelist = dsd.dimensions.get(id).local_representation.enumerated  # type: ignore [union-attr]
         assert codelist is not None
 
         for code in codelist:
@@ -103,7 +101,7 @@ def name_for_id(
     return result
 
 
-def make_template(output_path: Path = None, verbose: bool = True):
+def make_template(output_path: Optional[Path] = None, verbose: bool = True):
     """Generate a data template.
 
     Outputs files containing all keys specified for the iTEM ``HISTORICAL`` data
