@@ -41,28 +41,28 @@ def exclude(**kwargs):
     return [{"included": False, k: v} for k, v in kwargs.items()]
 
 
-AS_ITEM = AgencyScheme(
-    id="iTEM",
-    items=[
-        Agency(
-            id="iTEM",
-            name="International Transport Energy Modeling",
-            contact=[
-                Contact(
-                    name="iTEM organizing group",
-                    email=["mail@transportenergy.org"],
-                    uri=["https://transportenergy.org"],
-                )
-            ],
-        )
-    ],
+AS_ITEM = AgencyScheme(id="iTEM")
+AS_ITEM.append(
+    Agency(
+        id="iTEM",
+        name="International Transport Energy Modeling",
+        contact=[
+            Contact(
+                name="iTEM organizing group",
+                email=["mail@transportenergy.org"],
+                uri=["https://transportenergy.org"],
+            )
+        ],
+    )
 )
 
 
 CS_TRANSPORT = ConceptScheme(
     id="TRANSPORT",
     description="Concepts used as dimensions or attributes for transport data.",
-    items=[
+)
+CS_TRANSPORT.extend(
+    [
         # Used as dimensions
         Concept(
             id="SERVICE",
@@ -114,13 +114,15 @@ CS_TRANSPORT = ConceptScheme(
                 "Portion of a fleet of transport vehicles, e.g. new versus used."
             ),
         ),
-    ],
+    ]
 )
 
 CS_MODELING = ConceptScheme(
     id="MODELING",
     description="Concepts related to model-based research & assessment.",
-    items=[
+)
+CS_MODELING.extend(
+    [
         Concept(
             id="MODEL",
             name="Model",
@@ -133,13 +135,15 @@ CS_MODELING = ConceptScheme(
                 "Name or other identifier of a specific configuration of a model."
             ),
         ),
-    ],
+    ]
 )
 
 CS_TRANSPORT_MEASURE = ConceptScheme(
     id="TRANSPORT_MEASURE",
     description="Concepts used as measures in transport data.",
-    items=[
+)
+CS_TRANSPORT_MEASURE.extend(
+    [
         Concept(
             id="ACTIVITY",
             name="Transport activity",
@@ -223,7 +227,7 @@ CS_TRANSPORT_MEASURE = ConceptScheme(
             description="Quantity of transport vehicles.",
             **anno(preferred_units="10⁶ vehicle"),
         ),
-    ],
+    ]
 )
 
 #: Concept schemes.
