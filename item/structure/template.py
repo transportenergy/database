@@ -6,7 +6,7 @@ from typing import Dict, List, Mapping
 import numpy as np
 import pandas as pd
 import sdmx
-import sdmx.model as m
+import sdmx.model.v21 as m
 
 from item.common import paths
 from item.structure.sdmx import _get_anno, generate, merge_dsd

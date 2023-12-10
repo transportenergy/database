@@ -6,7 +6,7 @@ from typing import List, cast
 
 import numpy as np
 import sdmx.message as msg
-import sdmx.model as m
+import sdmx.model.v21 as m
 from sdmx import Client
 
 from item.structure import base

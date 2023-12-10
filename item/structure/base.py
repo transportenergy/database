@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from sdmx.model import (
+from sdmx.model.v21 import (
     Agency,
     AgencyScheme,
     Annotation,
