@@ -27,7 +27,7 @@ dependencies = [
   "iam-units",
   "openpyxl",
   "pandas",
-  "pint",
+  "Pint",
   "plotnine",
   "pprint36",
   "pycountry",
@@ -43,7 +43,7 @@ documentation = "https://transportenergy.readthedocs.io"
 
 [project.optional-dependencies]
 eppa = ["gdx >= 3"]
-hist = ["requests"]
+hist = ["Jinja2", "requests"]
 tests = [
   "transport-energy[doc]",
   "transport-energy[hist]",
