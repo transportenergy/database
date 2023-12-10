@@ -17,6 +17,7 @@ COMMANDS = [
     ("remote", "demo"),
     # Top-level
     ("debug",),
+    ("help",),
     ("mkdirs",),
     ("template",),
 ]
@@ -26,6 +27,14 @@ COMMANDS = [
 def test_help(cmd):
     runner = CliRunner()
     result = runner.invoke(item.cli.main, list(cmd) + ["--help"])
+    assert result.exit_code == 0
+
+
+@pytest.mark.parametrize("cmd", [("help",)])
+def test_invoke(cmd):
+    """Actually invoke certain commands."""
+    runner = CliRunner()
+    result = runner.invoke(item.cli.main, list(cmd))
     assert result.exit_code == 0
 
 
