@@ -21,7 +21,7 @@ For details on installation, usage, contributing, etc., see the **online documen
 License
 -------
 
-Copyright © 2017–2021, [iTEM contributors](https://github.com/transportenergy/database/graphs/contributors)
+Copyright © 2017–2024, [iTEM contributors](https://github.com/transportenergy/database/graphs/contributors)
 
 Licensed under the GNU General Public License, version 3.
 The full text of the license is available in the file `LICENSE`.
