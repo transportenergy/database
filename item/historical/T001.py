@@ -7,6 +7,7 @@ This module:
   magnitude (see also :issue:`57`).
 
 """
+
 import logging
 
 from item.util import convert_units, dropna_logged
