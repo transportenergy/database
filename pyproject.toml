@@ -72,7 +72,9 @@ omit = [
 ]
 
 [[tool.mypy.overrides]]
-module = ["gdx", "plotnine", "pycountry"]
+module = [
+  "gdx",
+]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

@@ -10,6 +10,8 @@ repos:
     - lxml-stubs
     - pandas-stubs
     - Pint
+    - plotnine
+    - pycountry
     - pytest
     - sdmx1
     - traitlets
