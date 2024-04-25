@@ -34,7 +34,7 @@ dependencies = [
   "plotnine",
   "pycountry",
   "pyyaml",
-  "sdmx1 >= 2.4.0",
+  "sdmx1 >= 2.8.0",
   "setuptools >= 41",
   "xarray",
 ]

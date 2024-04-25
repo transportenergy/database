@@ -1,6 +1,6 @@
 from typing import Any, Dict, List
 
-from sdmx.model.v21 import (
+from sdmx.model.common import (
     Agency,
     AgencyScheme,
     Annotation,
@@ -10,9 +10,8 @@ from sdmx.model.v21 import (
     ConstraintRole,
     ConstraintRoleType,
     Contact,
-    ContentConstraint,
-    DataStructureDefinition,
 )
+from sdmx.model.v21 import ContentConstraint, DataStructureDefinition
 
 #: Current version of all data structures.
 #:
