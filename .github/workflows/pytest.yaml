@@ -47,11 +47,11 @@ jobs:
     name: ${{ matrix.os }}-py${{ matrix.python-version }}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: true
 
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
         cache: pip
@@ -69,7 +69,8 @@ jobs:
       run: pytest --color=yes --cov-report=xml --verbose item
 
     - name: Upload test coverage to Codecov.io
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
+      with: { token: "${{ secrets.CODECOV_TOKEN }}" }
 
   diagnostics:
     # Temporarily disabled to merge #84
@@ -83,11 +84,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: true
 
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
       with:  # Should be the same as the latest supported version, above
         python-version: "3.12"
         cache: pip
@@ -125,14 +126,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
-      with:
-        python-version: 3.x
-
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with: { python-version: 3.x }
     - name: Force recreation of pre-commit virtual environment for mypy
       if: github.event_name == 'schedule'  # Comment this line to run on a PR
       run: gh cache list -L 999 | cut -f2 | grep pre-commit | xargs -I{} gh cache delete "{}" || true
       env: { GH_TOKEN: "${{ github.token }}" }
-
-    - uses: pre-commit/action@v3.0.0
+    - uses: pre-commit/action@v3.0.1
