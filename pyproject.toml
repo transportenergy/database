@@ -32,7 +32,6 @@ dependencies = [
   "pandas",
   "Pint",
   "plotnine",
-  "pprint36",
   "pycountry",
   "pyyaml",
   "sdmx1 >= 2.4.0",
