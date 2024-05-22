@@ -1,4 +1,5 @@
 """Command-line interface for the iTEM databases."""
+
 from pathlib import Path
 from textwrap import indent
 

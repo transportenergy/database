@@ -1,4 +1,5 @@
 """Data cleaning code and configuration for T000."""
+
 from functools import lru_cache
 
 import pandas as pd

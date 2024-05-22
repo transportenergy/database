@@ -4,6 +4,7 @@ The input data contains the variable names in :data:`VARIABLE_MAP`. A new sum is
 computed, mode="Inland ex. pipeline" that is the sum of the variables in
 :data:`PARTIAL`, i.e. excluding "Pipelines transport".
 """
+
 from functools import lru_cache
 
 import pandas as pd

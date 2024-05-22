@@ -32,10 +32,9 @@ dependencies = [
   "pandas",
   "Pint",
   "plotnine",
-  "pprint36",
   "pycountry",
   "pyyaml",
-  "sdmx1 >= 2.4.0",
+  "sdmx1 >= 2.8.0",
   "setuptools >= 41",
   "xarray",
 ]
@@ -72,7 +71,9 @@ omit = [
 ]
 
 [[tool.mypy.overrides]]
-module = ["gdx", "plotnine", "pycountry"]
+module = [
+  "gdx",
+]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
@@ -82,12 +83,12 @@ markers = [
   "network: mark a test that requires a network connection.",
 ]
 
-[tool.ruff]
+[tool.ruff.lint]
 select = ["C9", "E", "F", "I", "W"]
 ignore = ["E501", "W191"]
-
-[tool.ruff.mccabe]
-max-complexity = 13
+# Exceptions:
+# item.model.eppa5.check(): 13
+mccabe.max-complexity = 12
 
 [tool.setuptools.packages]
 find = {}

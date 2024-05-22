@@ -73,7 +73,7 @@ The goals for these tools are that:
 License
 =======
 
-Copyright © 2017–2021 iTEM contributors
+Copyright © 2017–2024 iTEM contributors
 
 The software is licensed under the `GNU General Public License, version 3 <http://www.gnu.org/licenses/gpl-3.0.en.html>`_.
 

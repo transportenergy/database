@@ -73,7 +73,8 @@ def country_map(path):
     ].sort_index().drop_duplicates().to_csv(join(path, "eppa5.tsv"), sep="\t")
 
 
-def import_data(data_path, metadata_path):
+# FIXME Reduce complexity from 13 → ≤12
+def import_data(data_path, metadata_path):  # noqa: C901
     # # Construct the countries-regions mapping
     # country_map(join(path, '..', 'downscale'))
 

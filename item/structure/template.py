@@ -1,15 +1,18 @@
 import logging
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List, Mapping, Optional
+from typing import TYPE_CHECKING, Dict, List, Mapping, Optional
 
 import numpy as np
 import pandas as pd
 import sdmx
-import sdmx.model.v21 as m
+import sdmx.model.common as m
 
 from item.common import paths
 from item.structure.sdmx import _get_anno, generate, merge_dsd
+
+if TYPE_CHECKING:
+    import sdmx.model.common
 
 log = logging.getLogger(__name__)
 
@@ -74,7 +77,7 @@ def collapse(row: pd.Series) -> pd.Series:
 
 
 def name_for_id(
-    dsd: m.DataStructureDefinition, ids: List[str]
+    dsd: "sdmx.model.common.BaseDataStructureDefinition", ids: List[str]
 ) -> Mapping[str, Dict[str, str]]:
     """Return a nested dict for use with :meth:`pandas.DataFrame.replace`.
 

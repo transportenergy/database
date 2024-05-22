@@ -1,4 +1,5 @@
 """Common code for data input."""
+
 from logging import DEBUG
 from os.path import join
 from typing import Dict

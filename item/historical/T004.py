@@ -18,6 +18,7 @@ Notes:
    - Capture and preserve the metadata provided by the UNECE data interface.
 
 """
+
 from functools import lru_cache
 
 import pandas as pd
