@@ -173,7 +173,7 @@ def merge_dsd(
 
         # Iterate over the possible keys in `dsd`; add to `k`
         ds.add_obs(
-            Observation(dimension=(base_key + key).order(), value=np.NaN)
+            Observation(dimension=(base_key + key).order(), value=np.nan)
             for key in dsd.iter_keys(constraint=cc)
         )
 
