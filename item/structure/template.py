@@ -156,7 +156,7 @@ def make_template(output_path: Optional[Path] = None, verbose: bool = True):
     log.info(f"Output to {output_path}/{{index,template}}.{{csv,xlsx}}")
 
     # "Index" format: only simple replacements, full dimensionality
-    df1 = df0.replace({"_Z": "", np.NaN: "", "(REF_AREA)": "…", "(TIME_PERIOD)": "…"})
+    df1 = df0.replace({"_Z": "", np.nan: "", "(REF_AREA)": "…", "(TIME_PERIOD)": "…"})
 
     df1.to_csv(output_path / "full.csv")
     df1.to_excel(output_path / "full.xlsx")

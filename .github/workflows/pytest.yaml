@@ -29,12 +29,14 @@ jobs:
         - ubuntu-latest
         - windows-latest
 
-        python-version:
-        - "3.8"
-        - "3.9"
-        - "3.10"
-        - "3.11"
-        - "3.12"
+        version:
+        - { python: "3.8",  others: "" }
+        # Pint 0.24 with numpy 2.0 compatibility is not available for Python 3.9.
+        # Use earlier numpy to be compatible with pint < 0.24.
+        - { python: "3.9",  others: "'numpy < 2'" }
+        - { python: "3.10", others: "" }
+        - { python: "3.11", others: "" }
+        - { python: "3.12", others: "" }
 
         # TEMPORARY Never run diagnostics
         run-diagnostics:
@@ -44,7 +46,7 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
-    name: ${{ matrix.os }}-py${{ matrix.python-version }}
+    name: ${{ matrix.os }}-py${{ matrix.version.python }}
 
     steps:
     - uses: actions/checkout@v4
@@ -53,7 +55,7 @@ jobs:
 
     - uses: actions/setup-python@v5
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: ${{ matrix.version.python }}
         cache: pip
         cache-dependency-path: "**/pyproject.toml"
 
@@ -61,7 +63,7 @@ jobs:
       run: python -m pip install --upgrade pip
 
     - name: Install the Python package and its dependencies
-      run: pip install .[tests]
+      run: pip install .[tests] ${{ matrix.version.others }}
 
     - name: Run pytest
       env:
