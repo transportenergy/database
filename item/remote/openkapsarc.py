@@ -5,15 +5,12 @@ from datetime import datetime
 
 import pandas as pd
 import requests
-import requests_cache
 
 from item.common import config, paths
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 log.addHandler(logging.StreamHandler(sys.stdout))
-
-requests_cache.install_cache("item")
 
 
 class APIError(Exception):

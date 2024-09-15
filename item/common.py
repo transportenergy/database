@@ -3,14 +3,14 @@ import logging.config
 import os
 from os.path import abspath, join
 from pathlib import Path
+from typing import Any, Dict, Optional
 
 import yaml
-from pkg_resources import resource_filename  # noqa: F401
 
 # Various paths to data
 paths = {
     # Package data
-    "data": Path(resource_filename(__name__, "data")).resolve(),
+    "data": Path(__file__).parent.joinpath("data"),
 }
 
 if not paths["data"].exists():
@@ -18,8 +18,8 @@ if not paths["data"].exists():
     paths["data"] = Path(__file__).parent / "data"
 
 
-config = {}
-_logger = None
+config: Dict[str, Any] = {}
+_logger: Optional["logging.Logger"] = None
 
 
 def load_config(path=None):

@@ -14,7 +14,7 @@ from item.remote import OpenKAPSARC
 ureg = pint.UnitRegistry()
 ureg.define(
     """
-idx_2005_100 = [index, 2005=100]
+idx_2005_100 = [index]
 person = [person]
 passenger = person
 TEU = [container]

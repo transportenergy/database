@@ -1,15 +1,18 @@
 import logging
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List, Mapping
+from typing import TYPE_CHECKING, Dict, List, Mapping, Optional
 
 import numpy as np
 import pandas as pd
 import sdmx
-import sdmx.model as m
+import sdmx.model.common as m
 
 from item.common import paths
 from item.structure.sdmx import _get_anno, generate, merge_dsd
+
+if TYPE_CHECKING:
+    import sdmx.model.common
 
 log = logging.getLogger(__name__)
 
@@ -74,7 +77,7 @@ def collapse(row: pd.Series) -> pd.Series:
 
 
 def name_for_id(
-    dsd: m.DataStructureDefinition, ids: List[str]
+    dsd: "sdmx.model.common.BaseDataStructureDefinition", ids: List[str]
 ) -> Mapping[str, Dict[str, str]]:
     """Return a nested dict for use with :meth:`pandas.DataFrame.replace`.
 
@@ -85,9 +88,7 @@ def name_for_id(
     """
     result: Mapping[str, Dict[str, str]] = defaultdict(dict)
     for id in ids:
-        codelist = dsd.dimensions.get(
-            id
-        ).local_representation.enumerated  # type: ignore [union-attr]
+        codelist = dsd.dimensions.get(id).local_representation.enumerated  # type: ignore [union-attr]
         assert codelist is not None
 
         for code in codelist:
@@ -103,7 +104,7 @@ def name_for_id(
     return result
 
 
-def make_template(output_path: Path = None, verbose: bool = True):
+def make_template(output_path: Optional[Path] = None, verbose: bool = True):
     """Generate a data template.
 
     Outputs files containing all keys specified for the iTEM ``HISTORICAL`` data
@@ -155,7 +156,7 @@ def make_template(output_path: Path = None, verbose: bool = True):
     log.info(f"Output to {output_path}/{{index,template}}.{{csv,xlsx}}")
 
     # "Index" format: only simple replacements, full dimensionality
-    df1 = df0.replace({"_Z": "", np.NaN: "", "(REF_AREA)": "…", "(TIME_PERIOD)": "…"})
+    df1 = df0.replace({"_Z": "", np.nan: "", "(REF_AREA)": "…", "(TIME_PERIOD)": "…"})
 
     df1.to_csv(output_path / "full.csv")
     df1.to_excel(output_path / "full.xlsx")

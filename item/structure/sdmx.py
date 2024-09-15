@@ -2,14 +2,28 @@ import logging
 from collections import ChainMap
 from datetime import datetime
 from functools import lru_cache
-from typing import List, cast
+from typing import TYPE_CHECKING, List, cast
 
 import numpy as np
 import sdmx.message as msg
-import sdmx.model as m
 from sdmx import Client
+from sdmx.model import common as m
+from sdmx.model.v21 import (
+    DataKey,
+    DataKeySet,
+    DataSet,
+    MeasureDimension,
+    MemberSelection,
+    MemberValue,
+    Observation,
+    PrimaryMeasure,
+)
 
 from item.structure import base
+
+if TYPE_CHECKING:
+    import sdmx.model.common
+    import sdmx.model.v21
 
 log = logging.getLogger(__name__)
 
@@ -47,10 +61,10 @@ def get_cdc():
 @lru_cache()
 def generate() -> msg.StructureMessage:
     """Return the SDMX data structures for iTEM data."""
-    item_agency = base.AS_ITEM.items["iTEM"]
+    item_agency = base.AS_ITEM["iTEM"]
 
     sm = msg.StructureMessage(
-        prepared=datetime.now(), header=msg.Header(sender=item_agency)
+        header=msg.Header(sender=item_agency, prepared=datetime.now())
     )
 
     # Add the AgencyScheme containing iTEM
@@ -66,7 +80,7 @@ def generate() -> msg.StructureMessage:
     # Process and add code lists
     for id, codes in base.CODELISTS.items():
         # Create a code list object
-        cl = m.Codelist(id=f"CL_{id}")
+        cl: "sdmx.model.common.Codelist" = m.Codelist(id=f"CL_{id}")
 
         # Add each code and any children
         # TODO move this upstream to sdmx1
@@ -129,12 +143,12 @@ def merge_dsd(
     target: str,
     others: List[str],
     fill_value: str = "_Z",
-) -> m.DataSet:
+) -> "sdmx.model.v21.DataSet":
     """‘Merge’ 2 or more data structure definitions."""
     dsd_target = sm.structure[target]
 
     # Create a temporary DataSet
-    ds = m.DataSet(structured_by=dsd_target)
+    ds: "sdmx.model.v21.DataSet" = DataSet(structured_by=dsd_target)
 
     # Count of keys
     count = 0
@@ -159,7 +173,7 @@ def merge_dsd(
 
         # Iterate over the possible keys in `dsd`; add to `k`
         ds.add_obs(
-            m.Observation(dimension=(base_key + key).order(), value=np.NaN)
+            Observation(dimension=(base_key + key).order(), value=np.nan)
             for key in dsd.iter_keys(constraint=cc)
         )
 
@@ -174,7 +188,9 @@ def merge_dsd(
     return ds
 
 
-def prepare_dsd(dsd: m.DataStructureDefinition, sm: msg.StructureMessage):
+def prepare_dsd(
+    dsd: "sdmx.model.v21.DataStructureDefinition", sm: msg.StructureMessage
+):
     """Populate data structures within `dsd`."""
     # Concepts for each dimension of each DSD
     dsd_concepts = ChainMap(
@@ -200,10 +216,11 @@ def prepare_dsd(dsd: m.DataStructureDefinition, sm: msg.StructureMessage):
         concept = dsd_concepts.get(concept_id)
 
         if concept_id == "VARIABLE":
-            d: m.DimensionComponent = m.MeasureDimension(
+            d: m.DimensionComponent = MeasureDimension(
                 id="VARIABLE",
-                name="Variable",
-                description="Reference to a concept from CL_TRANSPORT_MEASURES.",
+                # NB these are not attributes of Component; store as a Concept
+                # name="Variable",
+                # description="Reference to a concept from CL_TRANSPORT_MEASURES.",
                 local_representation=m.Representation(
                     enumerated=sm.concept_scheme["TRANSPORT_MEASURE"]
                 ),
@@ -212,9 +229,7 @@ def prepare_dsd(dsd: m.DataStructureDefinition, sm: msg.StructureMessage):
             raise KeyError(concept_id)
         else:
             # Create the dimension, referring to the concept
-            d = m.Dimension(
-                id=concept_id, name=concept.name, concept_identity=concept, order=order
-            )
+            d = m.Dimension(id=concept_id, concept_identity=concept, order=order)
 
             try:
                 # The dimension is represented by the corresponding code list, if any
@@ -231,15 +246,15 @@ def prepare_dsd(dsd: m.DataStructureDefinition, sm: msg.StructureMessage):
     concept = dsd_concepts.get(dsd.id) or dsd_concepts.get("OBS_VALUE")
     assert concept is not None
 
-    dsd.measures.append(
-        m.PrimaryMeasure(id=concept.id, name=concept.name, concept_identity=concept)
-    )
+    dsd.measures.append(PrimaryMeasure(id=concept.id, concept_identity=concept))
 
     # Assign order to the dimensions
     dsd.dimensions.assign_order()
 
 
-def cr_from(info: dict, dsd: m.DataStructureDefinition) -> m.CubeRegion:
+def cr_from(
+    info: dict, dsd: "sdmx.model.common.BaseDataStructureDefinition"
+) -> m.CubeRegion:
     """Create a :class:`.CubeRegion` from a simple :class:`dict` of `info`."""
     cr = m.CubeRegion(included=info.pop("included", True))
     for dim_id, values in info.items():
@@ -252,16 +267,19 @@ def cr_from(info: dict, dsd: m.DataStructureDefinition) -> m.CubeRegion:
         else:
             included = True
 
-        cr.member[dim] = m.MemberSelection(
+        cr.member[dim] = MemberSelection(
             included=included,
             values_for=dim,
-            values=[m.MemberValue(value=value) for value in values],
+            values=[MemberValue(value=value) for value in values],
         )
 
     return cr
 
 
-def cr_from_anno(obj: m.ContentConstraint, dsd: m.DataStructureDefinition) -> None:
+def cr_from_anno(
+    obj: "sdmx.model.v21.ContentConstraint",
+    dsd: "sdmx.model.common.BaseDataStructureDefinition",
+) -> None:
     """Convert an annotation on `obj` into a :class:`.CubeRegion` constraint."""
     all_info = _pop_anno(obj, "_data_content_region")
 
@@ -272,19 +290,22 @@ def cr_from_anno(obj: m.ContentConstraint, dsd: m.DataStructureDefinition) -> No
         obj.data_content_region.append(cr_from(info, dsd))
 
 
-def dks_from_anno(obj: m.ContentConstraint, dsd: m.DataStructureDefinition) -> None:
+def dks_from_anno(
+    obj: "sdmx.model.v21.ContentConstraint",
+    dsd: "sdmx.model.common.BaseDataStructureDefinition",
+) -> None:
     """Convert an annotation on `obj` into a :class:`.DataKeySet` constraint."""
     info = _pop_anno(obj, "_data_content_keys")
     if info is None:
         return
 
-    dks = m.DataKeySet(included=True, keys=[])
+    dks = DataKeySet(included=True, keys=[])
     for dim_id, values in info.items():
         dim = dsd.dimensions.get(dim_id)
 
         for value in values:
             dks.keys.append(
-                m.DataKey(
+                DataKey(
                     key_value={dim: m.ComponentValue(value_for=dim, value=value)},
                     included=True,
                 )
@@ -294,8 +315,8 @@ def dks_from_anno(obj: m.ContentConstraint, dsd: m.DataStructureDefinition) -> N
 
 
 def merge_general_constraints(
-    cc: m.ContentConstraint,
-    dsd: m.DataStructureDefinition,
+    cc: "sdmx.model.v21.ContentConstraint",
+    dsd: "sdmx.model.common.BaseDataStructureDefinition",
     sm: msg.StructureMessage,
 ) -> None:
     """Merge general constraints from `sm` into `cc` if relevant to `dsd`."""
