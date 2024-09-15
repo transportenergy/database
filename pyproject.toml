@@ -1,0 +1,96 @@
+[build-system]
+requires = ["build", "setuptools-scm"]
+
+[project]
+dynamic = ["version"]
+readme = "README.md"
+authors = [
+  { name = "International Transport Energy Modeling contributors", email = "mail@transportenergy.org" },
+]
+maintainers = [
+  { name = "Paul Natsuo Kishimoto", email = "mail@paul.kishimoto.name" },
+]
+name = "transport-energy"
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Operating System :: OS Independent",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering",
+]
+requires-python = ">=3.8"
+dependencies = [
+  "click",
+  "iam-units",
+  "openpyxl",
+  "pandas",
+  "Pint",
+  "plotnine",
+  "pycountry",
+  "pyyaml",
+  "sdmx1 >= 2.8.0",
+  "setuptools >= 41",
+  "xarray",
+]
+
+[project.urls]
+homepage = "https://github.com/transportenergy/database"
+documentation = "https://transportenergy.readthedocs.io"
+
+[project.optional-dependencies]
+eppa = ["gdx >= 3"]
+hist = ["Jinja2", "requests"]
+tests = [
+  "transport-energy[doc]",
+  "transport-energy[hist]",
+  "pytest",
+  "pytest-cov",
+]
+doc = ["sphinx", "sphinx-rtd-theme"]
+
+[project.scripts]
+item = "item.cli:main"
+
+[tool.coverage.run]
+omit = [
+  "item/historical/legacy.py",
+  "item/model/bp.py",
+  "item/model/cli.py",
+  "item/model/eia.py",
+  "item/model/eppa5.py",
+  "item/model/exxonmobil.py",
+  "item/model/get.py",
+  "item/model/itf.py",
+  "item/model/message.py",
+]
+
+[[tool.mypy.overrides]]
+module = [
+  "gdx",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+addopts = """-m "not slow" --cov=item --cov-report="""
+markers = [
+  "slow: mark a test as slow.",
+  "network: mark a test that requires a network connection.",
+]
+
+[tool.ruff.lint]
+select = ["C9", "E", "F", "I", "W"]
+ignore = ["E501", "W191"]
+# Exceptions:
+# item.model.eppa5.check(): 13
+mccabe.max-complexity = 12
+
+[tool.setuptools.packages]
+find = {}
+
+[tool.setuptools_scm]
