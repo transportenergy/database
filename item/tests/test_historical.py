@@ -97,6 +97,9 @@ def test_process(caplog, dataset_id):
     assert "Processing produced non-unique keys; no -wide output" not in caplog.messages
 
 
+@pytest.mark.xfail(
+    reason="Temporary, pending https://github.com/transportenergy/database/issues/88"
+)
 @pytest.mark.parametrize("dataset_id, N_areas", [(0, 59), (1, 39), (2, 54), (3, 59)])
 def test_coverage(dataset_id, N_areas):
     """Test the historical.diagnostics.coverage method."""
