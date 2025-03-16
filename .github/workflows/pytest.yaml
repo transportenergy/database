@@ -36,6 +36,7 @@ jobs:
         - { python: "3.10", others: "" }
         - { python: "3.11", others: "" }
         - { python: "3.12", others: "" }
+        - { python: "3.13", others: "" }
 
         # TEMPORARY Never run diagnostics
         run-diagnostics:
