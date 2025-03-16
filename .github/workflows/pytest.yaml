@@ -30,7 +30,6 @@ jobs:
         - windows-latest
 
         version:
-        - { python: "3.8",  others: "" }
         # Pint 0.24 with numpy 2.0 compatibility is not available for Python 3.9.
         # Use earlier numpy to be compatible with pint < 0.24.
         - { python: "3.9",  others: "'numpy < 2'" }
