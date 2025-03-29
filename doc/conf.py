@@ -20,7 +20,7 @@
 # -- Project information -----------------------------------------------------
 
 project = "iTEM"
-copyright = "2017–2024, iTEM consortium"
+copyright = "2017–%Y, iTEM consortium"
 author = "iTEM consortium"
 
 
