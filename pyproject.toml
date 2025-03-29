@@ -57,6 +57,12 @@ doc = ["sphinx", "sphinx-rtd-theme"]
 [project.scripts]
 item = "item.cli:main"
 
+[tool.coverage.report]
+exclude_also = [
+  # Imports only used by type checkers
+  "if TYPE_CHECKING:",
+]
+
 [tool.coverage.run]
 omit = [
   "item/historical/legacy.py",
