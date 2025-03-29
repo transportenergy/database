@@ -5,9 +5,6 @@ This module (:mod:`item.historical`) contains the code that implements the `iTEM
 
 See also the :doc:`glossary`, which gives precise terminology used on this page.
 
-.. contents::
-   :local:
-
 .. digraph:: historical_1
    :caption: High-level flow of historical data
 
