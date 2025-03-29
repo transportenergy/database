@@ -2,7 +2,7 @@ Tools for the iTEM databases
 ============================
 
 [![Build Status](https://travis-ci.org/transportenergy/database.svg?branch=master)](https://travis-ci.org/transportenergy/database)
-![Codecov](https://img.shields.io/codecov/c/gh/transportenergy/database.svg)
+[![Codecov](https://img.shields.io/codecov/c/gh/transportenergy/database.svg)](https://codecov.io/gh/transportenergy/database)
 [![Documentation Status](https://readthedocs.org/projects/transportenergy/badge/?version=latest)](https://transportenergy.readthedocs.io/en/latest/?badge=latest)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4271789.svg)](https://doi.org/10.5281/zenodo.4271789)
 
