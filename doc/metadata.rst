@@ -9,8 +9,6 @@ To make use of these files:
 - Install :mod:`item` and use its methods to retrieve the files in useful Python data formats.
 - Include this repository as a `git submodule <https://git-scm.com/book/en/v2/Git-Tools-Submodules>`_—as is done in the transportenergy/database repo used to build the :mod:`item` package and this documentation.
 
-.. contents::
-   :local:
 
 .. _structure-xml:
 

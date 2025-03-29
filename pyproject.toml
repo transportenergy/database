@@ -44,6 +44,7 @@ homepage = "https://github.com/transportenergy/database"
 documentation = "https://transportenergy.readthedocs.io"
 
 [project.optional-dependencies]
+doc = ["furo", "Sphinx"]
 eppa = ["gdx >= 3"]
 hist = ["Jinja2", "requests"]
 tests = [
@@ -52,7 +53,6 @@ tests = [
   "pytest",
   "pytest-cov",
 ]
-doc = ["sphinx", "sphinx-rtd-theme"]
 
 [project.scripts]
 item = "item.cli:main"
