@@ -17,14 +17,14 @@ classifiers = [
   "Intended Audience :: Science/Research",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Topic :: Scientific/Engineering",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dependencies = [
   "click",
   "iam-units",
@@ -56,6 +56,12 @@ doc = ["sphinx", "sphinx-rtd-theme"]
 
 [project.scripts]
 item = "item.cli:main"
+
+[tool.coverage.report]
+exclude_also = [
+  # Imports only used by type checkers
+  "if TYPE_CHECKING:",
+]
 
 [tool.coverage.run]
 omit = [

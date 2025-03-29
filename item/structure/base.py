@@ -3,7 +3,6 @@ from typing import Any, Dict, List
 from sdmx.model.common import (
     Agency,
     AgencyScheme,
-    Annotation,
     Code,
     Concept,
     ConceptScheme,
@@ -11,7 +10,7 @@ from sdmx.model.common import (
     ConstraintRoleType,
     Contact,
 )
-from sdmx.model.v21 import ContentConstraint, DataStructureDefinition
+from sdmx.model.v21 import Annotation, ContentConstraint, DataStructureDefinition
 
 #: Current version of all data structures.
 #:

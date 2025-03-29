@@ -13,7 +13,7 @@ Next release
 
 - Add :mod:`.A001` and :mod:`.A002` historical quality diagnostics (:pull:`74`).
 - Adjust for compatibility with `NumPy 2 <https://numpy.org/doc/stable/release/2.0.0-notes.html>`_ (:pull:`87`).
-
+- Drop support for Python version 3.8, which has reached EOL; test and declare support for Python 3.13 (:pull:`93`).
 
 v2021.5.4
 =========

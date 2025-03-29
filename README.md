@@ -2,7 +2,7 @@ Tools for the iTEM databases
 ============================
 
 [![Build Status](https://travis-ci.org/transportenergy/database.svg?branch=master)](https://travis-ci.org/transportenergy/database)
-![Codecov](https://img.shields.io/codecov/c/gh/transportenergy/database.svg)
+[![Codecov](https://img.shields.io/codecov/c/gh/transportenergy/database.svg)](https://codecov.io/gh/transportenergy/database)
 [![Documentation Status](https://readthedocs.org/projects/transportenergy/badge/?version=latest)](https://transportenergy.readthedocs.io/en/latest/?badge=latest)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4271789.svg)](https://doi.org/10.5281/zenodo.4271789)
 
@@ -21,7 +21,7 @@ For details on installation, usage, contributing, etc., see the **online documen
 License
 -------
 
-Copyright © 2017–2024, [iTEM contributors](https://github.com/transportenergy/database/graphs/contributors)
+Copyright © 2017–2025, [iTEM contributors](https://github.com/transportenergy/database/graphs/contributors)
 
 Licensed under the GNU General Public License, version 3.
 The full text of the license is available in the file `LICENSE`.

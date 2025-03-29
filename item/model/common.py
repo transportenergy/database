@@ -182,7 +182,7 @@ def select(data, *args, **kwargs):
     # Process arguments
     if len(args) > 1:
         raise ValueError(
-            ("can't determine dimensions for >1 positional " "arguments: {}").format(
+            ("can't determine dimensions for >1 positional arguments: {}").format(
                 " ".join(args)
             )
         )

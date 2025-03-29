@@ -66,9 +66,9 @@ FIX_32 = False
 def check(df):
     """Check data set T001."""
     # Input data contain only the expected variable name
-    assert df["Variable"].unique() == [
-        "Coastal shipping (national transport)"
-    ], "Values in 'Variable' column"
+    assert df["Variable"].unique() == ["Coastal shipping (national transport)"], (
+        "Values in 'Variable' column"
+    )
 
     # Input data have the expected units
     assert df["PowerCode"].unique() == ["Millions"], "Values in 'PowerCode' column"
