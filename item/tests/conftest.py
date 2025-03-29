@@ -14,7 +14,7 @@ def pytest_addoption(parser):
     )
 
 
-def pytest_report_header(config, startdir):
+def pytest_report_header(config, start_path):
     msg = "OpenKAPSARC API key: "
     msg += "present" if "OK_API_KEY" in os.environ else "MISSING"
     return msg
