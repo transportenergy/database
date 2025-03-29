@@ -179,9 +179,9 @@ epub_exclude_files = ["search.html"]
 # -- Options for sphinx.ext.extlinks ---------------------------------------------------
 
 extlinks = {
-    "issue": ("https://github.com/transportenergy/database/issues/%s", "#"),
-    "pull": ("https://github.com/transportenergy/database/pull/%s", "PR #"),
-    "gh-user": ("https://github.com/%s", "@"),
+    "issue": ("https://github.com/transportenergy/database/issues/%s", "#%s"),
+    "pull": ("https://github.com/transportenergy/database/pull/%s", "PR #%s"),
+    "gh-user": ("https://github.com/%s", "@%s"),
 }
 
 # -- Options for sphinx.ext.graphviz ---------------------------------------------------
