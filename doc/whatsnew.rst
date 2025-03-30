@@ -3,8 +3,11 @@
 What's new?
 ***********
 
-Next release
-============
+.. Next release
+.. ============
+
+v2025.3.30
+==========
 
 - Add :mod:`.A001` and :mod:`.A002` historical quality diagnostics (:pull:`74`).
 - Adjust for compatibility with `NumPy 2 <https://numpy.org/doc/stable/release/2.0.0-notes.html>`_ (:pull:`87`).
