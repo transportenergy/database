@@ -3,8 +3,11 @@
 What's new?
 ***********
 
-Next release
-============
+.. Next release
+.. ============
+
+v2025.3.31
+==========
 
 - Bug fix: the v2025.3.30 release omitted some package data files, leading to issues like :issue:`96` (:pull:`97`).
 
