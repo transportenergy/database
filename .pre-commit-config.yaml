@@ -18,7 +18,6 @@ repos:
     - types-PyYAML
     - types-python-dateutil
     - types-requests
-    - types-setuptools
     - xarray
     args: []
 - repo: https://github.com/astral-sh/ruff-pre-commit

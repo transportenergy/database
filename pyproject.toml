@@ -1,5 +1,6 @@
 [build-system]
-requires = ["build", "setuptools-scm"]
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
 
 [project]
 dynamic = ["version"]
@@ -35,13 +36,12 @@ dependencies = [
   "pycountry",
   "pyyaml",
   "sdmx1 >= 2.8.0",
-  "setuptools >= 41",
   "xarray",
 ]
 
 [project.urls]
-homepage = "https://github.com/transportenergy/database"
-documentation = "https://transportenergy.readthedocs.io"
+Homepage = "https://github.com/transportenergy/database"
+Documentation = "https://transportenergy.readthedocs.io"
 
 [project.optional-dependencies]
 doc = ["furo", "Sphinx"]
@@ -76,6 +76,13 @@ omit = [
   "item/model/message.py",
 ]
 
+[tool.hatch.build.targets.wheel]
+packages = ["item"]
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+
 [[tool.mypy.overrides]]
 module = [
   "gdx",
@@ -95,8 +102,3 @@ ignore = ["E501", "W191"]
 # Exceptions:
 # item.model.eppa5.check(): 13
 mccabe.max-complexity = 12
-
-[tool.setuptools.packages]
-find = {}
-
-[tool.setuptools_scm]
