@@ -3,8 +3,10 @@
 What's new?
 ***********
 
-.. Next release
-.. ============
+Next release
+============
+
+- Bug fix: the v2025.3.30 release omitted some package data files, leading to issues like :issue:`96` (:pull:`97`).
 
 v2025.3.30
 ==========
@@ -22,7 +24,6 @@ v2021.5.4
 - Increase minimum Python version to 3.7 and ensure compatibility (:issue:`41`, :pull:`43`).
 - Add the :doc:`glossary` page (:pull:`42`).
 - Correct an error in the input data for :mod:`.T001` (:issue:`32`, :pull:`40`).
-
 
 v2020.11.13
 ===========
