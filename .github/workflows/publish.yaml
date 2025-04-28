@@ -32,7 +32,7 @@ jobs:
         submodules: true
     - uses: astral-sh/setup-uv@v6
       with:
-        cache-dependency-glob: "**/pyproject.toml"
+        enable-cache: true
         python-version: ${{ env.python-version }}
     - run: uv build
     - run: uv publish --trusted-publishing=always
