@@ -6,8 +6,10 @@ from typing import TYPE_CHECKING, List, cast
 
 import numpy as np
 import sdmx.message as msg
+import sdmx.urn
 from sdmx import Client
 from sdmx.model import common as m
+from sdmx.model import v21
 from sdmx.model.v21 import (
     DataKey,
     DataKeySet,
@@ -136,6 +138,92 @@ def generate() -> msg.StructureMessage:
             obj.is_external_reference = False
 
     return sm
+
+
+def make_iamc_variable_cl(
+    sm: msg.StructureMessage,
+    source: str,
+    *,
+    format_id=None,
+    locale: str = "en",
+    use_constraint: bool = True,
+) -> "sdmx.model.v21.Codelist":
+    """Create a code list for the IAMC 'VARIABLE' concept/dimension from a `source` DFD.
+
+    Adds to `sm` and returns a new Codelist. The codelist contains 1 code for every
+    valid key in the the dataflow referred to by `source`.
+
+    Parameters
+    ----------
+    format_id :
+        Callback to format the code ID.
+    locale :
+        Locale (~language), such as "en", for formatting names.
+    use_constraint :
+        if :any:`True`, the default, retrieve and use a ContentConstraint from `sm`
+        that applies to the source DFD or DSD.
+    """
+    # Default `format_id` callback
+    if format_id is None:
+        format_id = str
+
+    # Retrieve the DSD
+    dsd: "sdmx.model.v21.DataStructureDefinition" = sm.structure[source]
+
+    # Ensure a URN
+    # FIXME Move upstream to where the dsd is created
+    dsd.urn = sdmx.urn.make(dsd)
+
+    # Retrieve a constraint that affects this DSD
+    # FIXME this duplicates code in merge_dsd(); deduplicate
+    cc = None
+    if use_constraint:
+        ccs = [cc for cc in sm.constraint.values() if dsd in cc.content]
+        assert len(ccs) <= 1
+        cc = ccs[0] if len(ccs) and len(ccs[0].data_content_region) else None
+
+    # Dimensions other than REF_AREA (→ IAMC 'REGION'), TIME_PERIOD (→ IAMC 'YEAR')
+    dims = list(
+        filter(lambda d: d.id not in ("REF_AREA", "TIME_PERIOD"), dsd.dimensions)
+    )
+
+    # Identify the measure quantity based on the structure ID
+    # FIXME Set this association within the DSD itself, and retrieve from there
+    cs_measure = sm.concept_scheme["CS_TRANSPORT_MEASURE"]
+    c_measure = cs_measure[source]
+
+    # Create the new codelist
+    cl_new: "m.Codelist" = m.Codelist(
+        id=f"CL_IAMC_VARIABLE_{source}",
+        annotations=[v21.Annotation(id="original-ds-urn", text=dsd.urn)],
+    )
+
+    # Use the localized name of the measure concept as the first part of the variable
+    var = f"{c_measure.name.localizations[locale]}"
+
+    # Iterate over keys
+    for key in dsd.iter_keys(constraint=cc):
+        # Parts for Code.id
+        id_parts = [var] + [key[d].value.id for d in dims]
+
+        # Parts to save in an annotation
+        key_parts = dict((d, kv.value.id) for d, kv in key.values.items() if d in dims)
+
+        # Create the Code.id
+        new_id = format_id("|".join(id_parts))
+
+        # Create a Code with the new ID and an annotation
+        cl_new.setdefault(
+            id=new_id,
+            annotations=[
+                v21.Annotation(id="original-key-values", text=repr(key_parts))
+            ],
+        )
+
+    # Add to the existing StructureMessage
+    sm.add(cl_new)
+
+    return cl_new
 
 
 def merge_dsd(
