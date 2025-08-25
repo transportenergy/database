@@ -1,3 +1,0 @@
-[submodule "data"]
-	path = item/data
-	url = https://github.com/transportenergy/metadata.git
