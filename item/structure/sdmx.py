@@ -220,9 +220,9 @@ def prepare_dsd(
                 id="VARIABLE",
                 # NB these are not attributes of Component; store as a Concept
                 # name="Variable",
-                # description="Reference to a concept from CL_TRANSPORT_MEASURES.",
+                # description="Reference to a concept from CS_TRANSPORT_MEASURES.",
                 local_representation=m.Representation(
-                    enumerated=sm.concept_scheme["TRANSPORT_MEASURE"]
+                    enumerated=sm.concept_scheme["CS_TRANSPORT_MEASURE"]
                 ),
             )
         elif concept is None:

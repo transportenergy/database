@@ -137,7 +137,7 @@ CS_MODELING.extend(
 )
 
 CS_TRANSPORT_MEASURE = ConceptScheme(
-    id="TRANSPORT_MEASURE",
+    id="CS_TRANSPORT_MEASURE",
     description="Concepts used as measures in transport data.",
 )
 CS_TRANSPORT_MEASURE.extend(
