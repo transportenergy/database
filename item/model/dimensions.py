@@ -1,11 +1,15 @@
-from collections import OrderedDict
+from collections.abc import Sequence
+from functools import cache
+from itertools import chain
 from os.path import join
-from typing import Dict
+from typing import TYPE_CHECKING, Dict
 
 import pandas as pd
-import yaml
 
 from item.common import paths
+
+if TYPE_CHECKING:
+    from sdmx.model.common import Code
 
 # Metadata on database dimensions
 INFO: Dict[str, dict] = {}
@@ -24,8 +28,8 @@ INDEX = [
 
 # Constants, for e.g. select()
 ALL = "All"
-PAX = None
-FREIGHT = None
+PAX: frozenset[str] = frozenset()
+FREIGHT: frozenset[str] = frozenset()
 
 
 def check(A, out_file):
@@ -53,44 +57,57 @@ def check(A, out_file):
 
 
 def load():
+    from . import structure
+
     global PAX, FREIGHT
 
-    # Read the lists of allowable labels for each data dimension
-    data = OrderedDict()
-    path = paths["data"].joinpath("model", "dimensions")
-    for k in ["variable", "mode", "technology", "fuel", "match"]:
-        with open(path.joinpath(k).with_suffix(".yaml"), encoding="utf-8") as f:
-            data[k] = yaml.safe_load(f)
-    variable, mode, tech, fuel, match = data.values()
+    # Retrieve codelists for each data dimension
+    INFO["fuel"] = structure.get_cl_fuel()
+    mode = INFO["mode"] = structure.get_cl_mode()
+    INFO["technology"] = structure.get_cl_technology()
+    INFO["variable"] = structure.get_cl_measure()
 
     # Sets of modes, for convenience
-    all_modes = frozenset(mode.keys())
-    pax_modes = frozenset(
-        [m for m, info in mode.items() if info["type"] == "passenger"]
-    )
-    PAX = pax_modes
-    freight_modes = all_modes - pax_modes
-    FREIGHT = freight_modes
+    all_modes, pax_modes, freight_modes = set(), set(), set()
+    for m in mode:
+        try:
+            service = str(m.get_annotation(id="SERVICE").text)
+        except KeyError:
+            pass
+        else:
+            if service == "passenger":
+                pax_modes.add(m.id)
+            elif service == "freight":
+                freight_modes.add(m.id)
+        all_modes.add(m.id)
 
-    # Read allowable combinations of data dimensions
-    # *mode_tech* and *tech_fuel* are now dictionaries mapping from labels on
-    # one dimension to allowable labels on the next dimension
+    PAX = frozenset(pax_modes)
+    FREIGHT = frozenset(freight_modes)
+    INFO.update(modes_all=frozenset(all_modes))
 
-    # mode → technology
-    mode_tech = match["mode_technology"]
-    for t in mode_tech.values():
-        t = tuple(["All"] + list(t))
-    mode_tech["All"] = ["All"]
 
-    tech_fuel = match["technology_fuel"]
-    for f in tech_fuel.items():
-        f = tuple(["All"] + list(f))
-    tech_fuel["All"] = ["All"]
-
-    INFO.update(data)
-    INFO.update(
-        {"modes_all": all_modes, "mode_tech": mode_tech, "tech_fuel": tech_fuel}
-    )
+#: Exclusions for :func:`generate`.
+EXCLUDE_MODE = {
+    "ef_bc": {"Freight Rail and Air and Ship"},
+    "intensity_service": {"Freight Rail and Air and Ship"},
+    "tkm": {"Freight Rail and Air and Ship"},
+    "ttw_bc": {"Freight Rail and Air and Ship"},
+    "ttw_ch4": {"Freight Rail and Air and Ship"},
+    "ttw_co2e": {"Freight Rail and Air and Ship"},
+    "ttw_n2o": {"Freight Rail and Air and Ship"},
+    "ttw_pm2.5": {"Freight Rail and Air and Ship", "International Shipping"},
+    "vkt": {"Freight Rail and Air and Ship"},
+    "wtt_co2e": {
+        "Domestic Shipping",
+        "Freight Rail and Air and Ship",
+        "International Shipping",
+    },
+    "wtw_co2e": {
+        "Domestic Shipping",
+        "Freight Rail and Air and Ship",
+        "International Shipping",
+    },
+}
 
 
 def generate():
@@ -98,56 +115,59 @@ def generate():
     # Generate the list of quantities
     index = []
 
-    # Iterate through each variable, in order
-    for name, var_info in INFO["variable"].items():
-        # Determine which modes are reported for this variable
-        if var_info.get("global", False):
-            # First eight are global quantities—only 'All' modes
-            modes = {}
-        else:
-            # Some variables are only for either passenger or freight modes
-            var_type = var_info.get("type", None)
+    @cache
+    def _tf(technology: "Code") -> Sequence[tuple[str, str]]:
+        """Return a sequence of valid (t, f) indices for `technology`."""
+        result = []
 
-            if var_type == "passenger":
+        for f in technology.eval_annotation(id="FUEL") or INFO["fuel"]:
+            result.append((technology.id, f))
+        return tuple(result)
+
+    @cache
+    def _mtf(mode: "Code") -> Sequence[tuple[str, str, str]]:
+        """Return a sequence of valid (m, t, f) indices for `mode`."""
+        result: list[tuple[str, str, str]] = []
+
+        for t in mode.eval_annotation(id="TECHNOLOGY") or INFO["technology"]:
+            t_code = INFO["technology"][t]
+            result.extend((mode.id, t, f) for (t, f) in _tf(t_code))
+
+        return tuple(result)
+
+    # Iterate through each measure concept, in order
+    for measure in INFO["variable"]:
+        # Retrieve information from annotations
+        global_ = measure.eval_annotation(id="is-global")
+        u = str(measure.get_annotation(id="UNIT_MEASURE").text)
+
+        # Determine which modes are relevant for this measures
+        modes = {m.id for m in INFO["mode"]}
+        if not global_:
+            # Some measures are relevant only for either passenger or freight modes
+            try:
+                service = str(measure.get_annotation(id="SERVICE").text)
+            except KeyError:
+                service = None
+
+            if service == "passenger":
                 modes = set(PAX)
-            elif var_type == "freight":
+            elif service == "freight":
                 modes = set(FREIGHT)
-            elif name == "intensity_new":
-                # A specific subset is used for this variable
+            elif measure.id == "intensity_new":
+                # A specific subset is used for this measure
                 modes = {"2W", "Aviation", "Bus", "HDT", "LDV", "Passenger Rail"}
-            else:
-                # Other variables are reported for all modes, minus the
-                # exclusions below
-                modes = set(INFO["modes_all"])
 
-            # Further exclusions from some variables
-            if name in [
-                "ef_bc",
-                "intensity_service",
-                "tkm",
-                "ttw_bc",
-                "ttw_ch4",
-                "ttw_co2e",
-                "ttw_n2o",
-                "ttw_pm2.5",
-                "vkt",
-                "wtt_co2e",
-                "wtw_co2e",
-            ]:
-                modes -= {"Freight Rail and Air and Ship"}
+            # Further exclude
+            modes -= EXCLUDE_MODE.get(measure.id, set())
 
-            if name in ["ttw_pm2.5", "wtt_co2e", "wtw_co2e"]:
-                modes -= {"International Shipping"}
+        # Convert set of mode IDs to a list of codes
+        m_codes = [INFO["mode"][m] for m in modes]
 
-            if name in ["wtt_co2e", "wtw_co2e"]:
-                modes -= {"Domestic Shipping"}
-
-        # Add one entry to quantities for each allowable combination of
-        # dimensions
-        for m in ["All"] + sorted(modes):
-            for t in INFO["mode_tech"][m]:
-                for f in INFO["tech_fuel"][t]:
-                    index.append([name, m, t, f, var_info["unit"]])
+        # Add one entry to quantities for each allowable combination of dimensions
+        index.extend(
+            [measure.id, m, t, f, u] for (m, t, f) in chain(*map(_mtf, m_codes))
+        )
 
     # Combine into a single table and return
     index = pd.DataFrame(
