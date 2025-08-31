@@ -5,6 +5,8 @@ the concept/dimension ``FOO``. The code lists were previously stored in/processe
 YAML files in a custom format, stored in the ``transportenergy/metadata`` repository.
 """
 
+from functools import cache
+
 from sdmx.model import common, v21
 
 
@@ -233,6 +235,62 @@ def get_cl_measure() -> "common.Codelist":
         description="well-to-wheel (i.e., lifecycle) emissions of all Kyoto GHGs (in terms of CO2-equivalent emissions)",
         annotations=[u("Mt CO₂-eq / year")],
     )
+    return cl
+
+
+@cache
+def get_cl_region() -> "common.Codelist":
+    """Return a code list of model regions.
+
+    This structural metadata was formerly in :file:`data/model/regions.yaml`.
+    """
+    cl: "common.Codelist" = common.Codelist(id="CL_REGION")
+
+    def _add(id, children: str):
+        parent = cl.setdefault(id=id)
+        for child_id in children.split():
+            parent.append_child(cl.setdefault(id=child_id))
+
+    _add(
+        "Africa",
+        """AGO BDI BEN BFA BWA CAF CIV CMR COD COG COM CPV DJI DZA ERI ESH ETH GAB GHA
+        GIN GMB GNB GNQ KEN LBR LBY LSO MAR MDG MLI MOZ MRT MUS MWI NAM NER NGA REU RWA
+        SDN SEN SLE SOM STP SWZ TCD TGO TUN TZA UGA ZAF ZMB ZWE""",
+    )
+    _add("Australia", "AUS")
+    _add("Brazil", "BRA")
+    _add("Canada", "CAN")
+    _add("China", "CHN HKG MAC TWN")
+    _add(
+        "EU-27",
+        """AUT BEL BGR CYP CZE DEU DNK ESP EST FIN FRA GBR GRC GRL HRV HUN IRL ITA LTU
+        LUX LVA MLT NLD POL PRT ROM ROU SVK SVN SWE""",
+    )
+    _add("India", "IND")
+    _add("Japan", "JPN")
+    _add("Mexico", "MEX")
+    _add("Middle East", "ARE BHR EGY IRN IRQ ISR JOR KWT LBN OMN PSE QAT SAU SYR YEM")
+    _add(
+        "Non-EU Europe",
+        """ALB AND ARM AZE BIH BLR CHE CHI FRO GEO GIB IMN ISL LIE MCO MDA MKD MNE NOR
+        SCG SHN SJM SMR SPM SRB TCA TUR UKR VAT WLF YUG""",
+    )
+    _add(
+        "Other Asia-Pacific",
+        """AFG ASM BGD BRN BTN CCK COK CXR FJI FSM GUM IDN KAZ KGZ KHM KIR LAO LKA MDV
+        MHL MMR MNG MNP MYS MYT NCL NFK NIU NPL NRU NZL PAK PCI PCN PHL PLW PNG PRK PYF
+        SGP SLB SYC THA TJK TKL TKM TLS TON TUV UZB VNM VUT WSM""",
+    )
+    _add(
+        "Other Latin America",
+        """ABW AIA ANT ARG ATG BHS BLZ BMU BOL BRB CHL COL CRI CUB CYM DMA DOM ECU FLK
+        GLP GRD GTM GUF GUY HND HTI JAM KNA LCA MSR MTQ NIC PAN PER PRY SLV SUR TTO URY
+        VCT VEN VGB VIR""",
+    )
+    _add("Russia", "RUS")
+    _add("South Korea", "KOR")
+    _add("U.S.", "PRI USA")
+
     return cl
 
 
