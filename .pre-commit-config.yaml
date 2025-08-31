@@ -5,6 +5,7 @@ repos:
   - id: mypy
     additional_dependencies:
     - click
+    - filelock
     - iam-units
     - Jinja2
     - lxml-stubs
