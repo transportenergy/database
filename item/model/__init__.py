@@ -1,19 +1,30 @@
 import errno
 import os
 import pickle
+from collections.abc import Mapping
 from importlib import import_module
 from os import makedirs
 from os.path import join
-from typing import Dict
+from typing import TYPE_CHECKING
 
 import pandas as pd
 import pycountry
+import sdmx.model.common
 import xarray as xr
 import yaml
 
 from item.common import log, paths
 from item.model.common import as_xarray, concat_versions, select, tidy, to_wide
 from item.model.dimensions import INDEX, load_template
+from item.util import metadata_repo_file
+
+from . import structure
+
+if TYPE_CHECKING:
+    from sdmx.model.common import Codelist
+
+    from .common import ModelInfo
+
 
 __all__ = [
     "concat_versions",
@@ -32,8 +43,23 @@ __all__ = [
 # Versions of the database
 VERSIONS = [1, 2]
 
-# Information about the models
-MODELS: Dict[str, dict] = {}
+#: Information about the models.
+MODELS: dict[str, "ModelInfo"] = {}
+
+#: List of submodule names containing :class:`.ModelInfo` instances.
+SUBMODULES = [
+    "bp",
+    "eia",
+    "eppa5",
+    "gcam",
+    "get",
+    "itf",
+    "message",
+    "momo",
+    "roadmap",
+    "shell",
+    "statoil",
+]
 
 
 def coverage(models):
@@ -96,30 +122,26 @@ def coverage(models):
     df.to_csv(os.path.join(paths["model data"], "output", "coverage.csv"))
 
 
-def get_model_info(name, version):
+def get_model_info(name: str, version: int) -> "ModelInfo":
     load_models_info()
 
     try:
         model_info = MODELS[name]
-        if version in model_info["versions"]:
+        if version in model_info.versions:
             return model_info
         else:
             raise ValueError(
-                "model '{}' not present in database version {}".format(name, version)
+                f"model {name!r} not present in database version {version}"
             )
     except KeyError:
-        raise ValueError(f"Model {repr(name)} not among {MODELS.keys()}")
+        raise ValueError(f"Model {name!r} not among {MODELS.keys()}")
 
 
-def get_model_names(version=VERSIONS[-1]):
+def get_model_names(version: int = VERSIONS[-1]) -> list[str]:
     """Return the names of all models in *version*."""
     load_models_info()
 
-    result = []
-    for name, info in MODELS.items():
-        if version in info["versions"]:
-            result.append(name)
-    return result
+    return [m.id for m in MODELS.values() if version in m.versions]
 
 
 def process_raw(version, models):
@@ -258,7 +280,7 @@ def load_model_data(
         return data
 
 
-def load_models_info():
+def load_models_info() -> None:
     """Load the models metadata into the MODELS global."""
     global MODELS
 
@@ -266,19 +288,19 @@ def load_models_info():
         # Already loaded
         return
 
-    with open(join(paths["data"], "model", "models.yaml")) as f:
-        MODELS = yaml.safe_load(f)
+    for id_ in SUBMODULES:
+        module = import_module(f"{__name__}.{id_}")
+        MODELS[id_] = getattr(module, "INFO")
 
 
-def load_model_regions(name, version):
+def load_model_regions(name: str, version: int) -> "Codelist":
     """Load regions.yaml for model *name* in database *version*.
 
     Returns a dictionary where:
     - Keys are codes or names of model regions.
     - Values are dictionaries with the keys:
       - description (optional): a longer name or description of the region
-      - countries: a list of ISO 3166 alpha-3 codes for countries in the
-        region.
+      - countries: a list of ISO 3166 alpha-3 codes for countries in the region.
     """
     # IDEA load from either regions-1.yaml or regions-2.yaml
     try:
@@ -287,12 +309,23 @@ def load_model_regions(name, version):
         if name.lower() == "item":
             # Use an empty path in the join() call below; this causes the
             # overall regions.yaml to be loaded
-            name = ""
+            return structure.get_cl_region()
         else:
             raise
+    else:
+        with open(metadata_repo_file("model", name, "regions.yaml")) as f:
+            return regions_yaml_to_codelist(yaml.safe_load(f))
 
-    with open(join(paths["data"], "model", name, "regions.yaml")) as f:
-        return yaml.safe_load(f)
+
+def regions_yaml_to_codelist(data: Mapping) -> "Codelist":
+    """Convert contents of a :file:`regions.yaml` to an SDMX Codelist."""
+    cl: "Codelist" = sdmx.model.common.Codelist(id="CL_REGION")
+    for id_, region_data in data.items():
+        code = cl.setdefault(id=id_)
+        # Add children, 1 for each member of the "countries:" key
+        for child_id in region_data["countries"]:
+            code.append_child(cl.setdefault(id=child_id))
+    return cl
 
 
 def load_model_scenarios(name, version):
@@ -308,30 +341,28 @@ def load_model_scenarios(name, version):
     # Don't do anything with the return value; just check arguments
     get_model_info(name, version)
 
-    with open(join(paths["data"], "model", name, "scenarios.yaml")) as f:
+    with open(metadata_repo_file("model", name, "scenarios.yaml")) as f:
         return yaml.safe_load(f)[version]
 
 
 def make_regions_csv(out_file, models=None, compare=None):
     """Produce a CSV *out_file* with a country→region map for *models*.
 
-    The table is created by parsing the regions.yaml files in the iTEM model
-    database metadata. It is indexed by ISO 3166 (alpha-3) codes, and has one
-    column for each model in *models* (if no models are specified, all models
-    are included).
+    The table is created by parsing the regions.yaml files in the iTEM model database
+    metadata. It is indexed by ISO 3166 (alpha-3) codes, and has one column for each
+    model in *models* (if no models are specified, all models are included).
 
-    If *compare* is given, the table has entries only where the generated
-    value and
+    If *compare* is given, the table has entries only where the generated value and
     """
     version = VERSIONS[-1]  # Version 2 only
 
     models = models or get_model_names(version)
 
     def _load(name):
-        def _invert(data):
+        def _invert(codelist) -> dict[str, str]:
             result = {}
-            for k, v in data.items():
-                result.update({c: k for c in v["countries"]})
+            for region in codelist:
+                result.update({c.id: region.id for c in region.child})
             return result
 
         return pd.Series(
