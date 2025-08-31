@@ -1,8 +1,9 @@
 """Common code for data input."""
 
+from dataclasses import dataclass, field
 from logging import DEBUG
 from os.path import join
-from typing import Dict
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -14,8 +15,30 @@ from item.model.dimensions import INDEX
 from item.util import metadata_repo_file
 
 # Information about the models
-MODELS: Dict[str, dict] = {}
+MODELS: dict[str, dict] = {}
 SCENARIOS = None
+
+
+@dataclass
+class ModelInfo:
+    """Information about a model.
+
+    This dataclass replaces entries previously in :file:`data/model/models.yaml`.
+    """
+
+    id: str
+    format: str
+    versions: tuple[int, ...] = field(default_factory=tuple)
+
+    name: Optional[str] = None
+
+    citation: Optional[str] = None
+    #: URL for model documentation.
+    model_url: Optional[str] = None
+    #: Organization name.
+    org: Optional[str] = None
+    #: Organization contact URL.
+    org_url: Optional[str] = None
 
 
 def as_xarray(data, version, fmt):

@@ -1,5 +1,14 @@
 import pandas as pd
 
+from .common import ModelInfo
+
+INFO = ModelInfo(
+    id="eia",
+    format="xlsx",
+    org="United States Department of Energy (DoE) Energy Information Administration (EIA)",
+    versions=(2, 3),
+)
+
 
 def import_data(data_path, metadata_path):
     input_fn = data_path

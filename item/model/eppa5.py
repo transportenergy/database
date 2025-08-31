@@ -4,7 +4,30 @@ import pandas as pd
 import pint
 import yaml
 
-from .common import log
+from .common import ModelInfo, log
+
+INFO = ModelInfo(
+    id="eppa5",
+    citation="""
+@report{chen-yh-2015,
+  author = {Y.-H. Henry Chen and Sergey Paltsev and John M. Reilly and Jennifer F. Morris and Mustafa H. Babiker},
+  eprint = {1721.1/95765},
+  eprinttype = {hdl},
+  institution = {MIT Joint Program on the Science and Policy of Global Change},
+  location = {Cambridge, MA, US},
+  month = {3},
+  number = {278},
+  title = {{The MIT EPPA 6 Model: Economic Growth, Energy Use, and Food Consumption}},
+  type = {JP Report},
+  year = {2015}
+}""",
+    format="gdx",
+    name="Emissions Prediction & Policy Analysis (EPPA)",
+    model_url="http://globalchange.mit.edu/research/IGSM#economics",
+    org="Massachusetts Institute of Technology (MIT) Joint Program on the Science & Policy of Global Change (JP)",
+    org_url="http://globalchange.mit.edu",
+    versions=(2,),
+)
 
 
 def country_map(path):
