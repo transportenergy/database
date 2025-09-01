@@ -2,6 +2,14 @@ import pandas as pd
 
 from item.common import log
 
+from .common import ModelInfo
+
+INFO = ModelInfo(
+    id="itf",
+    format="xlsx",
+    versions=(2,),
+)
+
 
 def import_data(data_path, metadata_path):
     input_fn = data_path

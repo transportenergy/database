@@ -3,8 +3,17 @@
 What's new?
 ***********
 
-.. Next release
-.. ============
+Next release
+============
+
+- Drop submodule/packaging of transportenergy/metadata (:pull:`99`);
+  instead, fetch these files over the network and cache them.
+- New class :class:`.ModelInfo` (:pull:`99`),
+  replacing an old/unspecified YAML syntax for information about participating models.
+  Instances of this class are in submodules of :mod:`item.model`,
+  including 5 new submodules.
+- New :func:`.structure.sdmx.make_iamc_variable_cl` (:pull:`99`).
+- New :func:`.util.metadata_repo_file` (:pull:`99`).
 
 v2025.3.31
 ==========

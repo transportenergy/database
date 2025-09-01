@@ -1,20 +1,44 @@
 """Common code for data input."""
 
+from dataclasses import dataclass, field
 from logging import DEBUG
 from os.path import join
-from typing import Dict
+from typing import Optional
 
 import numpy as np
 import pandas as pd
 import xarray as xr
 import yaml
 
-from item.common import log, paths
+from item.common import log
 from item.model.dimensions import INDEX
+from item.util import metadata_repo_file
 
 # Information about the models
-MODELS: Dict[str, dict] = {}
+MODELS: dict[str, dict] = {}
 SCENARIOS = None
+
+
+@dataclass
+class ModelInfo:
+    """Information about a model.
+
+    This dataclass replaces entries previously in :file:`data/model/models.yaml`.
+    """
+
+    id: str
+    format: str
+    versions: tuple[int, ...] = field(default_factory=tuple)
+
+    name: Optional[str] = None
+
+    citation: Optional[str] = None
+    #: URL for model documentation.
+    model_url: Optional[str] = None
+    #: Organization name.
+    org: Optional[str] = None
+    #: Organization contact URL.
+    org_url: Optional[str] = None
 
 
 def as_xarray(data, version, fmt):
@@ -131,13 +155,13 @@ def load():
     """Load model & scenario data."""
     global SCENARIOS
 
-    with open(join(paths["data"], "model", "models.yaml")) as f:
+    with open(metadata_repo_file("model", "model.yaml")) as f:
         MODELS = yaml.load(f, Loader=yaml.SafeLoader)
 
     # Load scenario information
     scenarios = []
     for model in MODELS:
-        fn = join(paths["data"], "model", model, "scenarios.yaml")
+        fn = join(metadata_repo_file("model", model, "scenarios.yaml"))
         try:
             with open(fn) as f:
                 m_s = yaml.load(f, Loader=yaml.SafeLoader)
@@ -225,6 +249,3 @@ def select(data, *args, **kwargs):
 def to_wide(data, dimension="year"):
     """Convert *data* to wide format, one column per year."""
     return data.set_index(INDEX + ["year"])["value"].unstack(dimension)
-
-
-load()

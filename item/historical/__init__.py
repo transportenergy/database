@@ -9,16 +9,18 @@ from typing import Dict, Optional, Union
 import pandas as pd
 import pycountry
 import yaml
+from platformdirs import user_data_path
 
 from item.common import paths
 from item.remote import OpenKAPSARC, get_sdmx
 from item.structure import generate
+from item.util import metadata_repo_file
 
 log = logging.getLogger(__name__)
 
 
 #: Path for output from :func:`process`.
-OUTPUT_PATH = paths["data"] / "historical" / "output"
+OUTPUT_PATH = user_data_path("item").joinpath("historical", "output")
 
 #: Non-ISO 3166 names that appear in 1 or more data sets. These are used in
 #: :meth:`iso_alpha_3` to replace names before they are looked up using
@@ -74,17 +76,7 @@ COUNTRY_NAME = {
 }
 
 
-# TODO don't do this every time this file is imported; add a utility function somewhere
-# to generate it, like .structure.generate().
-#: Map from ISO 3166 alpha-3 code to iTEM region name.
-REGION = {}
-# Populate the map from the regions.yaml file
-with open(paths["data"] / "model" / "regions.yaml") as file:
-    for region_name, info in yaml.safe_load(file).items():
-        REGION.update({c: region_name for c in info["countries"]})
-
-
-with open(paths["data"] / "historical" / "sources.yaml") as f:
+with open(metadata_repo_file("historical", "sources.yaml")) as f:
     #: The current version of the file is always accessible at
     #: https://github.com/transportenergy/metadata/blob/master/historical/sources.yaml
     SOURCES = yaml.safe_load(f)
@@ -107,7 +99,7 @@ def cache_results(id_str: str, df: pd.DataFrame) -> None:
       - ``ITEM_REGION``: this gives the name of the iTEM region to which the data
         correspond.
     """
-    OUTPUT_PATH.mkdir(exist_ok=True)
+    OUTPUT_PATH.mkdir(parents=True, exist_ok=True)
 
     # Long format ('programming friendly view')
     path = OUTPUT_PATH / f"{id_str}-clean.csv"
@@ -261,7 +253,7 @@ def process(id: Union[int, str]) -> pd.DataFrame:
     else:
         # Load the data from version stored in the transportenergy/metadata repo
         # TODO remove this option; always fetch from source or cache
-        path = paths["historical input"] / f"{id_str}_input.csv"
+        path = metadata_repo_file("historical", "input", f"{id_str}_input.csv")
 
     # Read the data
     df = pd.read_csv(path, sep=getattr(dataset_module, "CSV_SEP", ","))
@@ -436,7 +428,13 @@ def iso_alpha_3(name: str) -> str:
 @lru_cache()
 def get_item_region(code: str) -> str:
     """Return iTEM region for a country's ISO 3166 alpha-3 `code`, or “N/A”."""
-    return REGION.get(code, "N/A")
+    from item.model.structure import get_cl_region
+
+    for region_code in get_cl_region():
+        if code in region_code.child:
+            return region_code.id
+
+    return "N/A"
 
 
 @lru_cache()

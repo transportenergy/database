@@ -1,5 +1,13 @@
 import pandas as pd
 
+from .common import ModelInfo
+
+INFO = ModelInfo(
+    id="bp",
+    format="xlsx",
+    versions=(2,),
+)
+
 
 def import_data(data_path, metadata_path):
     input_fn = data_path

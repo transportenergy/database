@@ -28,13 +28,16 @@ classifiers = [
 requires-python = ">=3.9"
 dependencies = [
   "click",
+  "filelock",
   "iam-units",
   "openpyxl",
   "pandas",
   "Pint",
   "plotnine",
+  "pooch",
   "pycountry",
   "pyyaml",
+  "transport-data",
   "sdmx1 >= 2.8.0",
   "xarray",
 ]
@@ -48,10 +51,10 @@ doc = ["furo", "Sphinx"]
 eppa = ["gdx >= 3"]
 hist = ["Jinja2", "requests"]
 tests = [
-  "transport-energy[doc]",
-  "transport-energy[hist]",
+  "transport-energy[doc,hist]",
   "pytest",
   "pytest-cov",
+  "pytest-xdist",
 ]
 
 [project.scripts]
@@ -82,10 +85,10 @@ packages = ["item"]
 [tool.hatch.version]
 source = "uv-dynamic-versioning"
 
-
 [[tool.mypy.overrides]]
 module = [
   "gdx",
+  "pooch",
 ]
 ignore_missing_imports = true
 
