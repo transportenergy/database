@@ -56,6 +56,7 @@ jobs:
     - name: Set up uv, Python
       uses: astral-sh/setup-uv@v6
       with:
+        activate-environment: true
         cache-dependency-glob: "**/pyproject.toml"
         python-version: ${{ matrix.version.python }}
 
@@ -96,6 +97,7 @@ jobs:
     - name: Set up uv, Python
       uses: astral-sh/setup-uv@v6
       with:
+        activate-environment: true
         cache-dependency-glob: "**/pyproject.toml"
         python-version: "3.13"
 
