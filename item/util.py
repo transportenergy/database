@@ -1,11 +1,14 @@
 import logging
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import TYPE_CHECKING, Optional, Sequence, Union, cast
 
 import pandas as pd
 import pooch
 from iam_units import registry
 from platformdirs import user_cache_path
+
+if TYPE_CHECKING:
+    from numpy import ndarray
 
 log = logging.getLogger(__name__)
 
@@ -42,10 +45,16 @@ def convert_units(
     ]
 
     # Create a vector pint.Quantity; convert units
-    qty = registry.Quantity(df[cols[0]].values, units_from).to(units_to)
+    qty = registry.Quantity(cast("ndarray", df[cols[0]].values), units_from).to(
+        units_to
+    )
 
     # Assign magnitude and unit columns in output DataFrame
-    return df.assign(**{cols[0]: qty.magnitude, cols[1]: f"{qty.units:~}"})
+    kwargs: dict[str, Union[ndarray, str]] = {
+        cols[0]: qty.magnitude,
+        cols[1]: f"{qty.units:~}",
+    }
+    return df.assign(**kwargs)
 
 
 def dropna_logged(df, column, log_columns=[]):
