@@ -11,7 +11,7 @@ from item.common import paths
 from item.remote import OpenKAPSARC
 
 # Define a registry for tracking of units, and add units appearing in the data.
-ureg = pint.UnitRegistry()
+ureg: "pint.UnitRegistry" = pint.UnitRegistry()
 ureg.define(
     """
 idx_2005_100 = [index]
