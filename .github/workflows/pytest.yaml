@@ -74,7 +74,7 @@ jobs:
       shell: bash
 
     - name: Upload test coverage to Codecov.io
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@v6
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -115,7 +115,7 @@ jobs:
         item historical diagnostics output/
         rclone --progress copy output ${{ env.gcs_bucket }}${{ github.run_id }}/
 
-    - uses: LouisBrunner/checks-action@v2.0.0
+    - uses: LouisBrunner/checks-action@v3.0.0
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         name: Upload historical database & diagnostics
