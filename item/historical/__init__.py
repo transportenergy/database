@@ -441,10 +441,8 @@ def get_item_region(code: str) -> str:
 def get_country_name(code: str) -> str:
     """Return the country name for a country's ISO 3166 alpha-3 `code`."""
     for db in (pycountry.countries, pycountry.historic_countries):
-        try:
-            return db.get(alpha_3=code).name
-        except AttributeError:
-            continue
+        if match := db.get(alpha_3=code):
+            return match.name
 
     # Possibly an area code like "B0"
     sm = generate()
