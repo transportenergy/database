@@ -5,14 +5,21 @@ from functools import lru_cache
 from importlib import import_module
 from pathlib import Path
 from typing import Dict, Optional, Union
+import transport_data 
+from transport_data import adb
 
 import pandas as pd
 import pycountry
 import yaml
 from platformdirs import user_data_path
 
+import sdmx
+from typing import Optional
+import io
+
 from item.common import paths
 from item.remote import OpenKAPSARC, get_sdmx
+from item.remote.sdmx_from_file import get_sdmx_from_file, check_ADB_SDMX
 from item.structure import generate
 from item.util import metadata_repo_file
 
@@ -158,7 +165,6 @@ def fetch_source(id: Union[int, str], use_cache: bool = True) -> Path:
     # Retrieve source information from sources.yaml
     id = source_str(id)
     source_info = deepcopy(SOURCES[id])
-
     # Path for cached data. NB OpenKAPSARC does its own caching
     cache_path = paths["historical input"] / f"{id}.csv"
 
@@ -177,6 +183,9 @@ def fetch_source(id: Union[int, str], use_cache: bool = True) -> Path:
         # Retrieve data using the OpenKAPSARC API
         ok_api = OpenKAPSARC(api_key=os.environ.get("OK_API_KEY", None))
         result = ok_api.table(**fetch_info)
+    elif remote_type.lower() == "adb":
+        check_ADB_SDMX()
+        result = get_sdmx_from_file(fetch_info)
     else:
         raise ValueError(remote_type)
 
@@ -287,12 +296,15 @@ def process(id: Union[int, str]) -> pd.DataFrame:
     log.info(f"{len(df)} observations")
 
     if "REF_AREA" not in df.columns:
+        if "ECONOMY" in df.columns:
+            df=df.assign(REF_AREA=df["ECONOMY"])
         # Assign ISO 3166 alpha-3 codes from a country name column
-        country_col = COLUMNS.get("country_name", "Country")
+        else:
+            country_col = COLUMNS.get("country_name", "Country")
 
         # Use pandas.Series.apply() to apply the same function to each entry in
         # the column. Join these to the existing data frame as additional columns.
-        df = df.assign(REF_AREA=df[country_col].apply(iso_alpha_3))
+            df = df.assign(REF_AREA=df[country_col].apply(iso_alpha_3))
 
     df = df.rename(columns=dim_id_for_column_name)
 
@@ -332,13 +344,14 @@ def process(id: Union[int, str]) -> pd.DataFrame:
     )
 
     # Check for missing values
+    
     rows = df.isna().any(axis=1)
     if rows.any():
         log.error(f"Incomplete; missing values in {rows.sum()} rows:")
         print(df[rows])
         print(df[rows].head(1).transpose())
         raise RuntimeError
-
+    
     # Save the result to cache
     cache_results(id_str, df)
 
