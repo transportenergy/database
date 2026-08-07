@@ -30,13 +30,11 @@ jobs:
         - windows-latest
 
         version:
-        # Pint 0.24 with numpy 2.0 compatibility is not available for Python 3.9.
-        # Use earlier numpy to be compatible with pint < 0.24.
-        - { python: "3.9",  others: "'numpy < 2'" }
         - { python: "3.10", others: "" }
         - { python: "3.11", others: "" }
         - { python: "3.12", others: "" }
         - { python: "3.13", others: "" }
+        - { python: "3.14", others: "" }
 
         # TEMPORARY Never run diagnostics
         run-diagnostics:
@@ -54,10 +52,9 @@ jobs:
         submodules: true
 
     - name: Set up uv, Python
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@v8.0.0
       with:
         activate-environment: true
-        cache-dependency-glob: "**/pyproject.toml"
         python-version: ${{ matrix.version.python }}
 
     - name: Install the Python package and its dependencies
@@ -95,11 +92,10 @@ jobs:
         submodules: true
 
     - name: Set up uv, Python
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@v8.0.0
       with:
         activate-environment: true
-        cache-dependency-glob: "**/pyproject.toml"
-        python-version: "3.13"
+        python-version: "3.14"
 
     - name: Install the Python package and its dependencies
       run: uv pip install .[tests]
@@ -131,11 +127,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v7
-    - uses: astral-sh/setup-uv@v7
-      with:
-        cache-dependency-glob: "**/pyproject.toml"
-        python-version: "3.13"
-    - uses: actions/cache@v5
+    - uses: astral-sh/setup-uv@v8.0.0
+      with: { python-version: "3.14" }
+    - uses: actions/cache@v6
       with:
         path: ~/.cache/pre-commit
         key: pre-commit|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
