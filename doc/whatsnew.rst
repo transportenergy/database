@@ -6,6 +6,9 @@ What's new?
 Next release
 ============
 
+- Python 3.14 (`released 2025-10-07 <https://www.python.org/downloads/release/python-3140/>`_) is fully supported (:pull:`111`).
+- Python 3.9 support is dropped, as `it has reached end-of-life <https://peps.python.org/pep-0569/#lifespan>`__ (:pull:`111`).
+  :mod:`item` requires Python 3.10 or later.
 - Drop submodule/packaging of transportenergy/metadata (:pull:`99`);
   instead, fetch these files over the network and cache them.
 - New class :class:`.ModelInfo` (:pull:`99`),
