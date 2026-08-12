@@ -1,0 +1,52 @@
+Country,ISO Code,Region,Variable,Unit,Vehicle Type,Technology,Fuel,ID,Mode,Source,Service,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,Data quality flag
+Afghanistan,AFG,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,0.202,0.232,0.229,!
+Armenia,ARM,Non-EU Europe,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,2.209,2.022,1.562,1.711800049,1.867,1.974099976,2.1313,2.5585,2.6695,2.7417,2.515,2.5115,!
+Australia,AUS,Australia,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,288.158,290.28,298.89,302.123,302.369,301.45,303.8,!
+Azerbaijan,AZE,Non-EU Europe,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,9.153,9.442,9.603,9.861,10.279,10.892,11.786,12.893,14.041,15.291,16.633,!
+Bangladesh,BGD,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Bhutan,BTN,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Brunei Darussalam,BRN,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Cambodia,KHM,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,0.201,0.201,0.201,,,,,,,,,,!
+China,CHN,China,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,619.92,665.74,720.71,780.577,769.56,874.84,929.208,1013.085,1150.677,1247.611,1351.144,1502.081,!
+Cook Islands,COK,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Fiji,FJI,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Georgia,GEO,Non-EU Europe,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,5.15,5.2,5.252,5.2692,5.4167,5.5684,5.7243,5.884600000000001,!
+India,IND,India,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Indonesia,IDN,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Japan,JPN,Japan,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,955.564,951.252,954.294,955.412,954.187,947.562,,933.0,,919.0,905.907,898.721,!
+Kazakhstan,KAZ,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,80.824,85.24,91.651,100.865,103.381,106.878,110.47460000000001,126.21260000000001,!
+Kiribati,KIR,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Kyrgyzstan,KGZ,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,4.112100098,4.6215,5.033199707,5.080800293,5.273699707,5.623899902,5.8742,6.1168000000000005,6.4681999999999995,6.745,7.1567,7.2095,!
+Lao People's Democratic Republic,LAO,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,1.7235,2.0788,1.6759000000000002,1.8693,2.1143,2.1134,2.1971999999999996,,!
+Malaysia,MYS,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Maldives,MDV,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Marshall Islands,MHL,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+"Micronesia, Federated States of",FSM,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Mongolia,MNG,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,0.358,0.3885,0.256,0.7612000122,0.5565,0.6446000000000001,0.6397999999999999,0.6484,0.8697,1.215,1.5359,1.4802,!
+Myanmar,MMR,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Niue,NIU,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Nauru,NRU,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Nepal,NPL,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+New Zealand,NZL,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Pakistan,PAK,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,185.236,197.013,209.959,,,,263.788,,,,286.436,300.471,!
+Palau,PLW,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Papua New Guinea,PNG,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Philippines,PHL,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+"Korea, Republic of",KOR,South Korea,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,83.216,91.665,97.854,119.569,104.152,100.617,79.44,!
+Samoa,WSM,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Singapore,SGP,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,5.634,5.964,5.762,5.675,!
+Solomon Islands,SLB,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Sri Lanka,LKA,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,17.956,19.864,21.204,21.067,,,,,,,,,!
+Tajikistan,TJK,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Thailand,THA,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Timor-Leste,TLS,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Tonga,TON,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Turkmenistan,TKM,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Tuvalu,TUV,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Uzbekistan,UZB,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,47.9,55.8,62.8336,67.95410000000001,!
+Vanuatu,VUT,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Viet Nam,VNM,Other Asia-Pacific,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,30.4585,34.2656,38.601699999999994,43.5691,49.372099999999996,54.2211,61.5088,69.19739999999999,!
+Hong Kong,HKG,China,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+"Taiwan, Province of China",TWN,China,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+"Iran, Islamic Republic of",IRN,Middle East,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,,,,,,,!
+Russian Federation,RUS,Russia,Passenger Activity,10^9 passenger-km / yr,All,All,All,T013,Road,ATO2023 TAS-PAG-005(2),Passenger,,,,,,,142.4,136.1,150.0,152.2,139.2,140.7,!

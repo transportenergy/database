@@ -5,7 +5,7 @@ from item.util import convert_units, dropna_logged
 log = logging.getLogger(__name__)
 
 #: iTEM data flow matching the data from this source.
-DATAFLOW = "ACTIVITY"
+DATAFLOW = "SALES"
 FETCH = True
 
 #: Dimensions and attributes which do not vary across this data set.
@@ -15,19 +15,19 @@ COMMON_DIMS = dict(
     # There is only one activity being perform in this dataset and that is the
     # "Freight Activity". We are setting, for each row, the variable "Freight
     # Activity"
-    variable="Freight Activity",
+    variable="Sales (New Vehicles)",
     # Add the same source to all rows since all data comes from the same source
     source="ATO",
     # Since all the data is associated to "Freight," the Service is "Freight"
-    service="F",
+    service="P",
     # The dataset does not provide any data about those two columns, so we
     # add the default value of "All" in both cases
-    technology="All",
+    technology="_T",
     # Since all the data is about shipping, all rows have "Shipping" as mode
-    mode="Rail",
+    mode="Road",
     # Since all the data in this dataset is associted to coastal shipping, the
     # vehicle type is "Coastal"
-    vehicle="All",
+    vehicle="LDV",
     automation="_T",
     operator="_T",
     fleet="_T"
@@ -48,14 +48,19 @@ COLUMNS = dict(
 
 def check(df):
     # Input data have the expected units
-    assert df["UNITS"].unique() == ["Million tonne kilometers"]
+    assert df["UNITS"].unique() == ["Number"]
 
 
 def process(df):
+    """Process data set T001.
+
+    - Drop null values.
+    - Convert from Mt km / year to Gt km / year.
+    """
     # Drop rows with nulls in "Value"; log corresponding values in "Country"
     # TODO read the preferred units (here 'Gt km / year') from a common location
     df = df.pipe(dropna_logged, "value", ["ECONOMY"]).pipe(
-        convert_units, "Mt km/year", "Gt km/year"
+        convert_units, "vehicle", "Mvehicle"
     )
 
     return df
