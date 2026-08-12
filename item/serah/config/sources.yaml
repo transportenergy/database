@@ -1,0 +1,55 @@
+T018:
+  Name: Freight Transport - Tonne-km for Roads
+  Variable: Freight Activity
+  Service: Freight
+  Unit: 10^9 tonne-km / yr
+  Unit Factor: 1000
+  Source Prefix: ATO2023
+  Mode: Road
+  Vehicle Type:
+    Road freight transport: All
+    Road freight transport for hire and reward: For Hire and Reward
+    Road freight transport on own account: For Own Account
+    Rail freight transport: All
+    Pipelines transport: Pipeline
+    Inland waterways freight transport: Inland
+    Total inland freight transport: All
+    Inland (exl. Pipeline): All
+    Default: All
+  Technology: All
+  Fuel: All
+  Fill years from: 1950
+T019:
+  Name: Freight Transport - Tonne-km for Aviation (Domestic)
+  Variable: Freight Activity
+  Service: Freight
+  Unit: 10^9 tonne-km / yr
+  Unit Factor: 1000
+  Source Prefix: ATO2023
+  Mode: Aviation (Domestic)
+  Vehicle Type:
+     Total inland passenger transport is: All
+     Rail passenger transport is: All
+     Road passenger transport by passenger cars is: LDV
+     Road passenger transport by buses and coaches is: Bus
+     Default: All
+  Technology: All
+  Fuel: All
+  Fill years from: 1950
+T020:
+  Name: Vehicle registration  (Bus)
+  Variable: Stock
+  Service: Passenger
+  Unit: 10^6 vehicle
+  Unit Factor: 1000000
+  Source Prefix: ATO2023
+  Mode: Road
+  Vehicle Type:
+     Total inland passenger transport is: All
+     Rail passenger transport is: All
+     Road passenger transport by passenger cars is: LDV
+     Road passenger transport by buses and coaches is: Bus
+     Default: Bus
+  Technology: All
+  Fuel: All
+  Fill years from: 1950
