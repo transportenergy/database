@@ -51,9 +51,9 @@ def process(df):
         df.rename(columns=COLUMNS["rename"])
         .assign(
             SERVICE=lambda df_: df_["VEHICLE"].apply(map_service),
-            TECHNOLOGY=lambda df_: df_["fuel_type_name"]
-            .str.lstrip("- ")
-            .replace({"Total": "_T"}),
+            TECHNOLOGY=lambda df_: (
+                df_["fuel_type_name"].str.lstrip("- ").replace({"Total": "_T"})
+            ),
         )
         .drop(columns=["fuel_type_name"])
     )

@@ -50,10 +50,9 @@ def process(df):
             value_name="Value",
         )
         .assign(
-            Value=lambda df_: df_["Value"]
-            .str.replace(" ", "")
-            .replace("...", "NaN")
-            .astype(float)
+            Value=lambda df_: (
+                df_["Value"].str.replace(" ", "").replace("...", "NaN").astype(float)
+            )
         )
         .pipe(dropna_logged, "Value", [COLUMNS["country_name"]])
         .pipe(convert_units, "kpassenger", "Mpassenger")
